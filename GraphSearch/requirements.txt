@@ -1,0 +1,15 @@
+# GraphSearch client deps.
+#
+# This file is kept only for users who want to install the GraphSearch
+# client without installing the whole repo-root package (`pip install -e .`).
+# The recommended setup is the single-venv flow described in the repo README.
+#
+# vllm is intentionally dropped -- the client talks to a remote
+# OpenAI-compatible endpoint by default. Opt in to a local GPU vLLM runtime
+# with `pip install -e .[train]` from the repo root.
+
+numpy>=1.23
+aiohttp>=3.9
+tqdm>=4.66
+python-dotenv>=1.0.0
+openai>=1.0.0

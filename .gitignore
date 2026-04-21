@@ -1,0 +1,38 @@
+# Python bytecode / build artifacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+build/
+dist/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+conda_env/
+
+# Environment / secrets
+.env
+!.env.example
+
+# Logs & local outputs
+*.log
+logs/
+outputs/
+
+# OS cruft
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+
+RAGSearch/Search-o1/data/
+
+
+venvs/
+
+.env

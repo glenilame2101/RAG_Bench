@@ -1,0 +1,19 @@
+{
+    "total_runtime": 131.51044082641602,
+    "num_documents": 2,
+    "input_load_time": 0,
+    "workflows": {
+        "create_base_text_units": {
+            "overall": 1.3004024028778076,
+            "0_create_base_text_units": 1.3004024028778076
+        },
+        "create_final_documents": {
+            "overall": 0.006510019302368164,
+            "0_create_final_documents": 0.006510019302368164
+        },
+        "extract_graph": {
+            "overall": 129.9280924797058,
+            "0_extract_graph": 129.92709279060364
+        }
+    }
+}

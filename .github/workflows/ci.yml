@@ -1,0 +1,76 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  venv-smoke:
+    name: single-venv smoke test (no vllm / no CUDA)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Create single .venv and install core
+        run: |
+          python -m venv .venv
+          . .venv/bin/activate
+          python -m pip install --upgrade pip
+          # Install the base package (no extras) -- this is the clean path
+          # that must work without vllm / CUDA / flash-attn.
+          pip install -e .
+
+      - name: Import package + CLI smoke test
+        run: |
+          . .venv/bin/activate
+          python -c "import ragsearch_bench; print(ragsearch_bench.__version__)"
+          ragbench --help
+          ragbench env-check || true   # expected to report "URL unset"
+
+      - name: Guard: no top-level vllm import in client scripts
+        run: |
+          . .venv/bin/activate
+          # Every Search-o1 run_*.py must import without vllm installed.
+          # We assert vllm is NOT present in the venv, then parse each script.
+          python - <<'PY'
+          import ast, pathlib, sys
+          try:
+              import vllm  # noqa: F401
+              print("ERROR: vllm should NOT be installed in the base venv", file=sys.stderr)
+              sys.exit(1)
+          except ImportError:
+              pass
+          root = pathlib.Path("Search-o1/scripts")
+          bad = []
+          for p in sorted(root.glob("run_*.py")):
+              try:
+                  tree = ast.parse(p.read_text())
+              except SyntaxError as e:
+                  print(f"WARN: cannot parse {p}: {e}", file=sys.stderr)
+                  continue
+              # Collect nodes inside any Try.body (those imports are guarded).
+              try_nodes = set()
+              for parent in ast.walk(tree):
+                  if isinstance(parent, ast.Try):
+                      for body_stmt in parent.body:
+                          for sub in ast.walk(body_stmt):
+                              try_nodes.add(id(sub))
+              for node in ast.walk(tree):
+                  if isinstance(node, ast.ImportFrom) and node.module == "vllm":
+                      if id(node) not in try_nodes:
+                          bad.append(f"{p}:{node.lineno}")
+          if bad:
+              print("Unguarded top-level `from vllm import ...` found:", file=sys.stderr)
+              for b in bad:
+                  print(" -", b, file=sys.stderr)
+              sys.exit(1)
+          print("OK: no unguarded top-level vllm imports")
+          PY
