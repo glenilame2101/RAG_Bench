@@ -12,12 +12,15 @@ is used; otherwise a minimal parser walks the directory tree looking for a
 """
 from __future__ import annotations
 
+import hashlib
+import json
 import os
 from pathlib import Path
-from typing import Iterable, List, Optional, Sequence, Tuple
+from typing import Iterable, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 import requests
+from tqdm import tqdm
 
 
 def _parse_env_file(path: Path) -> None:
@@ -142,6 +145,151 @@ class EmbeddingClient:
         if isinstance(text, str):
             return self.encode([text])[0]
         return self.encode(text)
+
+    def _fingerprint(self, texts: Sequence[str]) -> str:
+        """Stable hash of the input set; used to refuse mismatched resumes."""
+        h = hashlib.sha256()
+        h.update(self.model.encode("utf-8"))
+        h.update(str(len(texts)).encode("utf-8"))
+        if texts:
+            h.update(texts[0][:1000].encode("utf-8", errors="replace"))
+            h.update(texts[-1][:1000].encode("utf-8", errors="replace"))
+            mid = texts[len(texts) // 2]
+            h.update(mid[:1000].encode("utf-8", errors="replace"))
+        return h.hexdigest()
+
+    def encode_with_checkpoint(
+        self,
+        texts: Sequence[str],
+        checkpoint_dir: Union[str, Path],
+        batch_size: int = 32,
+        normalize: bool = True,
+        save_every_pct: float = 1.0,
+    ) -> np.ndarray:
+        """Embed `texts`, saving partial progress to `checkpoint_dir` every
+        `save_every_pct` percent of total work.
+
+        On re-invocation with the same input set, picks up where it left off.
+        Refuses to resume if model name or input fingerprint differ.
+
+        Layout under `checkpoint_dir`:
+            state.json       — {model, total, completed, fingerprint, ...}
+            emb_000000.npy   — first chunk of saved embeddings
+            emb_000001.npy   — ...
+            (concatenated in order to produce the final array)
+        """
+        texts = list(texts)
+        n_total = len(texts)
+        if n_total == 0:
+            return np.zeros((0, 0), dtype=np.float32)
+
+        ckpt_dir = Path(checkpoint_dir)
+        ckpt_dir.mkdir(parents=True, exist_ok=True)
+        state_path = ckpt_dir / "state.json"
+
+        fingerprint = self._fingerprint(texts)
+
+        completed = 0
+        loaded_chunks: List[np.ndarray] = []
+        if state_path.exists():
+            try:
+                state = json.loads(state_path.read_text(encoding="utf-8"))
+            except json.JSONDecodeError as exc:
+                raise SystemExit(
+                    f"Checkpoint state at {state_path} is corrupt ({exc}). "
+                    f"Delete the directory to start over."
+                )
+            if state.get("fingerprint") != fingerprint:
+                raise SystemExit(
+                    f"Checkpoint at {ckpt_dir} was created from a different input set "
+                    f"(model/count/text fingerprint mismatch). Delete the directory or "
+                    f"use a different --output-dir."
+                )
+            completed = int(state.get("completed", 0))
+            for f in sorted(ckpt_dir.glob("emb_*.npy")):
+                loaded_chunks.append(np.load(f))
+            loaded_count = sum(c.shape[0] for c in loaded_chunks)
+            if loaded_count != completed:
+                raise SystemExit(
+                    f"Checkpoint inconsistent: state.json says {completed} done but "
+                    f"found {loaded_count} embeddings on disk in {ckpt_dir}."
+                )
+            if completed >= n_total:
+                print(f"[Embed] Checkpoint already complete ({completed}/{n_total})")
+                return np.vstack(loaded_chunks)
+            print(f"[Embed] Resuming from checkpoint: {completed}/{n_total} done")
+
+        save_every = max(batch_size, int(n_total * save_every_pct / 100))
+        next_chunk_index = len(loaded_chunks)
+        new_chunks: List[np.ndarray] = []
+        pending: List[np.ndarray] = []
+        pending_count = 0
+
+        bar = tqdm(
+            total=n_total,
+            initial=completed,
+            desc="[Embed] Embedding",
+            unit="chunk",
+        )
+        try:
+            for start in range(completed, n_total, batch_size):
+                batch = texts[start : start + batch_size]
+                data = self._post({"model": self.model, "input": batch})
+                for item in data["data"]:
+                    vec = np.asarray(item["embedding"], dtype=np.float32)
+                    if normalize:
+                        norm = float(np.linalg.norm(vec))
+                        if norm > 0.0:
+                            vec = vec / norm
+                    pending.append(vec)
+                pending_count += len(batch)
+                bar.update(len(batch))
+
+                if pending_count >= save_every:
+                    arr = np.vstack(pending)
+                    np.save(ckpt_dir / f"emb_{next_chunk_index:06d}.npy", arr)
+                    new_chunks.append(arr)
+                    next_chunk_index += 1
+                    completed += pending_count
+                    state_path.write_text(
+                        json.dumps(
+                            {
+                                "model": self.model,
+                                "total": n_total,
+                                "completed": completed,
+                                "batch_size": batch_size,
+                                "normalize": normalize,
+                                "fingerprint": fingerprint,
+                            }
+                        ),
+                        encoding="utf-8",
+                    )
+                    pending = []
+                    pending_count = 0
+
+            if pending:
+                arr = np.vstack(pending)
+                np.save(ckpt_dir / f"emb_{next_chunk_index:06d}.npy", arr)
+                new_chunks.append(arr)
+                completed += pending_count
+                state_path.write_text(
+                    json.dumps(
+                        {
+                            "model": self.model,
+                            "total": n_total,
+                            "completed": completed,
+                            "batch_size": batch_size,
+                            "normalize": normalize,
+                            "fingerprint": fingerprint,
+                        }
+                    ),
+                    encoding="utf-8",
+                )
+        finally:
+            bar.close()
+
+        all_chunks = loaded_chunks + new_chunks
+        return np.vstack(all_chunks)
 
 
 class RerankerClient:

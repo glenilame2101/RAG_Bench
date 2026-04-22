@@ -118,10 +118,23 @@ def call_retriever(url: str, query: str) -> str:
 
 
 def evaluate_single(question_data: Dict, retriever_url: str) -> Dict[str, Any]:
-    question = question_data.get("question") or question_data.get("query") or ""
-    gold = question_data.get("answer") or question_data.get("answers") or []
-    if isinstance(gold, str):
-        gold = [gold]
+    question = (
+        question_data.get("question")
+        or question_data.get("query")
+        or question_data.get("problem")           # MATH500, AIME, AMC
+        or question_data.get("question_content")  # LiveCodeBench
+        or ""
+    )
+    gold = (
+        question_data.get("answer")
+        or question_data.get("answers")
+        or question_data.get("golden_answers")    # FlashRAG: bamboogle, hotpotqa, 2wiki, etc.
+        or []
+    )
+    if isinstance(gold, (str, int, float)):
+        gold = [str(gold)]
+    elif isinstance(gold, list):
+        gold = [str(g) for g in gold]
     retrieved = call_retriever(retriever_url, question)
     return {
         "question": question,

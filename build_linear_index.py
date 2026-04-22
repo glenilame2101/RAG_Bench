@@ -12,7 +12,9 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import List
+from typing import List, Optional
+
+from tqdm import tqdm
 
 REPO_ROOT = Path(__file__).resolve().parent
 # LinearRAG.src.LinearRAG resolves through a namespace package rooted at
@@ -29,11 +31,16 @@ from LinearRAG.src.utils import LLM_Model  # noqa: E402
 TEXT_FIELDS = ("contents", "text", "content", "document", "body")
 
 
-def load_corpus(corpus_path: str) -> List[str]:
+def load_corpus(corpus_path: str, partial_pct: Optional[float] = None) -> List[str]:
     path = Path(corpus_path)
     if path.is_dir():
+        files = sorted(path.glob("*.txt"))
+        if partial_pct is not None:
+            n = max(1, int(len(files) * partial_pct / 100))
+            print(f"[Linear] --partial-index {partial_pct}%: using {n} of {len(files)} files")
+            files = files[:n]
         passages: List[str] = []
-        for i, file_path in enumerate(sorted(path.glob("*.txt"))):
+        for i, file_path in enumerate(tqdm(files, desc="[Linear] Loading files", unit="file")):
             content = file_path.read_text(encoding="utf-8").strip()
             if content:
                 passages.append(f"{i}: {content}")
@@ -42,9 +49,20 @@ def load_corpus(corpus_path: str) -> List[str]:
     if not path.is_file():
         raise FileNotFoundError(f"Corpus path not found: {path}")
 
+    target_lines: Optional[int] = None
+    if partial_pct is not None:
+        print(f"[Linear] --partial-index {partial_pct}%: counting lines in {path}...")
+        with path.open("r", encoding="utf-8") as fh:
+            total = sum(1 for _ in fh)
+        target_lines = max(1, int(total * partial_pct / 100))
+        print(f"[Linear] Loading first {target_lines} of {total} lines")
+
     passages: List[str] = []
     with path.open("r", encoding="utf-8") as fh:
-        for i, raw in enumerate(fh):
+        bar = tqdm(fh, desc="[Linear] Loading corpus", unit=" line", total=target_lines)
+        for i, raw in enumerate(bar):
+            if target_lines is not None and i >= target_lines:
+                break
             line = raw.strip()
             if not line:
                 continue
@@ -72,7 +90,12 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.strip())
     parser.add_argument("--corpus", required=True, help="Path to JSONL corpus or directory of .txt files")
     parser.add_argument("--output-dir", required=True, help="Directory containing the LinearRAG index files")
-    parser.add_argument("--name", required=True, help="Dataset subdirectory name under --output-dir")
+    parser.add_argument(
+        "--name",
+        default="default",
+        help="Dataset subdirectory under --output-dir (default: 'default'). "
+             "Override only if you want to keep multiple LinearRAG datasets in one --output-dir.",
+    )
     parser.add_argument("--embedding-base-url", default=None, help="Override EMBEDDING_BASE_URL")
     parser.add_argument("--embedding-model", default=None, help="Override EMBEDDING_MODEL")
     parser.add_argument("--llm-base-url", default=None, help="Override OPENAI_BASE_URL (used for LLM_Model)")
@@ -80,9 +103,18 @@ def main() -> None:
     parser.add_argument("--spacy-model", default="en_core_web_sm", help="spaCy model used for NER")
     parser.add_argument("--max-workers", type=int, default=4)
     parser.add_argument("--batch-size", type=int, default=32)
+    parser.add_argument(
+        "--partial-index",
+        type=float,
+        default=None,
+        help="Index only the first N%% of the corpus (e.g., 10 = first 10%%)",
+    )
     args = parser.parse_args()
 
-    passages = load_corpus(args.corpus)
+    if args.partial_index is not None and not (0 < args.partial_index <= 100):
+        raise SystemExit("--partial-index must be in (0, 100]")
+
+    passages = load_corpus(args.corpus, partial_pct=args.partial_index)
     if not passages:
         raise SystemExit(f"No passages loaded from {args.corpus}")
     print(f"[Linear] Loaded {len(passages)} passages from {args.corpus}")

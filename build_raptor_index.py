@@ -10,12 +10,14 @@ from __future__ import annotations
 import argparse
 import json
 import pickle
+import shutil
 from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import numpy as np
-from sklearn.cluster import KMeans
+from sklearn.cluster import KMeans, MiniBatchKMeans
+from tqdm import tqdm
 
 from rag_clients import EmbeddingClient, load_env
 
@@ -23,11 +25,16 @@ from rag_clients import EmbeddingClient, load_env
 TEXT_FIELDS = ("contents", "text", "content", "document", "body")
 
 
-def load_corpus(corpus_path: str) -> List[str]:
+def load_corpus(corpus_path: str, partial_pct: Optional[float] = None) -> List[str]:
     path = Path(corpus_path)
     if path.is_dir():
+        files = sorted(path.glob("*.txt"))
+        if partial_pct is not None:
+            n = max(1, int(len(files) * partial_pct / 100))
+            print(f"[Raptor] --partial-index {partial_pct}%: using {n} of {len(files)} files")
+            files = files[:n]
         out = []
-        for file_path in sorted(path.glob("*.txt")):
+        for file_path in tqdm(files, desc="[Raptor] Loading files", unit="file"):
             content = file_path.read_text(encoding="utf-8").strip()
             if content:
                 out.append(content)
@@ -35,9 +42,20 @@ def load_corpus(corpus_path: str) -> List[str]:
     if not path.is_file():
         raise FileNotFoundError(f"Corpus path not found: {path}")
 
+    target_lines: Optional[int] = None
+    if partial_pct is not None:
+        print(f"[Raptor] --partial-index {partial_pct}%: counting lines in {path}...")
+        with path.open("r", encoding="utf-8") as fh:
+            total = sum(1 for _ in fh)
+        target_lines = max(1, int(total * partial_pct / 100))
+        print(f"[Raptor] Loading first {target_lines} of {total} lines")
+
     out = []
     with path.open("r", encoding="utf-8") as fh:
-        for raw in fh:
+        bar = tqdm(fh, desc="[Raptor] Loading corpus", unit=" line", total=target_lines)
+        for i, raw in enumerate(bar):
+            if target_lines is not None and i >= target_lines:
+                break
             line = raw.strip()
             if not line:
                 continue
@@ -124,6 +142,7 @@ def build_raptor_tree(
     max_tokens: int,
     cluster_size: int,
     batch_size: int,
+    checkpoint_dir: Optional[Path] = None,
 ) -> RaptorTree:
     print(f"[Raptor] Chunking {len(texts)} documents...")
     all_chunks = [chunk for text in texts for chunk in chunk_text(text, max_tokens)]
@@ -131,7 +150,16 @@ def build_raptor_tree(
         raise ValueError("No chunks created from input texts")
 
     print(f"[Raptor] Embedding {len(all_chunks)} chunks via {embedder.base_url} ({embedder.model})")
-    embeddings = embedder.encode(all_chunks, batch_size=batch_size, normalize=True)
+    if checkpoint_dir is not None:
+        embeddings = embedder.encode_with_checkpoint(
+            all_chunks,
+            checkpoint_dir=checkpoint_dir,
+            batch_size=batch_size,
+            normalize=True,
+            save_every_pct=1.0,
+        )
+    else:
+        embeddings = embedder.encode(all_chunks, batch_size=batch_size, normalize=True)
 
     node_id_counter = 0
     level_nodes: Dict[int, List[TreeNode]] = defaultdict(list)
@@ -151,7 +179,20 @@ def build_raptor_tree(
     while current_level < num_layers - 1 and len(current_nodes) > cluster_size:
         n_clusters = max(1, len(current_nodes) // cluster_size)
         print(f"[Raptor] Clustering level {current_level}: {len(current_nodes)} -> {n_clusters}")
-        kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)
+        # Full KMeans is O(n * k * d * iters * n_init) and gets prohibitive past
+        # ~10k samples (e.g. 40k chunks at d=1024 with k=4k can take hours).
+        # MiniBatchKMeans is the standard sklearn fix for large n — same family
+        # of algorithm, processes data in mini-batches, near-identical quality.
+        if len(current_nodes) > 10_000:
+            kmeans = MiniBatchKMeans(
+                n_clusters=n_clusters,
+                random_state=42,
+                n_init=3,
+                batch_size=4096,
+                max_iter=100,
+            )
+        else:
+            kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init=3)
         labels = kmeans.fit_predict(current_embeddings)
 
         new_nodes: List[TreeNode] = []
@@ -204,12 +245,30 @@ def main() -> None:
     parser.add_argument("--max-tokens", type=int, default=100)
     parser.add_argument("--cluster-size", type=int, default=10)
     parser.add_argument("--batch-size", type=int, default=32)
+    parser.add_argument(
+        "--partial-index",
+        type=float,
+        default=None,
+        help="Index only the first N%% of the corpus (e.g., 10 = first 10%%)",
+    )
+    parser.add_argument(
+        "--no-checkpoint",
+        action="store_true",
+        help="Disable embedding checkpointing (default: checkpoint every 1%% to <output-dir>/.checkpoint/)",
+    )
     args = parser.parse_args()
 
-    texts = load_corpus(args.corpus)
+    if args.partial_index is not None and not (0 < args.partial_index <= 100):
+        raise SystemExit("--partial-index must be in (0, 100]")
+
+    texts = load_corpus(args.corpus, partial_pct=args.partial_index)
     if not texts:
         raise SystemExit(f"No documents loaded from {args.corpus}")
     print(f"[Raptor] Loaded {len(texts)} documents from {args.corpus}")
+
+    output_dir = Path(args.output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    checkpoint_dir = None if args.no_checkpoint else output_dir / ".checkpoint"
 
     embedder = EmbeddingClient(base_url=args.embedding_base_url, model=args.embedding_model)
     tree = build_raptor_tree(
@@ -219,14 +278,17 @@ def main() -> None:
         max_tokens=args.max_tokens,
         cluster_size=args.cluster_size,
         batch_size=args.batch_size,
+        checkpoint_dir=checkpoint_dir,
     )
 
-    output_dir = Path(args.output_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
     tree_path = output_dir / "tree.pkl"
     with tree_path.open("wb") as fh:
         pickle.dump(tree, fh)
     print(f"[Raptor] Wrote {tree_path}")
+
+    if checkpoint_dir is not None and checkpoint_dir.exists():
+        shutil.rmtree(checkpoint_dir)
+        print(f"[Raptor] Cleaned up checkpoint dir {checkpoint_dir}")
 
 
 if __name__ == "__main__":

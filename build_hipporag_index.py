@@ -16,7 +16,9 @@ import logging
 import os
 import sys
 from pathlib import Path
-from typing import List
+from typing import List, Optional
+
+from tqdm import tqdm
 
 REPO_ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(REPO_ROOT / "GraphR1" / "HippoRAG" / "src"))
@@ -33,11 +35,16 @@ logger = logging.getLogger(__name__)
 TEXT_FIELDS = ("contents", "text", "content", "document", "body")
 
 
-def load_corpus(corpus_path: str) -> List[str]:
+def load_corpus(corpus_path: str, partial_pct: Optional[float] = None) -> List[str]:
     path = Path(corpus_path)
     if path.is_dir():
+        files = sorted(path.glob("*.txt"))
+        if partial_pct is not None:
+            n = max(1, int(len(files) * partial_pct / 100))
+            print(f"[HippoRAG] --partial-index {partial_pct}%: using {n} of {len(files)} files")
+            files = files[:n]
         docs = []
-        for file_path in sorted(path.glob("*.txt")):
+        for file_path in tqdm(files, desc="[HippoRAG] Loading files", unit="file"):
             content = file_path.read_text(encoding="utf-8").strip()
             if content:
                 docs.append(content)
@@ -46,9 +53,20 @@ def load_corpus(corpus_path: str) -> List[str]:
     if not path.is_file():
         raise FileNotFoundError(f"Corpus path not found: {path}")
 
+    target_lines: Optional[int] = None
+    if partial_pct is not None:
+        print(f"[HippoRAG] --partial-index {partial_pct}%: counting lines in {path}...")
+        with path.open("r", encoding="utf-8") as fh:
+            total = sum(1 for _ in fh)
+        target_lines = max(1, int(total * partial_pct / 100))
+        print(f"[HippoRAG] Loading first {target_lines} of {total} lines")
+
     docs: List[str] = []
     with path.open("r", encoding="utf-8") as fh:
-        for raw in fh:
+        bar = tqdm(fh, desc="[HippoRAG] Loading corpus", unit=" line", total=target_lines)
+        for i, raw in enumerate(bar):
+            if target_lines is not None and i >= target_lines:
+                break
             line = raw.strip()
             if not line:
                 continue
@@ -81,9 +99,18 @@ def main() -> None:
     parser.add_argument("--llm-base-url", default=None, help="Override OPENAI_BASE_URL")
     parser.add_argument("--llm-model", default=None, help="Override OPENAI_MODEL")
     parser.add_argument("--batch-size", type=int, default=8, help="Number of docs per index() call")
+    parser.add_argument(
+        "--partial-index",
+        type=float,
+        default=None,
+        help="Index only the first N%% of the corpus (e.g., 10 = first 10%%)",
+    )
     args = parser.parse_args()
 
-    docs = load_corpus(args.corpus)
+    if args.partial_index is not None and not (0 < args.partial_index <= 100):
+        raise SystemExit("--partial-index must be in (0, 100]")
+
+    docs = load_corpus(args.corpus, partial_pct=args.partial_index)
     if not docs:
         raise SystemExit(f"No documents loaded from {args.corpus}")
     logger.info(f"Loaded {len(docs)} documents from {args.corpus}")
@@ -116,10 +143,13 @@ def main() -> None:
         embedding_base_url=embedding_base_url,
     )
 
-    for start in range(0, len(docs), args.batch_size):
+    for start in tqdm(
+        range(0, len(docs), args.batch_size),
+        desc="[HippoRAG] Indexing batches",
+        unit="batch",
+    ):
         batch = docs[start : start + args.batch_size]
         rag.index(docs=batch)
-        logger.info(f"Indexed {min(start + args.batch_size, len(docs))}/{len(docs)} docs")
 
     logger.info(f"Index built at: {save_dir}")
 

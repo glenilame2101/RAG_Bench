@@ -60,7 +60,12 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.strip())
     parser.add_argument("--index-dir", required=True)
     parser.add_argument("--port", type=int, required=True)
-    parser.add_argument("--name", required=True, help="Dataset subdirectory under --index-dir")
+    parser.add_argument(
+        "--name",
+        default="default",
+        help="Dataset subdirectory under --index-dir (default: 'default'). "
+             "Override only if you built the index with a non-default --name.",
+    )
     parser.add_argument("--embedding-base-url", default=None)
     parser.add_argument("--embedding-model", default=None)
     parser.add_argument("--llm-base-url", default=None)

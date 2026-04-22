@@ -1,11 +1,18 @@
 # Single, flat requirements file for the entire RAGSearch stack.
-# All retrievers (dense, hipporag, raptor, hypergraph, linear) and the
-# Search-o1 agent run inside one virtual environment built from this file.
+# Three of the five retrievers (dense, raptor, hypergraph) and the Search-o1
+# agent run inside one virtual environment built from this file alone.
 #
-# Forbidden (and not present): vllm, torch, transformers, sentence-transformers,
-# huggingface-hub, gritlm, dspy, litellm, graphrag, boto3, umap-learn.
-# Anything that pulls model weights from HuggingFace or requires a GPU does
-# not belong in this stack.
+# Two retrievers need extra packages that are deliberately NOT pinned here
+# because they pull in heavy deps (model weights, GPU, dspy/litellm) that
+# the rest of the stack avoids. Install them only when you want that
+# retriever:
+#
+#   hipporag   ->  pip install torch
+#   graphrag   ->  pip install graphrag lancedb
+#
+# Forbidden in the base file (still): vllm, transformers, sentence-transformers,
+# huggingface-hub, gritlm, boto3, umap-learn. Anything that pulls model weights
+# from HuggingFace or requires a GPU does not belong in this base stack.
 
 openai>=1.40
 python-dotenv>=1.0

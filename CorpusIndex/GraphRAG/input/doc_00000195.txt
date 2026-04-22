@@ -1,0 +1,2 @@
+"Weyl group"
+3, 4, or 6 depending on whether roots ""i"" and ""j"" make an angle of 90, 120, 135, or 150 degrees, i.e., whether in the Dynkin diagram they are unconnected, connected by a simple edge, connected by a double edge, or connected by a triple edge. We have already noted these relations in the bullet points above, but to say that formula_9 is a Coxeter group, we are saying that those are the ""only"" relations in formula_9. Weyl groups have a Bruhat order and length function in terms of this presentation: the ""length"" of a Weyl group element is the

@@ -13,10 +13,11 @@ import argparse
 import json
 import os
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 import faiss
 import numpy as np
+from tqdm import tqdm
 
 from rag_clients import EmbeddingClient, load_env
 
@@ -24,11 +25,16 @@ from rag_clients import EmbeddingClient, load_env
 TEXT_FIELDS = ("contents", "text", "content", "document", "body")
 
 
-def load_corpus(corpus_path: str) -> List[dict]:
+def load_corpus(corpus_path: str, partial_pct: Optional[float] = None) -> List[dict]:
     path = Path(corpus_path)
     if path.is_dir():
+        files = sorted(path.glob("*.txt"))
+        if partial_pct is not None:
+            n = max(1, int(len(files) * partial_pct / 100))
+            print(f"[Dense] --partial-index {partial_pct}%: using {n} of {len(files)} files")
+            files = files[:n]
         corpus = []
-        for file_path in sorted(path.glob("*.txt")):
+        for file_path in tqdm(files, desc="[Dense] Loading files", unit="file"):
             content = file_path.read_text(encoding="utf-8").strip()
             if content:
                 corpus.append({"id": file_path.stem, "contents": content})
@@ -37,9 +43,20 @@ def load_corpus(corpus_path: str) -> List[dict]:
     if not path.is_file():
         raise FileNotFoundError(f"Corpus path not found: {path}")
 
+    target_lines: Optional[int] = None
+    if partial_pct is not None:
+        print(f"[Dense] --partial-index {partial_pct}%: counting lines in {path}...")
+        with path.open("r", encoding="utf-8") as fh:
+            total = sum(1 for _ in fh)
+        target_lines = max(1, int(total * partial_pct / 100))
+        print(f"[Dense] Loading first {target_lines} of {total} lines")
+
     corpus = []
     with path.open("r", encoding="utf-8") as fh:
-        for raw in fh:
+        bar = tqdm(fh, desc="[Dense] Loading corpus", unit=" line", total=target_lines)
+        for i, raw in enumerate(bar):
+            if target_lines is not None and i >= target_lines:
+                break
             line = raw.strip()
             if not line:
                 continue
@@ -103,9 +120,18 @@ def main() -> None:
     parser.add_argument("--embedding-base-url", default=None, help="Override EMBEDDING_BASE_URL")
     parser.add_argument("--embedding-model", default=None, help="Override EMBEDDING_MODEL")
     parser.add_argument("--batch-size", type=int, default=32)
+    parser.add_argument(
+        "--partial-index",
+        type=float,
+        default=None,
+        help="Index only the first N%% of the corpus (e.g., 10 = first 10%%)",
+    )
     args = parser.parse_args()
 
-    corpus = load_corpus(args.corpus)
+    if args.partial_index is not None and not (0 < args.partial_index <= 100):
+        raise SystemExit("--partial-index must be in (0, 100]")
+
+    corpus = load_corpus(args.corpus, partial_pct=args.partial_index)
     if not corpus:
         raise SystemExit(f"No documents loaded from {args.corpus}")
     print(f"[Dense] Loaded {len(corpus)} documents from {args.corpus}")

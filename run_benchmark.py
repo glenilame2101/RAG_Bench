@@ -58,6 +58,12 @@ RETRIEVER_CONFIG = {
         "script": "serve_linear.py",
         "needs_name": True,
     },
+    "graphrag": {
+        "default_port": 8326,
+        "endpoint": "/search",
+        "script": "serve_graphrag.py",
+        "needs_name": False,
+    },
 }
 
 
@@ -121,7 +127,7 @@ def run_evaluation(args: argparse.Namespace, port: int) -> int:
         "--retriever",
         args.retriever,
         "--corpus",
-        args.corpus,
+        str(Path(args.corpus).resolve()),
         "--top-k",
         str(args.top_k),
         "--concurrency",
