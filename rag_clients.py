@@ -177,7 +177,7 @@ class RerankerClient:
         payload = {
             "model": self.model,
             "query": query,
-            "input": list(documents),
+            "documents": list(documents),
         }
         if top_n is not None:
             payload["top_n"] = int(top_n)
