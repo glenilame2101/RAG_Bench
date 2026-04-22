@@ -55,22 +55,20 @@ class PromptTemplateManager:
             raise FileNotFoundError(f"Templates directory '{self.templates_dir}' does not exist.")
         
         
+        # Derive the templates package name from this module's own __package__
+        # so the import path works no matter where the vendored tree sits on
+        # disk, and so relative imports inside template files (e.g. triple_extraction.py
+        # doing `from .ner import ...`) resolve correctly.
+        templates_package = f"{__package__}.templates"
+
         logger.info(f"Loading templates from directory: {self.templates_dir}")
         for filename in os.listdir(self.templates_dir):
             if filename.endswith(".py") and filename != "__init__.py":
                 script_name = os.path.splitext(filename)[0]
+                module_name = f"{templates_package}.{script_name}"
 
                 try:
-                    try:
-                        module_name = f"src.hipporag.prompts.templates.{script_name}"
-                        module = importlib.import_module(module_name)
-                    except ModuleNotFoundError:
-                        module_name = f".prompts.templates.{script_name}"
-                        module = importlib.import_module(module_name, 'HippoRAG.src.hipporag')
-
-                    # spec = importlib.util.spec_from_file_location(script_name, script_path)
-                    # module = importlib.util.module_from_spec(spec)
-                    # spec.loader.exec_module(module)
+                    module = importlib.import_module(module_name)
 
                     if not hasattr(module, "prompt_template"):
                         logger.error(f"Module '{module_name}' does not define a 'prompt_template'.")
