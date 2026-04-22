@@ -3,8 +3,9 @@
 Usage:
     python serve_hipporag.py --index-dir <path> --port <port>
 
-The --index-dir is the directory produced by `build_hipporag_index.py`
-(typically `<output-dir>/<name>/hipporag`).
+Pass the same directory you gave to `build_hipporag_index.py` as
+`--output-dir`. No extra nesting — the builder and the server agree on a
+single directory.
 """
 from __future__ import annotations
 

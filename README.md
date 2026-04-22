@@ -29,14 +29,14 @@ cp .env.example .env                # then edit .env
 python build_dense_index.py     --corpus ./mycorpus.jsonl --output-dir ./indexes/dense
 python build_raptor_index.py    --corpus ./mycorpus.jsonl --output-dir ./indexes/raptor
 python build_hypergraph_index.py --corpus ./mycorpus.jsonl --output-dir ./indexes/hyper
-python build_hipporag_index.py  --corpus ./mycorpus.jsonl --output-dir ./indexes/hippo --name mydata
+python build_hipporag_index.py  --corpus ./mycorpus.jsonl --output-dir ./indexes/hippo
 python build_linear_index.py    --corpus ./mycorpus.jsonl --output-dir ./indexes/linear --name mydata
 
-# 6. Serve the index
+# 6. Serve the index (same path you built into)
 python serve_dense.py     --index-dir ./indexes/dense  --port 8306
 python serve_raptor.py    --index-dir ./indexes/raptor --port 8346
 python serve_hypergraph.py --index-dir ./indexes/hyper --port 8336
-python serve_hipporag.py  --index-dir ./indexes/hippo/mydata/hipporag --port 8316
+python serve_hipporag.py  --index-dir ./indexes/hippo  --port 8316
 python serve_linear.py    --index-dir ./indexes/linear --name mydata --port 8356
 
 # 7. Or build + serve + evaluate in one command

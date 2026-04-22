@@ -1,10 +1,12 @@
 """Build a HippoRAG index using the OpenAI-compatible LLM + embeddings endpoints.
 
 Usage:
-    python build_hipporag_index.py --corpus <path> --output-dir <dir> --name <dataset>
+    python build_hipporag_index.py --corpus <path> --output-dir <dir>
 
-The output directory will contain a subdirectory `<name>/hipporag/` with the
-chunk / entity / fact embedding stores and the constructed graph.
+The index is written directly under --output-dir. Point `serve_hipporag.py`
+at the same directory with `--index-dir`. HippoRAG itself creates an internal
+`<llm>_<embedding>/` subdirectory for its embedding stores and graph; you do
+not need to know or care about that path.
 """
 from __future__ import annotations
 
@@ -73,8 +75,7 @@ def main() -> None:
     load_env()
     parser = argparse.ArgumentParser(description=__doc__.strip())
     parser.add_argument("--corpus", required=True, help="Path to JSONL corpus or directory of .txt files")
-    parser.add_argument("--output-dir", required=True, help="Directory containing the HippoRAG index files")
-    parser.add_argument("--name", required=True, help="Dataset subdirectory name under --output-dir")
+    parser.add_argument("--output-dir", required=True, help="Directory where the HippoRAG index will be written")
     parser.add_argument("--embedding-base-url", default=None, help="Override EMBEDDING_BASE_URL")
     parser.add_argument("--embedding-model", default=None, help="Override EMBEDDING_MODEL")
     parser.add_argument("--llm-base-url", default=None, help="Override OPENAI_BASE_URL")
@@ -100,7 +101,7 @@ def main() -> None:
     # its CacheOpenAI client; ensure it's exported.
     os.environ.setdefault("OPENAI_API_KEY", llm_check.api_key)
 
-    save_dir = Path(args.output_dir) / args.name / "hipporag"
+    save_dir = Path(args.output_dir)
     save_dir.mkdir(parents=True, exist_ok=True)
 
     logger.info(f"HippoRAG: save_dir={save_dir}")
