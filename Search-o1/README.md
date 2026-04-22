@@ -77,16 +77,22 @@ This approach enhances the reliability and accuracy of LRMs, enabling them to ha
 
 ## 🔧 Installation
 
-### 1. Environment Setup
-```bash
-# Create conda environment
-conda create -n search_o1 python=3.9
-conda activate search_o1
+After the OpenAI-only refactor, Search-o1 shares the parent RAGSearch venv — there is no separate `Search-o1/requirements.txt` anymore. From the repo root:
 
-# Install requirements
-cd Search-o1
+```bash
+# 1. Create and activate the shared venv (Python 3.10+)
+python -m venv .venv
+source .venv/bin/activate           # Linux / Mac
+.venv\Scripts\activate              # Windows
+
+# 2. Install everything (LLM + retriever stack)
 pip install -r requirements.txt
+
+# 3. Configure your OpenAI-compatible endpoint in .env
+cp .env.example .env                # then edit .env
 ```
+
+See [`../README.md`](../README.md) for the full `.env` contract and retriever setup. The Search-o1 client scripts only need `OPENAI_BASE_URL`, `OPENAI_API_KEY`, and `OPENAI_MODEL`.
 
 ## 🏃 Quick Start
 
@@ -112,71 +118,92 @@ If your task does not belong to any of the datasets mentioned above, for generat
 
 ### Model Inference
 
-You can run different inference modes using the provided scripts. Below are examples of how to execute each mode:
+After the OpenAI-only refactor these scripts no longer load local weights via vLLM. They call an OpenAI-compatible HTTP endpoint (LLM name, URL, and API key are read from the repo-root `.env`). No `torch`, no GPU required.
 
-1. **Direct Reasoning (Direct Generation)**
+#### Prerequisites
+
+1. Configure `.env` at the repo root (see [`../README.md`](../README.md) for the full contract). The three variables the client scripts need:
+
+   ```
+   OPENAI_BASE_URL=https://your-endpoint/v1
+   OPENAI_API_KEY=sk-...
+   OPENAI_MODEL=your-model-name
+   ```
+
+2. For retrieval-backed scripts (`run_search_o1*.py`), start the matching retriever server in another terminal. Example for the dense variant:
+
+   ```bash
+   python ../serve_dense.py --index-dir ../indexes/dense --port 8206
+   ```
+
+   Ports are hardcoded at the top of each `run_search_o1_*.py` as `RETRIEVER_URL`.
+
+#### Running each mode
+
+1. **Direct Reasoning** (no retrieval — hits the LLM only)
+   ```bash
+   python scripts/run_direct_gen.py \
+       --dataset_name gpqa \
+       --split diamond
+   ```
+
+2. **Naive Retrieval-Augmented Generation** (uses Bing — needs a Bing key)
+   ```bash
+   python scripts/run_naive_rag.py \
+       --dataset_name gpqa \
+       --split diamond \
+       --use_jina True \
+       --jina_api_key "YOUR_JINA_API_KEY" \
+       --bing_subscription_key "YOUR_BING_SUBSCRIPTION_KEY"
+   ```
+
+3. **RAG with Agentic Search** (uses Bing — needs a Bing key)
+   ```bash
+   python scripts/run_rag_agent.py \
+       --dataset_name gpqa \
+       --split diamond \
+       --max_search_limit 5 \
+       --max_url_fetch 5 \
+       --max_turn 10 \
+       --top_k 10 \
+       --use_jina True \
+       --jina_api_key "YOUR_JINA_API_KEY" \
+       --bing_subscription_key "YOUR_BING_SUBSCRIPTION_KEY"
+   ```
+
+4. **Search-o1** (agentic loop + local retriever — no Bing needed)
+   ```bash
+   python scripts/run_search_o1.py \
+       --dataset_name bamboogle \
+       --split test \
+       --max_search_limit 5 \
+       --max_turn 10 \
+       --top_k 10 \
+       --max_doc_len 3000
+   ```
+
+   `run_search_o1_graph.py`, `_hippo`, `_linear`, `_raptor`, `_hyper` are variants that point at the matching retriever server. Start the one whose index you have.
+
+#### Smoke-testing against a subset
+
+Every script accepts `--subset_num N` to process only the first N examples — useful for sanity checks:
+
 ```bash
-python scripts/run_direct_gen.py \
-    --dataset_name gpqa \
-    --split diamond \
-    --model_path "YOUR_MODEL_PATH"
+python scripts/run_direct_gen.py --dataset_name bamboogle --split test --subset_num 1 --max_tokens 1024
 ```
 
-2. **Naive Retrieval-Augmented Generation (RAG)**
-```bash
-python scripts/run_naive_rag.py \
-    --dataset_name gpqa \
-    --split diamond \
-    --use_jina True \
-    --model_path "YOUR_MODEL_PATH" \
-    --jina_api_key "YOUR_JINA_API_KEY" \
-    --bing_subscription_key "YOUR_BING_SUBSCRIPTION_KEY"
-```
+Output lands in `outputs/…/<split>.<M>.<D>,<HH>-<MM>.json` (predictions) and `.metrics.json` (EM / F1 / acc).
 
-3. **RAG with Agentic Search**
-```bash
-python scripts/run_rag_agent.py \
-    --dataset_name gpqa \
-    --split diamond \
-    --max_search_limit 5 \
-    --max_url_fetch 5 \
-    --max_turn 10 \
-    --top_k 10 \
-    --use_jina True \
-    --model_path "YOUR_MODEL_PATH" \
-    --jina_api_key "YOUR_JINA_API_KEY" \
-    --bing_subscription_key "YOUR_BING_SUBSCRIPTION_KEY"
-```
+#### Parameter reference
 
-4. **Search-o1 (Ours)**
-```bash
-python scripts/run_search_o1.py \
-    --dataset_name aime \
-    --split test \
-    --max_search_limit 5 \
-    --max_turn 10 \
-    --top_k 10 \
-    --max_doc_len 3000 \
-    --use_jina True \
-    --model_path "YOUR_MODEL_PATH" \
-    --jina_api_key "YOUR_JINA_API_KEY" \
-    --bing_subscription_key "YOUR_BING_SUBSCRIPTION_KEY"
-```
-
-**Parameters Explanation:**
-- `--dataset_name`: Name of the dataset to use (e.g., gpqa, aime).
-- `--split`: Data split to run (e.g., train, test, diamond).
-- `--model_path`: Path to the pre-trained LRM model.
-- `--bing_subscription_key`: Your Bing Search API subscription key.
-- `--max_search_limit`: Maximum number of search queries per reasoning session.
-- `--max_url_fetch`: Maximum number of URLs to fetch per search.
-- `--max_turn`: Maximum number of reasoning turns.
-- `--top_k`: Number of top documents to retrieve.
-- `--max_doc_len`: Maximum length of each retrieved document.
-- `--use_jina`: Whether to use Jina for document processing.
-- `--jina_api_key`: Your Jina API subscription key for URL content fetching.
-
-Ensure you replace `"YOUR_MODEL_PATH"` with your actual model path, replace `"YOUR_BING_SUBSCRIPTION_KEY"` and `"YOUR_JINA_API_KEY"` with your Bing Search and Jina API key.
+- `--dataset_name`: dataset key (e.g., `gpqa`, `aime`, `bamboogle`).
+- `--split`: data split (`test`, `diamond`, etc.).
+- `--model_path` *(optional)*: string label. Drives output-folder naming and the qwq/llama prompt branches. Falls back to `$OPENAI_MODEL` when omitted.
+- `--bing_subscription_key` *(optional)*: Bing API key. Required only for `run_naive_rag.py` and `run_rag_agent.py` at runtime; ignored by the Search-o1 scripts (they use the local retriever).
+- `--jina_api_key` *(optional)*: Jina key for URL content fetching.
+- `--max_search_limit`, `--max_turn`, `--top_k`, `--max_doc_len`: agent-loop knobs for the Search-o1 scripts.
+- `--subset_num`: run only the first N examples (default `-1` = all).
+- `--max_tokens`: override the generation cap (defaults vary by model family).
 
 ### Evaluation
 
