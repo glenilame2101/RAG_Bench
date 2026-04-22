@@ -103,9 +103,9 @@ def parse_args():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-    python run_benchmark.py --retriever dense --dataset bamboogle --method vanilla
-    python run_benchmark.py --retriever graphrag --dataset hotpotqa --method graphsearch
-    python run_benchmark.py --retriever hipporag2 --dataset bamboogle --method naive --limit 10
+    python run_benchmark.py --retriever dense --data_path ./my_corpus.jsonl --method vanilla
+    python run_benchmark.py --retriever hypergraphrag --data_path ./my_corpus.jsonl --limit 10
+    python run_benchmark.py --retriever raptor --data_path ./my_corpus.jsonl --top_k 5
 
 Supported retrievers: dense, graphrag, hipporag2, raptor, linearrag, hypergraphrag
 Supported datasets: bamboogle, hotpotqa, musique, nq, 2wikimultihopqa, triviaqa, popqa, aime, math500
@@ -120,8 +120,14 @@ Supported methods: vanilla (no retrieval), naive, dense, graphsearch
     )
     parser.add_argument(
         "--dataset", "-d",
-        required=True,
+        default=None,
         help="Dataset name (bamboogle, hotpotqa, musique, nq, etc.)"
+    )
+    parser.add_argument(
+        "--data_path",
+        type=str,
+        default=None,
+        help="Path to dataset JSONL file. If provided, overrides --dataset."
     )
     parser.add_argument(
         "--method", "-m",
@@ -309,7 +315,11 @@ def start_retriever(args) -> tuple:
 def run_evaluation(args, port):
     """Run the evaluation."""
     config = RETRIEVER_CONFIG[args.retriever]
-    dataset_path = get_dataset_path(args.dataset)
+    # Use --data_path if provided, otherwise use --dataset to find the path
+    if args.data_path:
+        dataset_path = Path(args.data_path) if Path(args.data_path).exists() else None
+    else:
+        dataset_path = get_dataset_path(args.dataset) if args.dataset else None
 
     # Set environment for eval
     env = os.environ.copy()
@@ -348,19 +358,27 @@ def main():
     print("RAGSearch Unified Benchmark Launcher")
     print("=" * 60)
     print(f"Retriever: {args.retriever}")
-    print(f"Dataset:   {args.dataset}")
+    print(f"Dataset:   {args.data_path or args.dataset or 'none'}")
     print(f"Method:    {args.method}")
     print(f"Top-K:    {args.top_k}")
     print(f"Limit:    {args.limit if args.limit > 0 else 'all'}")
     print("=" * 60)
 
     # Check dataset
-    dataset_path = get_dataset_path(args.dataset)
-    if not dataset_path:
-        print(f"[Launcher] WARNING: Dataset path not found for '{args.dataset}'")
-        print(f"[Launcher] Will try to use --data_path if provided")
-    else:
+    if args.data_path:
+        dataset_path = Path(args.data_path) if Path(args.data_path).exists() else None
+        if not dataset_path:
+            print(f"[Launcher] ERROR: Dataset file not found: {args.data_path}")
+            sys.exit(1)
         print(f"[Launcher] Dataset: {dataset_path}")
+    elif args.dataset:
+        dataset_path = get_dataset_path(args.dataset)
+        if not dataset_path:
+            print(f"[Launcher] WARNING: Dataset path not found for '{args.dataset}'")
+        else:
+            print(f"[Launcher] Dataset: {dataset_path}")
+    else:
+        dataset_path = None
 
     # Start retriever (skip for vanilla method)
     proc = None

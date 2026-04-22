@@ -2,7 +2,7 @@
 Simple RAG evaluation script.
 
 This script evaluates retrieval performance by:
-1. Loading questions from a dataset
+1. Loading questions from a dataset (JSON, JSONL, or Parquet)
 2. Calling the retriever API
 3. Computing retrieval metrics (EM, F1, Recall@K)
 """
@@ -15,48 +15,118 @@ from typing import List, Dict, Any
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
-def load_dataset(dataset_path: str, dataset_name: str, limit: int = None) -> List[Dict]:
-    """Load dataset from JSONL file."""
+def load_dataset(dataset_path: str = None, dataset_name: str = None, limit: int = None) -> List[Dict]:
+    """Load dataset from JSON, JSONL, or Parquet file.
+
+    Args:
+        dataset_path: Path to dataset file. If provided, overrides dataset_name.
+        dataset_name: Predefined dataset name (for backward compatibility).
+        limit: Maximum number of samples to load.
+
+    Returns:
+        List of dataset entries.
+    """
+    path = None
+
+    # If dataset_path provided, use it directly
     if dataset_path and os.path.exists(dataset_path):
-        data = []
-        with open(dataset_path, 'r', encoding='utf-8') as f:
-            for i, line in enumerate(f):
-                if limit and i >= limit:
-                    break
-                data.append(json.loads(line))
-        return data
-
-    search_o1_path = os.path.join(
-        os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-        "Search-o1", "data"
-    )
-
-    dataset_paths = {
-        "bamboogle": os.path.join(search_o1_path, "FlashRAG_datasets", "bamboogle", "test.jsonl"),
-        "hotpotqa": os.path.join(search_o1_path, "hotpotqa"),
-        "musique": os.path.join(search_o1_path, "musique"),
-        "nq": os.path.join(search_o1_path, "nq"),
-        "2wikimultihopqa": os.path.join(search_o1_path, "2wikimultihopqa"),
-        "triviaqa": os.path.join(search_o1_path, "triviaqa"),
-        "popqa": os.path.join(search_o1_path, "popqa"),
-    }
-
-    path = dataset_paths.get(dataset_name.lower())
-    if not path or not os.path.exists(path):
-        print(f"[Eval] Dataset path not found: {path}")
+        path = dataset_path
+    elif dataset_path:
+        print(f"[Eval] Dataset path not found: {dataset_path}")
         return []
 
-    data = []
-    if path.endswith(".jsonl"):
-        with open(path, 'r', encoding='utf-8') as f:
-            for i, line in enumerate(f):
-                if limit and i >= limit:
-                    break
+    # Fallback to predefined datasets
+    if not path:
+        search_o1_path = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            "Search-o1", "data"
+        )
+
+        dataset_paths = {
+            "bamboogle": os.path.join(search_o1_path, "FlashRAG_datasets", "bamboogle", "test.jsonl"),
+            "hotpotqa": os.path.join(search_o1_path, "hotpotqa"),
+            "musique": os.path.join(search_o1_path, "musique"),
+            "nq": os.path.join(search_o1_path, "nq"),
+            "2wikimultihopqa": os.path.join(search_o1_path, "2wikimultihopqa"),
+            "triviaqa": os.path.join(search_o1_path, "triviaqa"),
+            "popqa": os.path.join(search_o1_path, "popqa"),
+        }
+
+        path = dataset_paths.get(dataset_name.lower()) if dataset_name else None
+
+        if not path or not os.path.exists(path):
+            print(f"[Eval] Dataset path not found: {path}")
+            return []
+
+    # Detect format and load
+    ext = path.lower().split('.')[-1]
+
+    if ext == "jsonl":
+        return _load_jsonl(path, limit)
+    elif ext == "json":
+        return _load_json(path, limit)
+    elif ext == "parquet":
+        return _load_parquet(path, limit)
+    else:
+        # Try to auto-detect by reading the file
+        print(f"[Eval] Unknown extension '{ext}', attempting to auto-detect format...")
+        # Try JSONL first (most common)
+        try:
+            return _load_jsonl(path, limit)
+        except:
+            try:
+                return _load_json(path, limit)
+            except:
                 try:
-                    data.append(json.loads(line))
-                except:
-                    continue
+                    return _load_parquet(path, limit)
+                except Exception as e:
+                    print(f"[Eval] Failed to load dataset: {e}")
+                    return []
+
+
+def _load_jsonl(path: str, limit: int = None) -> List[Dict]:
+    """Load dataset from JSONL file."""
+    data = []
+    with open(path, 'r', encoding='utf-8') as f:
+        for i, line in enumerate(f):
+            if limit and i >= limit:
+                break
+            try:
+                data.append(json.loads(line.strip()))
+            except json.JSONDecodeError as e:
+                print(f"[Eval] Skipping invalid JSON line {i}: {e}")
+                continue
     return data
+
+
+def _load_json(path: str, limit: int = None) -> List[Dict]:
+    """Load dataset from JSON file (array or object)."""
+    with open(path, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+
+    # Handle both array and object formats
+    if isinstance(data, list):
+        return data[:limit] if limit else data
+    elif isinstance(data, dict):
+        # If it's a single object, wrap in list
+        return [data]
+    else:
+        print(f"[Eval] Unexpected JSON format in {path}")
+        return []
+
+
+def _load_parquet(path: str, limit: int = None) -> List[Dict]:
+    """Load dataset from Parquet file."""
+    try:
+        import pandas as pd
+    except ImportError:
+        print("[Eval] pandas required for Parquet support: pip install pandas pyarrow")
+        return []
+
+    df = pd.read_parquet(path)
+    # Convert to list of dicts
+    data = df.to_dict('records')
+    return data[:limit] if limit else data
 
 
 def normalize_answer(text: str) -> str:

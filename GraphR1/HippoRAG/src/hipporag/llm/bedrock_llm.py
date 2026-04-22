@@ -1,4 +1,6 @@
 import os
+import boto3
+from botocore.exceptions import ClientError
 from typing import List, Tuple
 from copy import deepcopy
 import sqlite3
@@ -6,7 +8,6 @@ import json
 import time
 import hashlib
 
-import litellm
 from filelock import FileLock
 
 from .base import BaseLLM, LLMConfig
@@ -94,18 +95,70 @@ class BedrockLLM(BaseLLM):
         logger.info(f"[BedrockLLM] Config: {self.llm_config}")
 
     def __llm_call(self, params):
+        model_id = params.get("model")
+        messages = params.get("messages", [])
+        temperature = params.get("temperature", 0.0)
+
         num, wait_s = 0, 0.5
         while True:
             try:
-                return litellm.completion(**params)
-            except Exception as e:
-                num += 1
-                if num > self.retry:
+                client = boto3.client("bedrock-runtime", region_name=os.environ.get("AWS_REGION", "us-east-1"))
+
+                formatted_messages = []
+                for msg in messages:
+                    if isinstance(msg, dict):
+                        role = msg.get("role", "user")
+                        content = msg.get("content", "")
+                    else:
+                        role = getattr(msg, "role", "user")
+                        content = str(getattr(msg, "content", ""))
+
+                    if isinstance(content, list):
+                        text_content = ""
+                        for item in content:
+                            if isinstance(item, dict) and item.get("type") == "text":
+                                text_content += item.get("text", "")
+                            elif hasattr(item, "text"):
+                                text_content += item.text
+                        content = text_content
+
+                    formatted_messages.append({"role": role, "content": [{"text": content}]})
+
+                inference_params = {
+                    "modelId": model_id,
+                    "messages": formatted_messages,
+                    "inferenceConfig": {
+                        "temperature": temperature,
+                        "maxTokens": 2048,
+                    }
+                }
+
+                response = client.converse(**inference_params)
+                output_message = response["output"]["message"]
+                return type('obj', (object,), {
+                    "choices": [type('obj', (object,), {
+                        "message": type('obj', (object,), {
+                            "content": output_message["content"][0]["text"]
+                        })(),
+                        "finish_reason": response.get("stopReason", "complete")
+                    })()],
+                    "usage": type('obj', (object,), {
+                        "prompt_tokens": response["usage"]["inputTokens"],
+                        "completion_tokens": response["usage"]["outputTokens"]
+                    })()
+                })()
+
+            except ClientError as e:
+                error_code = e.response.get("Error", {}).get("Code", "Unknown")
+                if error_code == "ThrottlingException":
+                    num += 1
+                    if num > self.retry:
+                        raise e
+                    logger.warning(f"Bedrock LLM Throttling: {e}\nRetry #{num} after {wait_s} seconds")
+                    time.sleep(wait_s)
+                    wait_s *= 2
+                else:
                     raise e
-                
-                logger.warning(f"Bedrock LLM Exception: {e}\nRetry #{num} after {wait_s} seconds")
-                time.sleep(wait_s)
-                wait_s *= 2
     
     def infer(self, messages: List[TextChatMessage], **kwargs) -> Tuple[List[TextChatMessage], dict]:
         params = deepcopy(self.llm_config.generate_params)
