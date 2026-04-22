@@ -3,9 +3,9 @@
 # Search-o1 agent run inside one virtual environment built from this file.
 #
 # Forbidden (and not present): vllm, torch, transformers, sentence-transformers,
-# huggingface-hub, gritlm, dspy, litellm, graphrag, boto3, tenacity, tiktoken,
-# umap-learn. Anything that pulls models from HuggingFace or requires a GPU
-# does not belong in this stack.
+# huggingface-hub, gritlm, dspy, litellm, graphrag, boto3, umap-learn.
+# Anything that pulls model weights from HuggingFace or requires a GPU does
+# not belong in this stack.
 
 openai>=1.40
 python-dotenv>=1.0
