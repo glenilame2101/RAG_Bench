@@ -11,7 +11,6 @@ dist/
 .venv/
 venv/
 env/
-conda_env/
 
 # Environment / secrets
 .env
@@ -21,6 +20,16 @@ conda_env/
 *.log
 logs/
 outputs/
+_tmp/
+
+# Local indexes (rebuild from your corpus)
+dense_index/
+raptor_index/
+hippo_index/
+hypergraph_index/
+linear_index/
+graphrags/
+indexes/
 
 # OS cruft
 .DS_Store
@@ -30,9 +39,5 @@ Thumbs.db
 .idea/
 .vscode/
 
-RAGSearch/Search-o1/data/
-
-
-venvs/
-
-.env
+# Datasets (large, fetched separately)
+Search-o1/data/

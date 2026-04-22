@@ -1,202 +1,129 @@
 # RAGSearch
 
-Graph-based retrieval and search system using GraphRAG, HippoRAG, RAPTOR, and other retrieval methods.
+A small set of retrieval-only RAG backends — Dense (FAISS), HippoRAG,
+RAPTOR, HypergraphRAG, and LinearRAG — that all talk to your own
+OpenAI-compatible HTTP endpoints (LLM, embeddings, optional reranker).
 
-## Overview
+There is **no vLLM, no HuggingFace download, no transformers, no
+sentence-transformers, no per-retriever virtual environment**. One Python
+venv, one `requirements.txt`, one `.env` file with seven variables.
 
-This is a simplified, focused version of RAGSearch that provides:
-- **Graph search** using GraphRAG, HippoRAG, HypergraphRAG
-- **Retrieval** using RAPTOR, Dense (FAISS), LinearRAG
-- **Search agents** via Search-o1
-
-No RL training or benchmark infrastructure included.
-
-## Quick Start
-
-### 1. Create Virtual Environment
+## Quick start
 
 ```bash
-# Create and activate virtual environment
+# 1. Create and activate a single venv (Python 3.10+)
 python -m venv .venv
-source .venv/bin/activate  # Linux/Mac
-.venv\Scripts\activate     # Windows
+source .venv/bin/activate           # Linux / Mac
+.venv\Scripts\activate              # Windows
 
-# Upgrade pip
-pip install -U pip
+# 2. Install everything
+pip install -r requirements.txt
+
+# 3. spaCy needs the English model once (used by LinearRAG NER)
+python -m spacy download en_core_web_sm
+
+# 4. Configure your endpoints
+cp .env.example .env                # then edit .env
+
+# 5. Build an index for the retriever you want
+python build_dense_index.py     --corpus ./mycorpus.jsonl --output-dir ./indexes/dense
+python build_raptor_index.py    --corpus ./mycorpus.jsonl --output-dir ./indexes/raptor
+python build_hypergraph_index.py --corpus ./mycorpus.jsonl --output-dir ./indexes/hyper
+python build_hipporag_index.py  --corpus ./mycorpus.jsonl --output-dir ./indexes/hippo --name mydata
+python build_linear_index.py    --corpus ./mycorpus.jsonl --output-dir ./indexes/linear --name mydata
+
+# 6. Serve the index
+python serve_dense.py     --index-dir ./indexes/dense  --port 8306
+python serve_raptor.py    --index-dir ./indexes/raptor --port 8346
+python serve_hypergraph.py --index-dir ./indexes/hyper --port 8336
+python serve_hipporag.py  --index-dir ./indexes/hippo/mydata/hipporag --port 8316
+python serve_linear.py    --index-dir ./indexes/linear --name mydata --port 8356
+
+# 7. Or build + serve + evaluate in one command
+python run_benchmark.py --retriever dense \
+    --corpus ./mycorpus.jsonl --index-dir ./indexes/dense
 ```
 
-### 2. Install Dependencies
+`--corpus` accepts either a JSONL file (one JSON document per line, with any
+of `contents`, `text`, `content`, `document`, `body`) or a directory of
+`*.txt` files. Nothing is hardcoded — every path comes in via the CLI.
 
-**Core dependencies:**
-```bash
-pip install openai python-dotenv httpx aiohttp requests tqdm numpy fastapi uvicorn pydantic torch
-```
+## `.env` contract
 
-**For specific retrievers:**
-```bash
-# HippoRAG
-pip install hipporag>=2.0.0a4 python-igraph networkx scipy
+The seven variables every entry point reads (no aliases, no fallbacks):
 
-# RAPTOR
-pip install faiss-cpu scikit-learn umap-learn
+| Variable             | Purpose                                          |
+|----------------------|--------------------------------------------------|
+| `OPENAI_BASE_URL`    | Base URL of your OpenAI-compatible LLM endpoint  |
+| `OPENAI_API_KEY`     | API key for that endpoint                        |
+| `OPENAI_MODEL`       | LLM model name                                   |
+| `EMBEDDING_BASE_URL` | OpenAI-compatible embeddings endpoint            |
+| `EMBEDDING_MODEL`    | Embedding model name                             |
+| `RERANKER_BASE_URL`  | OpenAI-compatible `/v1/rerank` endpoint (opt.)   |
+| `RERANKER_MODEL`     | Reranker model name (opt.)                       |
 
-# Dense retrieval
-pip install faiss-cpu datasets pyserini
+Trailing `/v1` is added automatically if missing. You can override any of
+these per command with the matching `--*-base-url` / `--*-model` flag.
 
-# GraphRAG
-pip install graphrag==1.0.1
-```
+`.env.example` ships a working template against a local llama.cpp instance
+plus a remote MiniMax LLM.
 
-### 3. Configure Environment
+## Available retrievers
 
-Create a `.env` file in the RAGSearch directory:
+| Retriever  | Default port | Builder                       | Server                  |
+|------------|--------------|-------------------------------|-------------------------|
+| dense      | 8306         | `build_dense_index.py`        | `serve_dense.py`        |
+| raptor     | 8346         | `build_raptor_index.py`       | `serve_raptor.py`       |
+| hypergraph | 8336         | `build_hypergraph_index.py`   | `serve_hypergraph.py`   |
+| hipporag   | 8316         | `build_hipporag_index.py`     | `serve_hipporag.py`     |
+| linear     | 8356         | `build_linear_index.py`       | `serve_linear.py`       |
 
-```bash
-# LLM API (OpenAI-compatible)
-URL=https://api.minimax.io/v1
-MODEL_NAME=MiniMax-M2.7
-OPENAI_API_KEY=your-api-key-here
+Every server exposes:
 
-# Embedding server (optional)
-EMBEDDING_BASE_URL=http://127.0.0.1:8080/v1
-EMBEDDING_MODEL_NAME=bge-m3-Q8_0
-```
+- `POST /search`  — body `{"queries": ["..."]}`, returns `[{"results": "..."}, ...]`
+- `GET  /status`  — `{"status": "ok", "retriever": "<name>", ...}`
 
-### 4. Run a Retriever Server
+`serve_dense.py` additionally keeps `POST /retrieve` for compatibility with
+the Search-o1 client scripts.
 
-Start a retriever server in one terminal:
-
-**Dense (FAISS):**
-```bash
-python serve_dense.py --index_path dense_index/dense_index.faiss --corpus_path dense_index/corpus.jsonl --port 8306
-```
-
-**HippoRAG:**
-```bash
-python GraphR1/script_api_HippoRAG.py --data_source bamboogle --port 8316
-```
-
-**RAPTOR:**
-```bash
-python GraphR1/script_api_RAPTOR.py --tree_path raptor_index/tree.pkl --port 8346
-```
-
-**HypergraphRAG:**
-```bash
-python GraphR1/script_api_HypergraphRAG.py --data_source bamboogle --port 8336
-```
-
-**GraphRAG:**
-```bash
-python GraphR1/script_api_GraphRAG.py --project_dir GraphR1/GraphRAG/inputs --port 8326
-```
-
-### 5. Run Evaluation
-
-With a retriever server running, run evaluation:
-
-```bash
-python run_benchmark.py --retriever hypergraphrag --dataset bamboogle --method graphsearch --limit 10
-```
-
-Or use the GraphSearch eval directly:
-
-```bash
-cd GraphSearch
-python eval.py --dataset bamboogle --method graphsearch --top_k 5
-```
-
-## Project Structure
+## Project layout
 
 ```
 RAGSearch/
-├── GraphR1/                           # Retriever implementations
-│   ├── script_api_*.py                # API server scripts
-│   ├── GraphRAG/                      # GraphRAG implementation
-│   ├── HippoRAG/                      # HippoRAG implementation
-│   ├── raptor/                        # RAPTOR implementation
-│   └── LinearRAG/                     # LinearRAG implementation
-├── GraphSearch/                       # Evaluation scripts
-│   └── eval.py                        # Retrieval evaluation
-├── Search-o1/                         # Search agent
-│   └── scripts/                       # Search scripts
-├── dense_index/                       # Dense FAISS index
-├── hippo_index/                       # HippoRAG index
-├── raptor_index/                      # RAPTOR tree index
-├── run_benchmark.py                   # Benchmark launcher
-└── serve_dense.py                    # Dense retriever server
+├── .env / .env.example              # canonical config
+├── requirements.txt                 # single, flat
+├── rag_clients.py                   # shared HTTP clients (Embedding/Reranker/LLM)
+├── build_<retriever>_index.py       # five builders (CLI: --corpus, --output-dir)
+├── serve_<retriever>.py             # five servers   (CLI: --index-dir, --port)
+├── run_benchmark.py                 # build/serve/eval orchestrator
+├── GraphR1/
+│   ├── HippoRAG/src/hipporag/       # vendored HippoRAG, OpenAI-only
+│   ├── LinearRAG/src/               # vendored LinearRAG
+│   └── raptor/raptor/               # vendored RAPTOR, HTTP embeddings only
+├── GraphSearch/
+│   └── eval.py                      # standalone EM/F1 evaluator
+└── Search-o1/
+    ├── data/                        # corpora (gitignored)
+    └── scripts/                     # agent client (run_search_o1*.py + helpers)
 ```
 
-## Available Retrievers
+## Reranker support
 
-| Retriever | Port | Description |
-|-----------|------|-------------|
-| dense | 8306 | FAISS dense retrieval |
-| graphrag | 8326 | Graph-based retrieval |
-| hipporag | 8316 | Hippocampus RAG |
-| raptor | 8346 | Tree-structured retrieval |
-| hypergraphrag | 8336 | Hypergraph RAG |
-| linearrag | 8356 | Linear graph RAG |
+If you set `RERANKER_BASE_URL` and `RERANKER_MODEL` in `.env`, retrievers
+that benefit from query-time reranking (currently HypergraphRAG and
+HippoRAG fact reranking) will use that endpoint via `POST /v1/rerank`.
+If those vars are unset, retrievers degrade gracefully to a passthrough
+ranking — no errors, no warnings beyond a single startup log line.
 
-## Building Indexes
+## Migrating from older versions
 
-**Dense index:**
-```bash
-python build_dense_index.py --input_dir <corpus_dir> --output_dir dense_index
-```
+The legacy environment variable names (`URL`, `MODEL_NAME`, `LLM_BASE_URL`,
+`EMBEDDING_URL`, `EMBEDDING_MODEL_NAME`, `REMOTE_MODEL_NAME`) have been
+collapsed into the seven names above. Update your `.env` accordingly.
 
-**RAPTOR tree:**
-```bash
-python build_raptor_index.py --input_dir <corpus_dir> --output_dir raptor_index
-```
-
-**HippoRAG index:**
-```bash
-python build_hippo_index.py --input_jsonl <corpus.jsonl> --output_dir hippo_index --dataset_name <name>
-```
-
-## Adding Datasets
-
-Place corpus files in `Search-o1/data/`:
-
-```
-Search-o1/data/mycorpus/
-├── doc1.txt
-├── doc2.txt
-```
-
-Or as JSONL:
-```
-Search-o1/data/mycorpus.jsonl   # {"id": "...", "contents": "..."}
-```
-
-## Architecture
-
-```
-                    +------------------+
-                    |  LLM API         |
-                    | (OpenAI-compat) |
-                    +--------+---------+
-                             |
-                    +--------v---------+
-                    |  Retriever API   |
-                    |  (per backend)  |
-                    +--------+---------+
-                             |
-         +-------------------+-------------------+
-         |                   |                   |
-+--------v------+   +--------v--------+   +-----v-----+
-|  Dense FAISS |   |  GraphRAG       |   |  RAPTOR   |
-|  Port: 8306  |   |  Port: 8326     |   |  Port:8346|
-+--------------+   +-----------------+   +-----------+
-```
-
-## Environment Variables
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `URL` | LLM API base URL | Required |
-| `MODEL_NAME` | LLM model name | Required |
-| `OPENAI_API_KEY` | API key | Required |
-| `EMBEDDING_BASE_URL` | Embedding server URL | Optional |
-| `EMBEDDING_MODEL_NAME` | Embedding model | Optional |
+The per-retriever `requirements.txt` files, the `venvs/` per-backend
+virtualenvs, the `script_api_*.py` server scripts under `GraphR1/`, the
+`vllm_infer/` runner, the `lcb_runner/` LiveCodeBench evaluator, the
+`graphr1/` Search-R1 trainer, and the GraphRAG retriever (the `graphrag`
+PyPI package) have all been removed. If you depended on any of those, pin
+the previous tag.

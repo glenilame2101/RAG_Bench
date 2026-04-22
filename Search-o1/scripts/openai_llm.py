@@ -1,8 +1,10 @@
 """OpenAI-compatible backend for Search-o1 client scripts.
 
-This module provides an ``OpenAILLM`` class whose ``generate`` method mimics
-``vllm.LLM.generate`` closely enough that the existing Search-o1 scripts work
-without modification beyond swapping the constructor.
+This module exposes an ``OpenAILLM`` class whose ``generate`` method matches
+the shape the run scripts originally expected from a local generation engine:
+prompts in, list of objects with ``.outputs[0].text`` out. After the
+OpenAI-only refactor the only supported backend is the OpenAI HTTP API
+(via OPENAI_BASE_URL / OPENAI_API_KEY / OPENAI_MODEL).
 
 Usage::
 
@@ -11,12 +13,7 @@ Usage::
     load_env_file()  # optional, picks up repo-root .env
     add_backend_args(parser)  # adds --backend / --base_url / --api_key / ...
     args = parser.parse_args()
-    llm = build_llm(args, model=model_path, gpu_memory_utilization=0.9)
-
-When ``args.backend == "openai"`` the returned object is an :class:`OpenAILLM`
-that calls an OpenAI-compatible chat-completions endpoint (e.g. a remote
-``vllm.entrypoints.openai.api_server``). When ``args.backend == "vllm"`` the
-function falls back to instantiating a real ``vllm.LLM``.
+    llm = build_llm(args, model=model_path)
 """
 
 from __future__ import annotations
@@ -62,20 +59,13 @@ def _normalize_base_url(url: str) -> str:
 # ---------------------------------------------------------------------------
 # SamplingParams shim
 # ---------------------------------------------------------------------------
-# The Search-o1 scripts instantiate ``SamplingParams(...)`` directly. When
-# vllm is not installed (single-venv / remote-endpoint deployments) we fall
-# back to this dataclass, which is duck-compatible with the attributes
-# ``_sampling_to_kwargs`` below reads.
+# The Search-o1 scripts instantiate ``SamplingParams(...)`` directly. We
+# expose a duck-typed dataclass with the same attributes so the scripts can
+# keep using ``SamplingParams(max_tokens=..., temperature=..., ...)`` without
+# pulling in any local-inference framework.
 @dataclass
 class SamplingParams:  # type: ignore[no-redef]
-    """Duck-typed fallback for ``vllm.SamplingParams``.
-
-    Used when vllm is not installed (single-venv / remote-endpoint setup).
-    Exposes the same attributes the Search-o1 scripts set and the ones
-    :meth:`OpenAILLM._sampling_to_kwargs` below reads, so callers can keep
-    writing ``SamplingParams(max_tokens=..., temperature=..., ...)`` without
-    caring whether the real vllm class is available.
-    """
+    """Duck-typed sampling-params dataclass for the OpenAI-only client."""
 
     max_tokens: Optional[int] = None
     temperature: float = 1.0
@@ -93,7 +83,7 @@ class SamplingParams:  # type: ignore[no-redef]
 
 
 # ---------------------------------------------------------------------------
-# Fake RequestOutput shapes (mimic vLLM)
+# Fake RequestOutput shapes (the run scripts expect .outputs[0].text)
 # ---------------------------------------------------------------------------
 @dataclass
 class _FakeCompletionOutput:
@@ -113,7 +103,7 @@ class _FakeRequestOutput:
 # OpenAI-backed LLM
 # ---------------------------------------------------------------------------
 class OpenAILLM:
-    """Drop-in replacement for ``vllm.LLM`` that hits an OpenAI-compatible API.
+    """Client that hits an OpenAI-compatible chat-completions API.
 
     Only the ``generate(prompts, sampling_params)`` method is implemented,
     since that is all the Search-o1 scripts use.
@@ -153,14 +143,11 @@ class OpenAILLM:
         """Convert a prompt (string or already-structured messages) to OpenAI
         chat-completions ``messages`` format.
 
-        The Search-o1 scripts already apply the tokenizer chat template and
-        pass the resulting string in. Those strings include special tokens
-        like ``<|im_start|>user\n...<|im_end|>``; the remote vLLM server will
-        re-apply its chat template to whatever we send, so we wrap the raw
-        string as a single user message. The server then treats the
-        already-templated text as user content -- slightly wasteful but
-        semantically identical because the model has seen that format in
-        pre-training and the outer template contributes only a thin wrapper.
+        The Search-o1 scripts pre-format prompts via the local tokenizer
+        stub, then hand the result here. The OpenAI-compatible server
+        re-applies its chat template, so we wrap the formatted text as a
+        single user message — the outer template contribution is tiny and
+        the model has seen the inner format during pre-training.
         """
         if isinstance(prompt, str):
             return [{"role": "user", "content": prompt}]
@@ -170,12 +157,11 @@ class OpenAILLM:
 
     @staticmethod
     def _sampling_to_kwargs(sp: Any) -> dict:
-        """Translate a ``vllm.SamplingParams`` (or anything with matching
-        attributes) into chat.completions kwargs.
+        """Translate a ``SamplingParams``-shaped object into chat.completions kwargs.
 
         ``top_k`` and ``repetition_penalty`` are not part of the standard
-        OpenAI API but are accepted by the vLLM OpenAI server via
-        ``extra_body``.
+        OpenAI API but are accepted by some OpenAI-compatible servers via
+        ``extra_body``; we forward them when set.
         """
         kwargs: dict = {}
         extra_body: dict = {}
@@ -307,28 +293,23 @@ def add_backend_args(parser) -> None:
     Defaults are read from environment variables (``URL``, ``MODEL_NAME``,
     ``OPENAI_API_KEY``) so that ``.env`` values are picked up automatically.
     """
-    default_url = os.environ.get("URL") or os.environ.get("LLM_BASE_URL") or ""
-    default_model = os.environ.get("MODEL_NAME") or ""
+    default_url = os.environ.get("OPENAI_BASE_URL") or ""
+    default_model = os.environ.get("OPENAI_MODEL") or ""
     default_key = os.environ.get("OPENAI_API_KEY") or ""
-    # Default backend: remote OpenAI-compatible endpoint. The user must set
-    # URL (via .env or --base_url) for it to work; fall back to local vllm
-    # only with --backend vllm explicitly.
+    # The OpenAI-compatible endpoint is the only supported backend.
     default_backend = "openai"
 
     parser.add_argument(
         "--backend",
-        choices=["vllm", "openai"],
-        default=default_backend,
-        help="LLM backend: 'openai' (remote OpenAI-compatible endpoint, "
-             "default) or 'vllm' (local GPU vLLM; requires the vllm package "
-             "and a GPU).",
+        choices=["openai"],
+        default="openai",
+        help="LLM backend (only 'openai' remains after the OpenAI-only refactor).",
     )
     parser.add_argument(
         "--base_url",
         type=str,
         default=default_url,
-        help="Base URL of the OpenAI-compatible endpoint (reads $URL or "
-             "$LLM_BASE_URL by default).",
+        help="Base URL of the OpenAI-compatible endpoint (reads $OPENAI_BASE_URL by default).",
     )
     parser.add_argument(
         "--api_key",
@@ -341,8 +322,7 @@ def add_backend_args(parser) -> None:
         "--remote_model_name",
         type=str,
         default=default_model,
-        help="Model name sent in chat.completions requests (reads "
-             "$MODEL_NAME by default). Only used when --backend=openai.",
+        help="Model name sent in chat.completions requests (reads $OPENAI_MODEL by default).",
     )
     parser.add_argument(
         "--tokenizer_path",
@@ -360,21 +340,19 @@ def add_backend_args(parser) -> None:
     )
 
 
-def build_llm(args, model: str, **vllm_kwargs: Any):
-    """Return a backend LLM: either ``vllm.LLM`` or :class:`OpenAILLM`."""
+def build_llm(args, model: str, **_unused: Any):
+    """Return an :class:`OpenAILLM` configured from args / env."""
     backend = getattr(args, "backend", "openai")
     if backend == "openai":
-        base_url = getattr(args, "base_url", "") or os.environ.get("URL", "")
+        base_url = getattr(args, "base_url", "") or os.environ.get("OPENAI_BASE_URL", "")
         if not base_url:
             raise ValueError(
-                "--backend=openai requires --base_url or the URL env var. "
-                "Set URL in .env (see .env.example) or pass --base_url, or "
-                "use --backend vllm for a local GPU run."
+                "OPENAI_BASE_URL is not set. Configure it in .env or pass --base_url."
             )
         api_key = getattr(args, "api_key", "") or os.environ.get("OPENAI_API_KEY", "")
         model_name = (
             getattr(args, "remote_model_name", "")
-            or os.environ.get("MODEL_NAME", "")
+            or os.environ.get("OPENAI_MODEL", "")
             or model
         )
         max_workers = int(getattr(args, "openai_max_workers", 16) or 16)
@@ -389,17 +367,10 @@ def build_llm(args, model: str, **vllm_kwargs: Any):
             max_workers=max_workers,
         )
 
-    # Explicit opt-in: real vLLM (local GPU).
-    try:
-        from vllm import LLM  # lazy import so the OpenAI backend doesn't need it
-    except ImportError as exc:
-        raise ImportError(
-            "--backend=vllm requires the 'vllm' package. Install with the "
-            "optional 'train' extra (pip install -e '.[train]'), or switch "
-            "to --backend openai against a remote endpoint."
-        ) from exc
-    print(f"[build_llm] Using local vLLM backend: model={model}")
-    return LLM(model=model, **vllm_kwargs)
+    raise ValueError(
+        "Local vLLM backend has been removed in the OpenAI-only refactor. "
+        "Use --backend=openai (the default) with OPENAI_BASE_URL configured."
+    )
 
 
 def resolve_tokenizer_path(args, model_path: str) -> str:

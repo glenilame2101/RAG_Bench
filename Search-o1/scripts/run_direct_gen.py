@@ -6,11 +6,9 @@ import re
 import os, time
 import numpy as np
 from tqdm import tqdm
-try:
-    from vllm import LLM, SamplingParams  # noqa: F401
-except ImportError:  # vllm is optional when using the remote OpenAI backend
-    LLM = None  # type: ignore[assignment]
-    from openai_llm import SamplingParams  # type: ignore[no-redef]
+# vLLM removed — OpenAI-only after the refactor.
+LLM = None
+from openai_llm import SamplingParams
 from openai_llm import (
     add_backend_args,
     build_llm,
@@ -20,7 +18,7 @@ from openai_llm import (
 
 # Load .env (URL, MODEL_NAME, OPENAI_API_KEY) if present.
 load_env_file()
-from transformers import AutoTokenizer
+from tokenizer_stub import AutoTokenizer
 from evaluate import run_evaluation
 from prompts import (
     get_task_instruction_openqa, 

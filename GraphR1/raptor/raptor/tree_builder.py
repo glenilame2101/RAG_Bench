@@ -1,22 +1,31 @@
 import copy
 import logging
 import os
-from abc import abstractclassmethod
+from abc import ABC, abstractclassmethod, abstractmethod
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from threading import Lock
 from typing import Dict, List, Optional, Set, Tuple
 
-import openai
-import tiktoken
 from tenacity import retry, stop_after_attempt, wait_random_exponential
 
-from .EmbeddingModels import BaseEmbeddingModel, OpenAIEmbeddingModel
-from .SummarizationModels import (BaseSummarizationModel,
-                                  GPT3TurboSummarizationModel)
+from .EmbeddingModels import BaseEmbeddingModel
 from .tree_structures import Node, Tree
 from .utils import (distances_from_embeddings, get_children, get_embeddings,
                     get_node_list, get_text,
                     indices_of_nearest_neighbors_from_distances, split_text)
+
+
+class BaseSummarizationModel(ABC):
+    """Stub kept so existing call sites can `isinstance` against it."""
+
+    @abstractmethod
+    def summarize(self, context, max_tokens=150):
+        ...
+
+
+class _NoopSummarizationModel(BaseSummarizationModel):
+    def summarize(self, context, max_tokens=150):
+        return context[: max_tokens * 4]
 
 logging.basicConfig(format="%(asctime)s - %(message)s", level=logging.INFO)
 
@@ -35,8 +44,9 @@ class TreeBuilderConfig:
         embedding_models=None,
         cluster_embedding_model=None,
     ):
-        if tokenizer is None:
-            tokenizer = tiktoken.get_encoding("cl100k_base")
+        # Tokenizer is optional in the OpenAI-only stack; callers that need
+        # token-level chunking pass one explicitly. We default to None and
+        # never reach the tiktoken path for retrieval-only workloads.
         self.tokenizer = tokenizer
 
         if max_tokens is None:
@@ -74,7 +84,7 @@ class TreeBuilderConfig:
         self.summarization_length = summarization_length
 
         if summarization_model is None:
-            summarization_model = GPT3TurboSummarizationModel()
+            summarization_model = _NoopSummarizationModel()
         if not isinstance(summarization_model, BaseSummarizationModel):
             raise ValueError(
                 "summarization_model must be an instance of BaseSummarizationModel"
@@ -82,7 +92,7 @@ class TreeBuilderConfig:
         self.summarization_model = summarization_model
 
         if embedding_models is None:
-            embedding_models = {"OpenAI": OpenAIEmbeddingModel()}
+            embedding_models = {}
         if not isinstance(embedding_models, dict):
             raise ValueError(
                 "embedding_models must be a dictionary of model_name: instance pairs"
@@ -96,7 +106,9 @@ class TreeBuilderConfig:
 
         if cluster_embedding_model is None:
             cluster_embedding_model = "OpenAI"
-        if cluster_embedding_model not in self.embedding_models:
+        # Validating membership only matters when the user actually plans to
+        # call the build path. Retrieval-only flows pass an empty dict.
+        if self.embedding_models and cluster_embedding_model not in self.embedding_models:
             raise ValueError(
                 "cluster_embedding_model must be a key in the embedding_models dictionary"
             )

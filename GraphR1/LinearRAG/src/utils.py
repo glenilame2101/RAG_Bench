@@ -1,77 +1,83 @@
-from hashlib import md5
-from dataclasses import dataclass, field
-from typing import List, Dict
-import httpx
-from openai import OpenAI
-from collections import defaultdict
-import multiprocessing as mp
+"""LinearRAG utility helpers — uses the canonical OpenAI-compatible env names."""
+from __future__ import annotations
+
+import logging
+import os
 import re
 import string
-import logging
+from hashlib import md5
+from typing import Iterable
+
 import numpy as np
-import os
+from openai import OpenAI
+
 
 def compute_mdhash_id(content: str, prefix: str = "") -> str:
     return prefix + md5(content.encode()).hexdigest()
 
+
 class LLM_Model:
-    def __init__(self, llm_model):
-        http_client = httpx.Client(timeout=60.0, trust_env=False)
-        self.openai_client = OpenAI(
-            api_key=os.getenv("OPENAI_API_KEY"),
-            base_url=os.getenv("OPENAI_BASE_URL"),
-            http_client=http_client
-        )
+    """Thin LLM wrapper used by LinearRAG indexing/retrieval pipelines.
+
+    Reads OPENAI_BASE_URL / OPENAI_API_KEY from the environment if no explicit
+    base_url / api_key is passed.
+    """
+
+    def __init__(self, llm_model: str = None):
+        base_url = os.getenv("OPENAI_BASE_URL") or os.getenv("OPENAI_API_BASE")
+        api_key = os.getenv("OPENAI_API_KEY", "")
+        model_name = llm_model or os.getenv("OPENAI_MODEL")
+        if base_url and not base_url.rstrip("/").endswith("/v1"):
+            base_url = base_url.rstrip("/") + "/v1"
+        self.openai_client = OpenAI(api_key=api_key, base_url=base_url)
         self.llm_config = {
-            "model": llm_model,
+            "model": model_name,
             "max_tokens": 2000,
             "temperature": 0,
         }
-    def infer(self, messages):
-        response = self.openai_client.chat.completions.create(**self.llm_config,messages=messages)
-        return response.choices[0].message.content
+
+    def infer(self, messages: Iterable[dict]) -> str:
+        response = self.openai_client.chat.completions.create(
+            **self.llm_config, messages=list(messages)
+        )
+        return response.choices[0].message.content or ""
 
 
-
-def normalize_answer(s):
+def normalize_answer(s) -> str:
     if s is None:
         return ""
     if not isinstance(s, str):
-        s = str(s) 
+        s = str(s)
+
     def remove_articles(text):
         return re.sub(r"\b(a|an|the)\b", " ", text)
+
     def white_space_fix(text):
         return " ".join(text.split())
+
     def remove_punc(text):
         exclude = set(string.punctuation)
         return "".join(ch for ch in text if ch not in exclude)
-    def lower(text):
-        return text.lower()
-    return white_space_fix(remove_articles(remove_punc(lower(s))))
 
-def setup_logging(log_file):
-    log_format = '%(asctime)s - %(levelname)s - %(message)s'
-    handlers = [logging.StreamHandler()]  
+    return white_space_fix(remove_articles(remove_punc(s.lower())))
+
+
+def setup_logging(log_file: str) -> None:
+    log_format = "%(asctime)s - %(levelname)s - %(message)s"
+    handlers = [logging.StreamHandler()]
     os.makedirs(os.path.dirname(log_file), exist_ok=True)
-    handlers.append(logging.FileHandler(log_file, mode='a', encoding='utf-8'))
-    logging.basicConfig(
-        level=logging.INFO,
-        format=log_format,
-        handlers=handlers,
-        force=True
-    )
-    # Suppress noisy HTTP request logs (e.g., 401 Unauthorized) from httpx/openai
-    logging.getLogger("httpx").setLevel(logging.WARNING)
-    logging.getLogger("httpcore").setLevel(logging.WARNING)
-    logging.getLogger("openai").setLevel(logging.WARNING)
+    handlers.append(logging.FileHandler(log_file, mode="a", encoding="utf-8"))
+    logging.basicConfig(level=logging.INFO, format=log_format, handlers=handlers, force=True)
+    for noisy in ("httpx", "httpcore", "openai"):
+        logging.getLogger(noisy).setLevel(logging.WARNING)
+
 
 def min_max_normalize(x):
-    min_val = np.min(x)
-    max_val = np.max(x)
-    range_val = max_val - min_val
-    
-    # Handle the case where all values are the same (range is zero)
-    if range_val == 0:
-        return np.ones_like(x)  # Return an array of ones with the same shape as x
-    
-    return (x - min_val) / range_val
+    arr = np.asarray(x)
+    if arr.size == 0:
+        return arr
+    min_val = float(np.min(arr))
+    max_val = float(np.max(arr))
+    if max_val - min_val == 0:
+        return np.ones_like(arr)
+    return (arr - min_val) / (max_val - min_val)

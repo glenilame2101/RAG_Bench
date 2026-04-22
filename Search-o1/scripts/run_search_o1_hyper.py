@@ -10,12 +10,10 @@ import string
 from typing import Optional, Tuple, List, Dict
 import argparse
 
-from transformers import AutoTokenizer
-try:
-    from vllm import LLM, SamplingParams  # noqa: F401
-except ImportError:  # vllm is optional when using the remote OpenAI backend
-    LLM = None  # type: ignore[assignment]
-    from openai_llm import SamplingParams  # type: ignore[no-redef]
+from tokenizer_stub import AutoTokenizer
+# vLLM removed — OpenAI-only after the refactor.
+LLM = None
+from openai_llm import SamplingParams
 from openai_llm import (
     add_backend_args,
     build_llm,
@@ -56,8 +54,6 @@ import hashlib
 RETRIEVER_URL = "http://127.0.0.1:8236/search"
 
 def local_dense_search(query: str, cache_dict: dict, topk: int = 3):
-、
-     
     if query in cache_dict:
         content = cache_dict[query]
         return [{
@@ -96,8 +92,6 @@ def local_dense_search(query: str, cache_dict: dict, topk: int = 3):
         formatted_content = "\n\n".join(content_strs)
     else:
         formatted_content = str(result_list)
-
-  (key=query)
 
     cache_dict[query] = formatted_content
     

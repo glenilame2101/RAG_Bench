@@ -7,16 +7,12 @@ from typing import Union, Optional, List, Set, Dict, Any, Tuple, Literal
 import numpy as np
 import importlib
 from collections import defaultdict
-from transformers import HfArgumentParser
 from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
 from igraph import Graph
 import igraph as ig
-import numpy as np
-from collections import defaultdict
 import re
 import time
-import pdb
 
 from .llm import _get_llm_class, BaseLLM
 from .embedding_model import _get_embedding_model_class, BaseEmbeddingModel
@@ -56,8 +52,7 @@ class HippoRAG:
                 to `outputs` if no value is provided.
             llm_model (BaseLLM): The language model used for processing based on the global
                 configuration settings.
-            openie (Union[OpenIE, VLLMOfflineOpenIE]): The Open Information Extraction module
-                configured in either online or offline mode based on the global settings.
+            openie (OpenIE): The Open Information Extraction module (online OpenAI mode).
             graph: The graph instance initialized by the `initialize_graph` method.
             embedding_model (BaseEmbeddingModel): The embedding model associated with the current
                 configuration.
@@ -123,37 +118,17 @@ class HippoRAG:
 
         self.llm_model: BaseLLM = _get_llm_class(self.global_config)
 
-        if self.global_config.openie_mode == 'online':
-            self.openie = OpenIE(llm_model=self.llm_model)
-        elif self.global_config.openie_mode == 'offline':
-            llm_name = getattr(self.global_config, 'llm_name', '')
-            if 'gpt-' in llm_name or 'miniMax' in llm_name or llm_name.startswith('anthropic') or llm_name.startswith('bedrock'):
-                # Lazy import OpenAI version
-                from .information_extraction.openie_litellm_offline import OpenAIOfflineOpenIE
-                self.openie = OpenAIOfflineOpenIE(self.global_config)
-            else:
-                # Lazy import vLLM version
-                from .information_extraction.openie_vllm_offline import VLLMOfflineOpenIE
-                self.openie = VLLMOfflineOpenIE(self.global_config)
-        elif self.global_config.openie_mode ==  'Transformers-offline':
-            from .information_extraction.openie_transformers_offline import TransformersOfflineOpenIE
-            self.openie = TransformersOfflineOpenIE(self.global_config)
+        # OpenAI-only refactor: only the online OpenIE path remains.
+        self.openie = OpenIE(llm_model=self.llm_model)
 
         self.graph = self.initialize_graph()
 
-        # For LiteLLM offline mode, we still need embedding model for retrieval
-        if self.global_config.openie_mode == 'offline':
-            llm_name = getattr(self.global_config, 'llm_name', '')
-            if 'gpt-' in llm_name or 'miniMax' in llm_name or llm_name.startswith('anthropic') or llm_name.startswith('bedrock'):
-                self.embedding_model: BaseEmbeddingModel = _get_embedding_model_class(
-                    embedding_model_name=self.global_config.embedding_model_name)(global_config=self.global_config,
-                                                                                  embedding_model_name=self.global_config.embedding_model_name)
-            else:
-                self.embedding_model = None
-        else:
-            self.embedding_model: BaseEmbeddingModel = _get_embedding_model_class(
-                embedding_model_name=self.global_config.embedding_model_name)(global_config=self.global_config,
-                                                                              embedding_model_name=self.global_config.embedding_model_name)
+        self.embedding_model: BaseEmbeddingModel = _get_embedding_model_class(
+            embedding_model_name=self.global_config.embedding_model_name
+        )(
+            global_config=self.global_config,
+            embedding_model_name=self.global_config.embedding_model_name,
+        )
         self.chunk_embedding_store = EmbeddingStore(self.embedding_model,
                                                     os.path.join(self.working_dir, "chunk_embeddings"),
                                                     self.global_config.embedding_batch_size, 'chunk')

@@ -6,7 +6,7 @@ import numpy as np
 import tiktoken
 from tqdm import tqdm
 
-from .EmbeddingModels import BaseEmbeddingModel, OpenAIEmbeddingModel
+from .EmbeddingModels import BaseEmbeddingModel
 from .Retrievers import BaseRetriever
 from .utils import split_text
 
@@ -50,7 +50,9 @@ class FaissRetrieverConfig:
         self.max_tokens = max_tokens
         self.max_context_tokens = max_context_tokens
         self.use_top_k = use_top_k
-        self.embedding_model = embedding_model or OpenAIEmbeddingModel()
+        if embedding_model is None:
+            raise ValueError("embedding_model is required (no default after the OpenAI-only refactor)")
+        self.embedding_model = embedding_model
         self.question_embedding_model = question_embedding_model or self.embedding_model
         self.tokenizer = tokenizer
         self.embedding_model_string = embedding_model_string or "OpenAI"

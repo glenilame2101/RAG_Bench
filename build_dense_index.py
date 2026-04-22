@@ -1,141 +1,121 @@
+"""Build a dense FAISS index using the OpenAI-compatible embeddings endpoint.
+
+Usage:
+    python build_dense_index.py --corpus <path-to-corpus> --output-dir <dir>
+
+`--corpus` may be a `.jsonl` file (one JSON document per line, with any of
+the fields `contents`, `text`, `content`, `document`, `body`) or a directory
+of `*.txt` files.
 """
-Build a Dense retriever index using HTTP embedding server.
-"""
+from __future__ import annotations
+
+import argparse
 import json
 import os
-import argparse
-import requests
-import numpy as np
-import faiss
 from pathlib import Path
+from typing import List
+
+import faiss
+import numpy as np
+
+from rag_clients import EmbeddingClient, load_env
 
 
-class HTTPEmbeddingClient:
-    def __init__(self, base_url: str, model_name: str = "bge-m3-Q8_0"):
-        self.base_url = base_url.rstrip("/")
-        if not self.base_url.endswith("/v1"):
-            self.base_url = f"{self.base_url}/v1"
-        self.model_name = model_name
-
-    def encode(self, texts: list[str], batch_size: int = 32) -> np.ndarray:
-        """Encode texts to embeddings via HTTP API."""
-        all_embeddings = []
-        for i in range(0, len(texts), batch_size):
-            batch = texts[i:i + batch_size]
-            payload = {
-                "input": batch,
-                "model": self.model_name
-            }
-            response = requests.post(
-                f"{self.base_url}/embeddings",
-                json=payload,
-                timeout=60
-            )
-            response.raise_for_status()
-            data = response.json()
-            embeddings = [item["embedding"] for item in data["data"]]
-            all_embeddings.extend(embeddings)
-        return np.array(all_embeddings, dtype=np.float32)
+TEXT_FIELDS = ("contents", "text", "content", "document", "body")
 
 
-def load_corpus_from_dir(input_dir: str) -> list[dict]:
-    """Load text files from directory and create corpus JSONL format."""
+def load_corpus(corpus_path: str) -> List[dict]:
+    path = Path(corpus_path)
+    if path.is_dir():
+        corpus = []
+        for file_path in sorted(path.glob("*.txt")):
+            content = file_path.read_text(encoding="utf-8").strip()
+            if content:
+                corpus.append({"id": file_path.stem, "contents": content})
+        return corpus
+
+    if not path.is_file():
+        raise FileNotFoundError(f"Corpus path not found: {path}")
+
     corpus = []
-    input_path = Path(input_dir)
-    for file_path in sorted(input_path.glob("*.txt")):
-        with open(file_path, 'r', encoding='utf-8') as f:
-            content = f.read()
-        corpus.append({
-            "id": file_path.stem,
-            "contents": content
-        })
-    return corpus
-
-
-def load_corpus_from_jsonl(jsonl_path: str) -> list[dict]:
-    """Load corpus from JSONL file."""
-    corpus = []
-    with open(jsonl_path, 'r', encoding='utf-8') as f:
-        for line in f:
-            corpus.append(json.loads(line.strip()))
+    with path.open("r", encoding="utf-8") as fh:
+        for raw in fh:
+            line = raw.strip()
+            if not line:
+                continue
+            try:
+                doc = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            text = None
+            for field in TEXT_FIELDS:
+                if field in doc:
+                    text = doc[field]
+                    break
+            if text is None:
+                text = (doc.get("question", "") + " " + doc.get("answer", "")).strip()
+            if isinstance(text, list):
+                text = " ".join(str(t) for t in text)
+            text = str(text).strip()
+            if not text:
+                continue
+            corpus.append({"id": str(doc.get("id", len(corpus))), "contents": text})
     return corpus
 
 
 def build_index(
-    corpus: list[dict],
-    embedding_url: str,
-    embedding_model: str,
-    output_dir: str,
-    dimension: int = 1024,
-    batch_size: int = 32
-):
-    """Build FAISS index from corpus using HTTP embeddings."""
-    print(f"[Index Builder] Loading {len(corpus)} documents...")
+    corpus: List[dict],
+    output_dir: Path,
+    embedding_base_url: str | None,
+    embedding_model: str | None,
+    batch_size: int,
+) -> None:
+    embedder = EmbeddingClient(base_url=embedding_base_url, model=embedding_model)
+    print(f"[Dense] Embedding {len(corpus)} documents via {embedder.base_url} ({embedder.model})")
 
-    # Initialize embedding client
-    embedding_client = HTTPEmbeddingClient(embedding_url, embedding_model)
-
-    # Get dimension from a test embedding
-    print(f"[Index Builder] Testing embedding dimension...")
-    test_emb = embedding_client.encode(["test"])[0]
-    dim = len(test_emb)
-    print(f"[Index Builder] Embedding dimension: {dim}")
-
-    # Build FAISS index
-    print(f"[Index Builder] Building FAISS index...")
-    index = faiss.IndexFlatL2(dim)
-
-    # Encode all documents in batches
     texts = [doc["contents"] for doc in corpus]
-    embeddings = embedding_client.encode(texts, batch_size=batch_size)
+    embeddings = embedder.encode(texts, batch_size=batch_size, normalize=True)
+    if embeddings.size == 0:
+        raise RuntimeError("No embeddings generated — corpus likely empty")
 
-    # Normalize embeddings for cosine similarity
-    faiss.normalize_L2(embeddings)
+    dim = int(embeddings.shape[1])
+    print(f"[Dense] Embedding dimension: {dim}")
 
-    # Add to index
-    index.add(embeddings)
+    index = faiss.IndexFlatIP(dim)
+    index.add(embeddings.astype(np.float32))
 
-    # Save index
-    os.makedirs(output_dir, exist_ok=True)
-    index_path = os.path.join(output_dir, "dense_index.faiss")
-    faiss.write_index(index, index_path)
-    print(f"[Index Builder] Index saved to: {index_path}")
-
-    # Save corpus
-    corpus_path = os.path.join(output_dir, "corpus.jsonl")
-    with open(corpus_path, 'w', encoding='utf-8') as f:
+    output_dir.mkdir(parents=True, exist_ok=True)
+    index_path = output_dir / "dense_index.faiss"
+    corpus_path = output_dir / "corpus.jsonl"
+    faiss.write_index(index, str(index_path))
+    with corpus_path.open("w", encoding="utf-8") as fh:
         for doc in corpus:
-            f.write(json.dumps(doc, ensure_ascii=False) + "\n")
-    print(f"[Index Builder] Corpus saved to: {corpus_path}")
+            fh.write(json.dumps(doc, ensure_ascii=False) + "\n")
+    print(f"[Dense] Wrote {index_path}")
+    print(f"[Dense] Wrote {corpus_path}")
 
-    return index_path, corpus_path
 
-
-def main():
-    parser = argparse.ArgumentParser(description="Build Dense retriever index")
-    parser.add_argument("--input_dir", type=str, help="Directory with text files")
-    parser.add_argument("--input_jsonl", type=str, help="JSONL file with corpus")
-    parser.add_argument("--output_dir", type=str, required=True, help="Output directory")
-    parser.add_argument("--embedding_url", type=str, default="http://127.0.0.1:8080/v1", help="Embedding server URL")
-    parser.add_argument("--embedding_model", type=str, default="bge-m3-Q8_0", help="Embedding model name")
-    parser.add_argument("--batch_size", type=int, default=32, help="Batch size for encoding")
+def main() -> None:
+    load_env()
+    parser = argparse.ArgumentParser(description=__doc__.strip())
+    parser.add_argument("--corpus", required=True, help="Path to JSONL corpus or directory of .txt files")
+    parser.add_argument("--output-dir", required=True, help="Directory for the FAISS index + corpus.jsonl")
+    parser.add_argument("--embedding-base-url", default=None, help="Override EMBEDDING_BASE_URL")
+    parser.add_argument("--embedding-model", default=None, help="Override EMBEDDING_MODEL")
+    parser.add_argument("--batch-size", type=int, default=32)
     args = parser.parse_args()
 
-    # Load corpus
-    if args.input_dir:
-        corpus = load_corpus_from_dir(args.input_dir)
-    elif args.input_jsonl:
-        corpus = load_corpus_from_jsonl(args.input_jsonl)
-    else:
-        raise ValueError("Must specify either --input_dir or --input_jsonl")
+    corpus = load_corpus(args.corpus)
+    if not corpus:
+        raise SystemExit(f"No documents loaded from {args.corpus}")
+    print(f"[Dense] Loaded {len(corpus)} documents from {args.corpus}")
 
-    # Build index
     build_index(
         corpus=corpus,
-        embedding_url=args.embedding_url,
+        output_dir=Path(args.output_dir),
+        embedding_base_url=args.embedding_base_url,
         embedding_model=args.embedding_model,
-        output_dir=args.output_dir,
-        batch_size=args.batch_size
+        batch_size=args.batch_size,
     )
 
 

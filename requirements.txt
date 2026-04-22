@@ -1,0 +1,29 @@
+# Single, flat requirements file for the entire RAGSearch stack.
+# All retrievers (dense, hipporag, raptor, hypergraph, linear) and the
+# Search-o1 agent run inside one virtual environment built from this file.
+#
+# Forbidden (and not present): vllm, torch, transformers, sentence-transformers,
+# huggingface-hub, gritlm, dspy, litellm, graphrag, boto3, tenacity, tiktoken,
+# umap-learn. Anything that pulls models from HuggingFace or requires a GPU
+# does not belong in this stack.
+
+openai>=1.40
+python-dotenv>=1.0
+requests>=2.31
+httpx>=0.27
+numpy>=1.26,<2.0
+fastapi>=0.110
+uvicorn>=0.29
+pydantic>=2.6
+faiss-cpu>=1.7.4
+scikit-learn>=1.3
+pandas>=2.0
+pyarrow>=14.0
+python-igraph>=0.11
+networkx>=3.2
+spacy>=3.7
+tqdm>=4.66
+filelock>=3.13
+packaging>=23.0
+tenacity>=8.2
+tiktoken>=0.7

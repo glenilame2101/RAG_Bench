@@ -179,8 +179,10 @@ class CacheOpenAI(BaseLLM):
         params["messages"] = messages
         logger.debug(f"Calling OpenAI GPT API with:\n{params}")
 
-        if 'gpt' not in params['model'] or version.parse(openai.__version__) < version.parse("1.45.0"): # if we use vllm to call openai api or if we use openai but the version is too old to use 'max_completion_tokens' argument
-            # TODO strange version change in openai protocol, but our current vllm version not changed yet
+        # Some OpenAI-compatible servers and old SDK versions do not accept
+        # `max_completion_tokens`; fall back to `max_tokens` everywhere except
+        # an up-to-date official OpenAI gpt-* call.
+        if 'gpt' not in params['model'] or version.parse(openai.__version__) < version.parse("1.45.0"):
             params['max_tokens'] = params.pop('max_completion_tokens')
 
         response = self.openai_client.chat.completions.create(**params)

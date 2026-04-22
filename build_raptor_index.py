@@ -1,176 +1,232 @@
+"""Build a RAPTOR tree index using the OpenAI-compatible embeddings endpoint.
+
+Usage:
+    python build_raptor_index.py --corpus <path> --output-dir <dir>
+
+The output directory will contain `tree.pkl` (a pickled RaptorTree).
 """
-Build RAPTOR tree index using HTTP embedding server.
-"""
-import json
-import os
+from __future__ import annotations
+
 import argparse
+import json
 import pickle
+from collections import defaultdict
 from pathlib import Path
+from typing import Any, Dict, List, Optional
 
-import sys
-raptor_path = Path(__file__).parent / "GraphR1" / "raptor"
-sys.path.insert(0, str(raptor_path))
+import numpy as np
+from sklearn.cluster import KMeans
 
-import raptor
-from raptor import RetrievalAugmentation, RetrievalAugmentationConfig
-from raptor.EmbeddingModels import HTTPEmbeddingModel
-from raptor.QAModels import BaseQAModel
-from raptor.SummarizationModels import BaseSummarizationModel
+from rag_clients import EmbeddingClient, load_env
 
 
-class HTTPQAModel(BaseQAModel):
-    """QA model using MiniMax API."""
-    def __init__(self, api_key=None, base_url="https://api.minimax.io/v1"):
-        self.api_key = api_key or os.environ.get("OPENAI_API_KEY", "")
-        self.base_url = base_url
-
-    def answer_question(self, context, question, max_tokens=150):
-        """Answer a question using MiniMax."""
-        from openai import OpenAI
-        client = OpenAI(api_key=self.api_key, base_url=self.base_url)
-        try:
-            response = client.chat.completions.create(
-                model="MiniMax-M2.7",
-                messages=[
-                    {"role": "system", "content": "You are a helpful assistant."},
-                    {"role": "user", "content": f"Context:\n{context}\n\nQuestion: {question}"},
-                ],
-                max_tokens=max_tokens,
-                temperature=0.0,
-            )
-            return response.choices[0].message.content
-        except Exception as e:
-            print(f"QA error: {e}")
-            return "I don't know."
+TEXT_FIELDS = ("contents", "text", "content", "document", "body")
 
 
-class HTTPSummarizationModel(BaseSummarizationModel):
-    """Summarization model using MiniMax API."""
-    def __init__(self, api_key=None, base_url="https://api.minimax.io/v1"):
-        self.api_key = api_key or os.environ.get("OPENAI_API_KEY", "")
-        self.base_url = base_url
+def load_corpus(corpus_path: str) -> List[str]:
+    path = Path(corpus_path)
+    if path.is_dir():
+        out = []
+        for file_path in sorted(path.glob("*.txt")):
+            content = file_path.read_text(encoding="utf-8").strip()
+            if content:
+                out.append(content)
+        return out
+    if not path.is_file():
+        raise FileNotFoundError(f"Corpus path not found: {path}")
 
-    def summarize(self, context, max_tokens=150):
-        """Summarize text using MiniMax."""
-        from openai import OpenAI
-        client = OpenAI(api_key=self.api_key, base_url=self.base_url)
-        try:
-            response = client.chat.completions.create(
-                model="MiniMax-M2.7",
-                messages=[
-                    {"role": "system", "content": "You are a helpful assistant."},
-                    {"role": "user", "content": f"Write a concise summary of the following:\n\n{context}"},
-                ],
-                max_tokens=max_tokens,
-                temperature=0.0,
-            )
-            return response.choices[0].message.content
-        except Exception as e:
-            print(f"Summarization error: {e}")
-            return str(context)[:500]  # Fallback to truncated context
-
-
-def load_corpus_from_dir(input_dir: str) -> str:
-    """Load text files from directory and concatenate."""
-    texts = []
-    input_path = Path(input_dir)
-    for file_path in sorted(input_path.glob("*.txt")):
-        with open(file_path, 'r', encoding='utf-8') as f:
-            content = f.read().strip()
-        if content:
-            texts.append(content)
-    return "\n\n".join(texts)
-
-
-def load_corpus_from_jsonl(jsonl_path: str) -> str:
-    """Load corpus from JSONL file and concatenate contents."""
-    texts = []
-    with open(jsonl_path, 'r', encoding='utf-8') as f:
-        for line in f:
-            obj = json.loads(line.strip())
-            if 'contents' in obj:
-                texts.append(obj['contents'])
-            elif 'text' in obj:
-                texts.append(obj['text'])
-    return "\n\n".join(texts)
+    out = []
+    with path.open("r", encoding="utf-8") as fh:
+        for raw in fh:
+            line = raw.strip()
+            if not line:
+                continue
+            try:
+                doc = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            text = None
+            for field in TEXT_FIELDS:
+                if field in doc:
+                    text = doc[field]
+                    break
+            if text is None:
+                text = (doc.get("question", "") + " " + doc.get("answer", "")).strip()
+            if isinstance(text, list):
+                text = " ".join(str(t) for t in text)
+            text = str(text).strip()
+            if text:
+                out.append(text)
+    return out
 
 
-def build_raptor_index(
-    corpus_text: str,
-    embedding_url: str,
-    embedding_model: str,
-    output_path: str,
-    num_layers: int = 5,
-    max_tokens: int = 100,
-    summarization_length: int = 100,
-):
-    """Build RAPTOR tree index."""
-    print(f"[RAPTOR Index Builder] Building tree...")
+class TreeNode:
+    def __init__(self, node_id: str, content: str, level: int = 0, children: Optional[List[str]] = None):
+        self.node_id = node_id
+        self.content = content
+        self.level = level
+        self.children = children or []
+        self.embedding: Optional[np.ndarray] = None
 
-    # Create embedding model
-    embedding = HTTPEmbeddingModel(base_url=embedding_url, model_name=embedding_model)
+    def to_dict(self) -> Dict[str, Any]:
+        return {"node_id": self.node_id, "content": self.content, "level": self.level, "children": self.children}
 
-    # Configure
-    config = RetrievalAugmentationConfig(
-        embedding_model=embedding,
-        summarization_model=HTTPSummarizationModel(),
-        qa_model=HTTPQAModel(),
-        tree_builder_type="cluster",
-        tb_num_layers=num_layers,
-        tb_max_tokens=max_tokens,
-        tb_summarization_length=summarization_length,
-        tb_cluster_embedding_model="EMB",
-        tr_num_layers=num_layers,
-    )
-
-    # Create RetrievalAugmentation
-    RA = RetrievalAugmentation(config=config)
-
-    # Add documents
-    print(f"[RAPTOR Index Builder] Adding documents...")
-    RA.add_documents(corpus_text)
-
-    # Save tree
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
-    with open(output_path, 'wb') as f:
-        pickle.dump(RA.tree, f)
-
-    print(f"[RAPTOR Index Builder] Tree saved to: {output_path}")
-    return output_path
+    @classmethod
+    def from_dict(cls, d: Dict[str, Any]) -> "TreeNode":
+        node = cls(d["node_id"], d["content"], d.get("level", 0), d.get("children", []))
+        if "embedding" in d:
+            node.embedding = np.array(d["embedding"])
+        return node
 
 
-def main():
-    parser = argparse.ArgumentParser(description="Build RAPTOR tree index")
-    parser.add_argument("--input_dir", type=str, help="Directory with text files")
-    parser.add_argument("--input_jsonl", type=str, help="JSONL file with corpus")
-    parser.add_argument("--output_path", type=str, required=True, help="Output pickle path")
-    parser.add_argument("--embedding_url", type=str, default="http://127.0.0.1:8080/v1", help="Embedding server URL")
-    parser.add_argument("--embedding_model", type=str, default="bge-m3-Q8_0", help="Embedding model name")
-    parser.add_argument("--num_layers", type=int, default=3, help="Number of tree layers")
-    parser.add_argument("--max_tokens", type=int, default=100, help="Max tokens per node")
-    parser.add_argument("--summarization_length", type=int, default=100, help="Summarization length")
+class RaptorTree:
+    def __init__(self):
+        self.nodes: Dict[str, TreeNode] = {}
+        self.root_ids: List[str] = []
+
+    def add_node(self, node: TreeNode):
+        self.nodes[node.node_id] = node
+
+    def get_node(self, node_id: str) -> Optional[TreeNode]:
+        return self.nodes.get(node_id)
+
+    def set_root(self, node_ids: List[str]):
+        self.root_ids = node_ids
+
+
+def chunk_text(text: str, max_tokens: int = 100) -> List[str]:
+    sentences = text.split(".")
+    chunks: List[str] = []
+    current_chunk = ""
+    current_tokens = 0
+    for sent in sentences:
+        sent = sent.strip()
+        if not sent:
+            continue
+        sent = sent + "."
+        tokens = len(sent.split())
+        if current_tokens + tokens > max_tokens and current_chunk:
+            chunks.append(current_chunk.strip())
+            current_chunk = sent
+            current_tokens = tokens
+        else:
+            current_chunk += " " + sent
+            current_tokens += tokens
+    if current_chunk.strip():
+        chunks.append(current_chunk.strip())
+    return chunks
+
+
+def build_raptor_tree(
+    texts: List[str],
+    embedder: EmbeddingClient,
+    num_layers: int,
+    max_tokens: int,
+    cluster_size: int,
+    batch_size: int,
+) -> RaptorTree:
+    print(f"[Raptor] Chunking {len(texts)} documents...")
+    all_chunks = [chunk for text in texts for chunk in chunk_text(text, max_tokens)]
+    if not all_chunks:
+        raise ValueError("No chunks created from input texts")
+
+    print(f"[Raptor] Embedding {len(all_chunks)} chunks via {embedder.base_url} ({embedder.model})")
+    embeddings = embedder.encode(all_chunks, batch_size=batch_size, normalize=True)
+
+    node_id_counter = 0
+    level_nodes: Dict[int, List[TreeNode]] = defaultdict(list)
+
+    leaf_nodes: List[TreeNode] = []
+    for i, chunk in enumerate(all_chunks):
+        node = TreeNode(f"node_{node_id_counter}", chunk, level=0)
+        node.embedding = embeddings[i]
+        node_id_counter += 1
+        leaf_nodes.append(node)
+        level_nodes[0].append(node)
+
+    current_nodes = leaf_nodes
+    current_embeddings = embeddings
+    current_level = 0
+
+    while current_level < num_layers - 1 and len(current_nodes) > cluster_size:
+        n_clusters = max(1, len(current_nodes) // cluster_size)
+        print(f"[Raptor] Clustering level {current_level}: {len(current_nodes)} -> {n_clusters}")
+        kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)
+        labels = kmeans.fit_predict(current_embeddings)
+
+        new_nodes: List[TreeNode] = []
+        new_embeddings: List[np.ndarray] = []
+        for cluster_id in range(n_clusters):
+            indices = np.where(labels == cluster_id)[0]
+            if len(indices) == 0:
+                continue
+            cluster_node_objs = [current_nodes[i] for i in indices]
+            cluster_emb = current_embeddings[indices]
+            summary = " ".join(n.content for n in cluster_node_objs[:5])
+            if len(summary) > 500:
+                summary = summary[:500] + "..."
+            summary_emb = cluster_emb.mean(axis=0)
+            norm = float(np.linalg.norm(summary_emb))
+            if norm > 0:
+                summary_emb = summary_emb / norm
+            node = TreeNode(f"node_{node_id_counter}", summary, level=current_level + 1)
+            node.embedding = summary_emb
+            node.children = [n.node_id for n in cluster_node_objs]
+            node_id_counter += 1
+            for n in cluster_node_objs:
+                n.children.append(node.node_id)
+            new_nodes.append(node)
+            new_embeddings.append(summary_emb)
+
+        level_nodes[current_level + 1].extend(new_nodes)
+        current_nodes = new_nodes
+        current_embeddings = np.array(new_embeddings)
+        current_level += 1
+
+    tree = RaptorTree()
+    for nodes in level_nodes.values():
+        for node in nodes:
+            tree.add_node(node)
+    root_nodes = current_nodes if current_nodes else leaf_nodes[: min(10, len(leaf_nodes))]
+    tree.set_root([n.node_id for n in root_nodes])
+    print(f"[Raptor] Tree built: {len(tree.nodes)} nodes, {len(tree.root_ids)} roots")
+    return tree
+
+
+def main() -> None:
+    load_env()
+    parser = argparse.ArgumentParser(description=__doc__.strip())
+    parser.add_argument("--corpus", required=True, help="Path to JSONL corpus or directory of .txt files")
+    parser.add_argument("--output-dir", required=True, help="Directory for tree.pkl")
+    parser.add_argument("--embedding-base-url", default=None, help="Override EMBEDDING_BASE_URL")
+    parser.add_argument("--embedding-model", default=None, help="Override EMBEDDING_MODEL")
+    parser.add_argument("--num-layers", type=int, default=3)
+    parser.add_argument("--max-tokens", type=int, default=100)
+    parser.add_argument("--cluster-size", type=int, default=10)
+    parser.add_argument("--batch-size", type=int, default=32)
     args = parser.parse_args()
 
-    # Load corpus
-    if args.input_dir:
-        corpus_text = load_corpus_from_dir(args.input_dir)
-    elif args.input_jsonl:
-        corpus_text = load_corpus_from_jsonl(args.input_jsonl)
-    else:
-        raise ValueError("Must specify either --input_dir or --input_jsonl")
+    texts = load_corpus(args.corpus)
+    if not texts:
+        raise SystemExit(f"No documents loaded from {args.corpus}")
+    print(f"[Raptor] Loaded {len(texts)} documents from {args.corpus}")
 
-    print(f"[RAPTOR Index Builder] Loaded corpus with {len(corpus_text)} characters")
-
-    # Build index
-    build_raptor_index(
-        corpus_text=corpus_text,
-        embedding_url=args.embedding_url,
-        embedding_model=args.embedding_model,
-        output_path=args.output_path,
+    embedder = EmbeddingClient(base_url=args.embedding_base_url, model=args.embedding_model)
+    tree = build_raptor_tree(
+        texts=texts,
+        embedder=embedder,
         num_layers=args.num_layers,
         max_tokens=args.max_tokens,
-        summarization_length=args.summarization_length,
+        cluster_size=args.cluster_size,
+        batch_size=args.batch_size,
     )
+
+    output_dir = Path(args.output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    tree_path = output_dir / "tree.pkl"
+    with tree_path.open("wb") as fh:
+        pickle.dump(tree, fh)
+    print(f"[Raptor] Wrote {tree_path}")
 
 
 if __name__ == "__main__":

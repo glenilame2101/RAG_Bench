@@ -116,7 +116,7 @@ class BaseConfig:
     )
     skip_graph: bool = field(
         default=False,
-        metadata={"help": "Whether to skip graph construction or not. Set it to be true when running vllm offline indexing for the first time."}
+        metadata={"help": "Whether to skip graph construction during indexing."}
     )
     
     

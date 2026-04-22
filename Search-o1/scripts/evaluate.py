@@ -5,7 +5,10 @@ from collections import Counter
 import string
 import os, time
 from collections import defaultdict
-from lcb_runner.evaluation import codegen_metrics
+# LiveCodeBench evaluation is no longer supported in the OpenAI-only refactor;
+# importing codegen_metrics is deferred and only attempted on the 'livecode'
+# branch so the rest of evaluate.py keeps working.
+codegen_metrics = None
 from utils.math_equivalence import is_equiv
 
 
@@ -129,6 +132,10 @@ def evaluate_predictions(output, labeled_answer, mode='gen'):
 
 def run_evaluation(filtered_data, input_list, output_list, dataset_name, output_dir, total_time, split, apply_backoff=False):
     if dataset_name == 'livecode':
+        raise NotImplementedError(
+            "LiveCodeBench evaluation was removed in the OpenAI-only refactor."
+        )
+    if False:  # legacy livecode branch retained for reference, never executed
         # Prepare samples and generations for codegen_metrics
         samples_list = []
         generations_list = []

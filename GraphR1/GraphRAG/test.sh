@@ -1,1 +1,0 @@
-python test_graphrag.py --data HotpotQA --method global --query "Which actor does American Beauty and American Beauty have in common?"

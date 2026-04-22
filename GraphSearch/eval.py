@@ -1,287 +1,191 @@
-"""
-Simple RAG evaluation script.
+"""Simple RAG retrieval evaluation.
 
-This script evaluates retrieval performance by:
-1. Loading questions from a dataset (JSON, JSONL, or Parquet)
-2. Calling the retriever API
-3. Computing retrieval metrics (EM, F1, Recall@K)
+The retriever is reached via the `RETRIEVER_URL` env var (set by
+`run_benchmark.py`, or set manually). The corpus path is supplied with
+`--corpus`; no dataset names are hardcoded here.
 """
+from __future__ import annotations
+
 import argparse
 import json
 import os
-import requests
-import time
-from typing import List, Dict, Any
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from typing import Any, Dict, List, Optional
+
+import requests
 
 
-def load_dataset(dataset_path: str = None, dataset_name: str = None, limit: int = None) -> List[Dict]:
-    """Load dataset from JSON, JSONL, or Parquet file.
+def load_dataset(corpus_path: str, limit: Optional[int] = None) -> List[Dict]:
+    if not os.path.exists(corpus_path):
+        raise SystemExit(f"Corpus path not found: {corpus_path}")
 
-    Args:
-        dataset_path: Path to dataset file. If provided, overrides dataset_name.
-        dataset_name: Predefined dataset name (for backward compatibility).
-        limit: Maximum number of samples to load.
-
-    Returns:
-        List of dataset entries.
-    """
-    path = None
-
-    # If dataset_path provided, use it directly
-    if dataset_path and os.path.exists(dataset_path):
-        path = dataset_path
-    elif dataset_path:
-        print(f"[Eval] Dataset path not found: {dataset_path}")
-        return []
-
-    # Fallback to predefined datasets
-    if not path:
-        search_o1_path = os.path.join(
-            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-            "Search-o1", "data"
-        )
-
-        dataset_paths = {
-            "bamboogle": os.path.join(search_o1_path, "FlashRAG_datasets", "bamboogle", "test.jsonl"),
-            "hotpotqa": os.path.join(search_o1_path, "hotpotqa"),
-            "musique": os.path.join(search_o1_path, "musique"),
-            "nq": os.path.join(search_o1_path, "nq"),
-            "2wikimultihopqa": os.path.join(search_o1_path, "2wikimultihopqa"),
-            "triviaqa": os.path.join(search_o1_path, "triviaqa"),
-            "popqa": os.path.join(search_o1_path, "popqa"),
-        }
-
-        path = dataset_paths.get(dataset_name.lower()) if dataset_name else None
-
-        if not path or not os.path.exists(path):
-            print(f"[Eval] Dataset path not found: {path}")
-            return []
-
-    # Detect format and load
-    ext = path.lower().split('.')[-1]
-
+    ext = corpus_path.lower().rsplit(".", 1)[-1]
     if ext == "jsonl":
-        return _load_jsonl(path, limit)
-    elif ext == "json":
-        return _load_json(path, limit)
-    elif ext == "parquet":
-        return _load_parquet(path, limit)
-    else:
-        # Try to auto-detect by reading the file
-        print(f"[Eval] Unknown extension '{ext}', attempting to auto-detect format...")
-        # Try JSONL first (most common)
-        try:
-            return _load_jsonl(path, limit)
-        except:
-            try:
-                return _load_json(path, limit)
-            except:
-                try:
-                    return _load_parquet(path, limit)
-                except Exception as e:
-                    print(f"[Eval] Failed to load dataset: {e}")
-                    return []
+        return _load_jsonl(corpus_path, limit)
+    if ext == "json":
+        return _load_json(corpus_path, limit)
+    if ext == "parquet":
+        return _load_parquet(corpus_path, limit)
+    # try jsonl as the default
+    return _load_jsonl(corpus_path, limit)
 
 
-def _load_jsonl(path: str, limit: int = None) -> List[Dict]:
-    """Load dataset from JSONL file."""
-    data = []
-    with open(path, 'r', encoding='utf-8') as f:
-        for i, line in enumerate(f):
-            if limit and i >= limit:
+def _load_jsonl(path: str, limit: Optional[int]) -> List[Dict]:
+    out: List[Dict] = []
+    with open(path, "r", encoding="utf-8") as fh:
+        for i, line in enumerate(fh):
+            if limit is not None and i >= limit:
                 break
-            try:
-                data.append(json.loads(line.strip()))
-            except json.JSONDecodeError as e:
-                print(f"[Eval] Skipping invalid JSON line {i}: {e}")
+            line = line.strip()
+            if not line:
                 continue
-    return data
+            try:
+                out.append(json.loads(line))
+            except json.JSONDecodeError:
+                continue
+    return out
 
 
-def _load_json(path: str, limit: int = None) -> List[Dict]:
-    """Load dataset from JSON file (array or object)."""
-    with open(path, 'r', encoding='utf-8') as f:
-        data = json.load(f)
-
-    # Handle both array and object formats
+def _load_json(path: str, limit: Optional[int]) -> List[Dict]:
+    with open(path, "r", encoding="utf-8") as fh:
+        data = json.load(fh)
     if isinstance(data, list):
         return data[:limit] if limit else data
-    elif isinstance(data, dict):
-        # If it's a single object, wrap in list
+    if isinstance(data, dict):
         return [data]
-    else:
-        print(f"[Eval] Unexpected JSON format in {path}")
-        return []
+    return []
 
 
-def _load_parquet(path: str, limit: int = None) -> List[Dict]:
-    """Load dataset from Parquet file."""
+def _load_parquet(path: str, limit: Optional[int]) -> List[Dict]:
     try:
         import pandas as pd
     except ImportError:
-        print("[Eval] pandas required for Parquet support: pip install pandas pyarrow")
-        return []
-
+        raise SystemExit("pandas required for Parquet support: pip install pandas pyarrow")
     df = pd.read_parquet(path)
-    # Convert to list of dicts
-    data = df.to_dict('records')
-    return data[:limit] if limit else data
+    rows = df.to_dict("records")
+    return rows[:limit] if limit else rows
 
 
 def normalize_answer(text: str) -> str:
-    """Normalize answer text for comparison."""
     if not text:
         return ""
-    text = text.lower()
-    text = " ".join(text.strip().split())
-    return text
+    return " ".join(str(text).strip().lower().split())
 
 
 def compute_exact_match(pred: str, gold: List[str]) -> float:
-    """Compute exact match score."""
     pred_norm = normalize_answer(pred)
-    for g in gold:
-        if pred_norm == normalize_answer(g):
-            return 1.0
-    return 0.0
+    return 1.0 if any(pred_norm == normalize_answer(g) for g in gold) else 0.0
 
 
 def compute_f1(pred: str, gold: List[str]) -> float:
-    """Compute token-level F1 score."""
     pred_norm = normalize_answer(pred)
     if not pred_norm:
         return 0.0
-
-    best_f1 = 0.0
+    best = 0.0
+    pred_tokens = set(pred_norm.split())
     for g in gold:
         gold_norm = normalize_answer(g)
         if not gold_norm:
             continue
-
-        pred_tokens = set(pred_norm.split())
         gold_tokens = set(gold_norm.split())
-
         overlap = len(pred_tokens & gold_tokens)
         if overlap == 0:
             continue
-
         precision = overlap / len(pred_tokens)
         recall = overlap / len(gold_tokens)
         f1 = 2 * precision * recall / (precision + recall)
-        best_f1 = max(best_f1, f1)
+        best = max(best, f1)
+    return best
 
-    return best_f1
 
-
-def call_retriever(url: str, query: str, top_k: int) -> List[str]:
-    """Call retriever API and return results."""
+def call_retriever(url: str, query: str) -> str:
     try:
-        response = requests.post(
-            url,
-            json={"queries": [query]},
-            timeout=30
-        )
-        response.raise_for_status()
-        result = response.json()
+        resp = requests.post(url, json={"queries": [query]}, timeout=30)
+        resp.raise_for_status()
+        data = resp.json()
+    except requests.RequestException as exc:
+        print(f"[Eval] Error calling retriever: {exc}")
+        return ""
 
-        if isinstance(result, list) and len(result) > 0:
-            if isinstance(result[0], dict) and "results" in result[0]:
-                return [r["results"] for r in result]
-            return result
-        elif isinstance(result, dict) and "results" in result:
-            return [result["results"]]
-        return []
-    except Exception as e:
-        print(f"[Eval] Error calling retriever: {e}")
-        return []
+    if isinstance(data, list) and data:
+        first = data[0]
+        if isinstance(first, dict):
+            return first.get("results", "")
+        return str(first)
+    if isinstance(data, dict) and "results" in data:
+        return data["results"]
+    return ""
 
 
-def evaluate_single(question_data: Dict, retriever_url: str, top_k: int) -> Dict:
-    """Evaluate a single question."""
-    question = question_data.get("question", question_data.get("query", ""))
-    gold_answers = question_data.get("answer", question_data.get("answers", []))
-    if isinstance(gold_answers, str):
-        gold_answers = [gold_answers]
-
-    retrieved = call_retriever(retriever_url, question, top_k)
-    retrieved_text = retrieved[0] if retrieved else ""
-
-    em = compute_exact_match(retrieved_text, gold_answers)
-    f1 = compute_f1(retrieved_text, gold_answers)
-
+def evaluate_single(question_data: Dict, retriever_url: str) -> Dict[str, Any]:
+    question = question_data.get("question") or question_data.get("query") or ""
+    gold = question_data.get("answer") or question_data.get("answers") or []
+    if isinstance(gold, str):
+        gold = [gold]
+    retrieved = call_retriever(retriever_url, question)
     return {
         "question": question,
-        "gold": gold_answers,
-        "retrieved": retrieved_text[:200] if retrieved_text else "",
-        "em": em,
-        "f1": f1
+        "gold": gold,
+        "retrieved": retrieved[:200] if retrieved else "",
+        "em": compute_exact_match(retrieved, gold),
+        "f1": compute_f1(retrieved, gold),
     }
 
 
-def main():
-    parser = argparse.ArgumentParser(description="RAG Retrieval Evaluation")
-    parser.add_argument("--dataset", required=True, help="Dataset name")
-    parser.add_argument("--graphrag", default=None, help="Retriever type (unused)")
-    parser.add_argument("--method", default="graphsearch", help="Method (unused)")
-    parser.add_argument("--top_k", type=int, default=5, help="Top-K for retrieval")
-    parser.add_argument("--concurrency", type=int, default=1, help="Concurrency")
-    parser.add_argument("--data_path", type=str, default=None, help="Dataset path")
-    parser.add_argument("--limit", type=int, default=0, help="Limit number of questions")
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__.strip())
+    parser.add_argument("--retriever", default="unknown", help="Retriever name (used for output filename)")
+    parser.add_argument("--corpus", required=True, help="Path to JSONL/JSON/Parquet evaluation file")
+    parser.add_argument("--top-k", type=int, default=5)
+    parser.add_argument("--concurrency", type=int, default=1)
+    parser.add_argument("--limit", type=int, default=0)
     args = parser.parse_args()
 
-    retriever_url = os.environ.get("RETRIEVER_URL", "http://127.0.0.1:8000/search")
+    retriever_url = os.environ.get("RETRIEVER_URL", "http://127.0.0.1:8306/search")
 
-    print(f"[Eval] Loading dataset: {args.dataset}")
-    data = load_dataset(args.data_path, args.dataset, args.limit if args.limit > 0 else None)
-    print(f"[Eval] Loaded {len(data)} questions")
-
+    data = load_dataset(args.corpus, args.limit if args.limit > 0 else None)
+    print(f"[Eval] Loaded {len(data)} questions from {args.corpus}")
     if not data:
-        print("[Eval] No data loaded, exiting")
         return
+    print(f"[Eval] Retriever: {retriever_url}")
+    print(f"[Eval] Top-K: {args.top_k}  Concurrency: {args.concurrency}")
 
-    print(f"[Eval] Evaluating with retriever at: {retriever_url}")
-    print(f"[Eval] Top-K: {args.top_k}, Concurrency: {args.concurrency}")
-
-    results = []
+    results: List[Dict[str, Any]] = []
     if args.concurrency > 1:
-        with ThreadPoolExecutor(max_workers=args.concurrency) as executor:
-            futures = {
-                executor.submit(evaluate_single, item, retriever_url, args.top_k): item
-                for item in data
-            }
+        with ThreadPoolExecutor(max_workers=args.concurrency) as pool:
+            futures = {pool.submit(evaluate_single, item, retriever_url): item for item in data}
             for future in as_completed(futures):
                 results.append(future.result())
     else:
-        for item in data:
-            result = evaluate_single(item, retriever_url, args.top_k)
-            results.append(result)
-            if len(results) % 10 == 0:
-                print(f"[Eval] Processed {len(results)}/{len(data)} questions")
+        for i, item in enumerate(data):
+            results.append(evaluate_single(item, retriever_url))
+            if (i + 1) % 10 == 0:
+                print(f"[Eval] Processed {i + 1}/{len(data)}")
 
-    em_scores = [r["em"] for r in results]
-    f1_scores = [r["f1"] for r in results]
-
+    em = sum(r["em"] for r in results) / max(1, len(results))
+    f1 = sum(r["f1"] for r in results) / max(1, len(results))
     print("\n" + "=" * 50)
     print("EVALUATION RESULTS")
     print("=" * 50)
     print(f"Total questions: {len(results)}")
-    print(f"Exact Match (EM): {sum(em_scores)/len(em_scores):.4f}")
-    print(f"F1 Score:         {sum(f1_scores)/len(f1_scores):.4f}")
+    print(f"Exact Match:     {em:.4f}")
+    print(f"F1 Score:        {f1:.4f}")
     print("=" * 50)
 
-    output_file = f"eval_results_{args.dataset}_{args.graphrag or 'unknown'}.json"
-    with open(output_file, 'w', encoding='utf-8') as f:
-        json.dump({
-            "dataset": args.dataset,
-            "retriever": args.graphrag,
-            "metrics": {
-                "em": sum(em_scores)/len(em_scores),
-                "f1": sum(f1_scores)/len(f1_scores),
+    output_file = f"eval_results_{args.retriever}.json"
+    with open(output_file, "w", encoding="utf-8") as fh:
+        json.dump(
+            {
+                "retriever": args.retriever,
+                "corpus": args.corpus,
+                "metrics": {"em": em, "f1": f1},
+                "details": results,
             },
-            "details": results
-        }, f, indent=2, ensure_ascii=False)
-    print(f"\n[Eval] Results saved to: {output_file}")
+            fh,
+            indent=2,
+            ensure_ascii=False,
+        )
+    print(f"[Eval] Results saved to: {output_file}")
 
 
 if __name__ == "__main__":

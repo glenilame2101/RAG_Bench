@@ -2,17 +2,36 @@ import os
 import json
 import requests
 from requests.exceptions import Timeout
-from bs4 import BeautifulSoup
-from tqdm import tqdm
 import time
 import concurrent
 from concurrent.futures import ThreadPoolExecutor
-import pdfplumber
 from io import BytesIO
 import re
 import string
 from typing import Optional, Tuple
-from nltk.tokenize import sent_tokenize
+
+# Optional dependencies — lazy-imported so the bing path is only required at runtime.
+try:
+    from bs4 import BeautifulSoup  # noqa: F401
+except ImportError:  # pragma: no cover
+    BeautifulSoup = None  # type: ignore[assignment]
+
+try:
+    from tqdm import tqdm  # noqa: F401
+except ImportError:  # pragma: no cover
+    def tqdm(x, *a, **k):  # type: ignore[no-redef]
+        return x
+
+try:
+    from nltk.tokenize import sent_tokenize  # noqa: F401
+except ImportError:  # pragma: no cover
+    def sent_tokenize(text: str):  # type: ignore[no-redef]
+        return [s.strip() for s in re.split(r"(?<=[.!?])\s+", text) if s.strip()]
+
+try:
+    import pdfplumber  # noqa: F401
+except ImportError:  # pragma: no cover
+    pdfplumber = None  # type: ignore[assignment]
 
 
 # ----------------------- Custom Headers -----------------------
@@ -238,6 +257,8 @@ def extract_pdf_text(url):
             return f"Error: Unable to retrieve the PDF (status code {response.status_code})"
         
         # Open the PDF file using pdfplumber
+        if pdfplumber is None:
+            raise RuntimeError("pdfplumber is not installed; PDF fetch is disabled")
         with pdfplumber.open(BytesIO(response.content)) as pdf:
             full_text = ""
             for page in pdf.pages:

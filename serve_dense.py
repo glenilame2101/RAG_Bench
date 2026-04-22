@@ -1,53 +1,37 @@
+"""Dense FAISS retriever HTTP server.
+
+Usage:
+    python serve_dense.py --index-dir <path> --port <port>
+
+The --index-dir must contain `dense_index.faiss` and `corpus.jsonl`,
+typically produced by `build_dense_index.py`.
+
+Endpoints:
+    POST /search    -> standard {"queries":[...]} interface
+    POST /retrieve  -> Search-o1 compatible alias
+    GET  /status    -> liveness + size
 """
-Dense Retriever API server using HTTP embeddings.
-Search-R1 compatible API format.
-"""
-import json
-import os
+from __future__ import annotations
+
 import argparse
-import requests
-import numpy as np
-import faiss
+import json
 from pathlib import Path
-from typing import List, Dict
+from typing import List, Optional
+
+import faiss
+import numpy as np
+import uvicorn
 from fastapi import FastAPI
 from pydantic import BaseModel
-import uvicorn
+
+from rag_clients import EmbeddingClient, load_env
 
 
-class HTTPEmbeddingClient:
-    def __init__(self, base_url: str, model_name: str = "bge-m3-Q8_0"):
-        self.base_url = base_url.rstrip("/")
-        if not self.base_url.endswith("/v1"):
-            self.base_url = f"{self.base_url}/v1"
-        self.model_name = model_name
+app = FastAPI(title="RAGSearch Dense Retriever")
 
-    def encode(self, texts: list[str], batch_size: int = 32) -> np.ndarray:
-        """Encode texts to embeddings via HTTP API."""
-        all_embeddings = []
-        for i in range(0, len(texts), batch_size):
-            batch = texts[i:i + batch_size]
-            payload = {
-                "input": batch,
-                "model": self.model_name
-            }
-            response = requests.post(
-                f"{self.base_url}/embeddings",
-                json=payload,
-                timeout=60
-            )
-            response.raise_for_status()
-            data = response.json()
-            embeddings = [item["embedding"] for item in data["data"]]
-            all_embeddings.extend(embeddings)
-        return np.array(all_embeddings, dtype=np.float32)
-
-
-app = FastAPI()
-
-index = None
-corpus = []
-embedding_client = None
+INDEX: Optional[faiss.Index] = None
+CORPUS: List[dict] = []
+EMBEDDER: Optional[EmbeddingClient] = None
 
 
 class SearchRequest(BaseModel):
@@ -56,73 +40,70 @@ class SearchRequest(BaseModel):
     return_scores: bool = True
 
 
-@app.post("/retrieve")
-def retrieve(request: SearchRequest):
-    """Search-R1 compatible /retrieve endpoint."""
-    global index, corpus, embedding_client
-
-    results = []
-    for query in request.queries:
-        # Encode query
-        query_emb = embedding_client.encode([query])
-        faiss.normalize_L2(query_emb)
-
-        # Search
-        D, I = index.search(query_emb, min(request.topk, len(corpus)))
-
-        # Format results in Search-R1 format
+def _search(queries: List[str], topk: int) -> List[List[dict]]:
+    assert INDEX is not None and EMBEDDER is not None
+    embeddings = EMBEDDER.encode(queries, normalize=True)
+    topk = max(1, min(int(topk), len(CORPUS)))
+    D, I = INDEX.search(embeddings.astype(np.float32), topk)
+    out = []
+    for row_d, row_i in zip(D, I):
         hits = []
-        for i, (score, idx) in enumerate(zip(D[0], I[0])):
-            if idx < len(corpus):
+        for score, idx in zip(row_d, row_i):
+            if 0 <= idx < len(CORPUS):
                 hits.append({
                     "document": {
-                        "id": corpus[idx]["id"],
-                        "contents": corpus[idx]["contents"]
+                        "id": CORPUS[idx].get("id"),
+                        "contents": CORPUS[idx].get("contents", ""),
                     },
-                    "score": float(score)
+                    "score": float(score),
                 })
+        out.append(hits)
+    return out
 
-        results.append(hits)
 
-    return {"result": results}
+@app.post("/retrieve")
+def retrieve(request: SearchRequest):
+    return {"result": _search(request.queries, request.topk)}
+
+
+@app.post("/search")
+def search(request: SearchRequest):
+    hits_per_query = _search(request.queries, request.topk)
+    return [
+        {"results": "\n\n".join(h["document"].get("contents", "") for h in hits)}
+        for hits in hits_per_query
+    ]
 
 
 @app.get("/status")
 def status():
-    return {
-        "status": "OK",
-        "index_size": len(corpus) if corpus else 0
-    }
+    return {"status": "ok", "retriever": "dense", "index_size": len(CORPUS)}
 
 
-def load_index(index_path: str, corpus_path: str, embedding_url: str, embedding_model: str):
-    global index, corpus, embedding_client
+def main() -> None:
+    load_env()
+    parser = argparse.ArgumentParser(description=__doc__.strip())
+    parser.add_argument("--index-dir", required=True, help="Directory with dense_index.faiss + corpus.jsonl")
+    parser.add_argument("--port", type=int, required=True)
+    parser.add_argument("--embedding-base-url", default=None)
+    parser.add_argument("--embedding-model", default=None)
+    args = parser.parse_args()
 
-    print(f"[Startup] Loading FAISS index from: {index_path}")
-    index = faiss.read_index(index_path)
+    index_dir = Path(args.index_dir)
+    index_path = index_dir / "dense_index.faiss"
+    corpus_path = index_dir / "corpus.jsonl"
+    if not index_path.is_file() or not corpus_path.is_file():
+        raise SystemExit(f"Missing dense_index.faiss or corpus.jsonl in {index_dir}")
 
-    print(f"[Startup] Loading corpus from: {corpus_path}")
-    corpus = []
-    with open(corpus_path, 'r', encoding='utf-8') as f:
-        for line in f:
-            corpus.append(json.loads(line.strip()))
+    global INDEX, CORPUS, EMBEDDER
+    INDEX = faiss.read_index(str(index_path))
+    CORPUS = [json.loads(line) for line in corpus_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    EMBEDDER = EmbeddingClient(base_url=args.embedding_base_url, model=args.embedding_model)
+    print(f"[serve_dense] Loaded {len(CORPUS)} docs from {index_dir}")
+    print(f"[serve_dense] Embedding via {EMBEDDER.base_url} ({EMBEDDER.model})")
 
-    print(f"[Startup] Loaded {len(corpus)} documents")
-
-    embedding_client = HTTPEmbeddingClient(embedding_url, embedding_model)
-    print(f"[Startup] Embedding client configured: {embedding_url}")
+    uvicorn.run(app, host="0.0.0.0", port=args.port)
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Dense Retriever API server")
-    parser.add_argument("--index_path", type=str, required=True, help="FAISS index path")
-    parser.add_argument("--corpus_path", type=str, required=True, help="Corpus JSONL path")
-    parser.add_argument("--embedding_url", type=str, default="http://127.0.0.1:8080/v1", help="Embedding server URL")
-    parser.add_argument("--embedding_model", type=str, default="bge-m3-Q8_0", help="Embedding model name")
-    parser.add_argument("--port", type=int, default=8306, help="Server port")
-    args = parser.parse_args()
-
-    load_index(args.index_path, args.corpus_path, args.embedding_url, args.embedding_model)
-
-    print(f"[Startup] Starting Dense Retriever API on port {args.port}")
-    uvicorn.run(app, host="0.0.0.0", port=args.port)
+    main()

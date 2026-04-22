@@ -1,13 +1,38 @@
 import logging
 import pickle
+from abc import ABC, abstractmethod
 
 from .cluster_tree_builder import ClusterTreeBuilder, ClusterTreeConfig
 from .EmbeddingModels import BaseEmbeddingModel
-from .QAModels import BaseQAModel, GPT3TurboQAModel
-from .SummarizationModels import BaseSummarizationModel
 from .tree_builder import TreeBuilder, TreeBuilderConfig
 from .tree_retriever import TreeRetriever, TreeRetrieverConfig
 from .tree_structures import Node, Tree
+
+
+class BaseQAModel(ABC):
+    """Minimal QA model interface kept after the OpenAI-only refactor."""
+
+    @abstractmethod
+    def answer_question(self, context, question):
+        ...
+
+
+class _NoopQAModel(BaseQAModel):
+    """Default QA model that just echoes the context.
+
+    The retriever scripts only ever call ``RetrievalAugmentation.retrieve``,
+    not ``answer_question``. Picking a no-op default avoids an extra LLM
+    round-trip during pure retrieval workloads.
+    """
+
+    def answer_question(self, context, question, max_tokens=150):
+        return context
+
+
+class BaseSummarizationModel(ABC):
+    @abstractmethod
+    def summarize(self, context, max_tokens=150):
+        ...
 
 # Define a dictionary to map supported tree builders to their respective configs
 supported_tree_builders = {"cluster": (ClusterTreeBuilder, ClusterTreeConfig)}
@@ -129,7 +154,7 @@ class RetrievalAugmentationConfig:
         # Assign the created configurations to the instance
         self.tree_builder_config = tree_builder_config
         self.tree_retriever_config = tree_retriever_config
-        self.qa_model = qa_model or GPT3TurboQAModel()
+        self.qa_model = qa_model or _NoopQAModel()
         self.tree_builder_type = tree_builder_type
 
     def log_config(self):

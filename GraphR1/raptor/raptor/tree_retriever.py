@@ -2,10 +2,9 @@ import logging
 import os
 from typing import Dict, List, Set
 
-import tiktoken
 from tenacity import retry, stop_after_attempt, wait_random_exponential
 
-from .EmbeddingModels import BaseEmbeddingModel, OpenAIEmbeddingModel
+from .EmbeddingModels import BaseEmbeddingModel
 from .Retrievers import BaseRetriever
 from .tree_structures import Node, Tree
 from .utils import (distances_from_embeddings, get_children, get_embeddings,
@@ -28,8 +27,8 @@ class TreeRetrieverConfig:
         num_layers=None,
         start_layer=None,
     ):
-        if tokenizer is None:
-            tokenizer = tiktoken.get_encoding("cl100k_base")
+        # Tokenizer optional; only matters if the caller wants token-level
+        # context truncation, which the OpenAI-only retrieval flow does not.
         self.tokenizer = tokenizer
 
         if threshold is None:
@@ -61,9 +60,9 @@ class TreeRetrieverConfig:
             raise ValueError("context_embedding_model must be a string")
         self.context_embedding_model = context_embedding_model
 
-        if embedding_model is None:
-            embedding_model = OpenAIEmbeddingModel()
-        if not isinstance(embedding_model, BaseEmbeddingModel):
+        # The retrieval-only flow always passes an explicit embedding model
+        # (an HTTPEmbeddingModel pointed at the user's endpoint).
+        if embedding_model is not None and not isinstance(embedding_model, BaseEmbeddingModel):
             raise ValueError(
                 "embedding_model must be an instance of BaseEmbeddingModel"
             )
