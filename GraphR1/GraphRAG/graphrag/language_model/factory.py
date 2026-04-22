@@ -1,45 +1,35 @@
-# Copyright (c) 2025 Microsoft Corporation.
-# Licensed under the MIT License
+# Copyright (c) 2025 RAGSearch Contributors.
+# Licensed under MIT License
 
 """A package containing a factory for supported llm types."""
 
 from collections.abc import Callable
 from typing import Any, ClassVar
 
-from graphrag.config.enums import ModelType
-from graphrag.language_model.protocol.base import ChatModel, EmbeddingModel
-from graphrag.language_model.providers.fnllm.models import (
-    AzureOpenAIChatFNLLM,
-    AzureOpenAIEmbeddingFNLLM,
-    OpenAIChatFNLLM,
-    OpenAIEmbeddingFNLLM,
-)
-from graphrag.language_model.providers.litellm.chat_model import LitellmChatModel
-from graphrag.language_model.providers.litellm.embedding_model import (
-    LitellmEmbeddingModel,
-)
+from graphrag.language_model.providers.openai.chat_model import SimpleChatModel
+from graphrag.language_model.providers.openai.embedding_model import SimpleEmbeddingModel
 
 
 class ModelFactory:
     """A factory for creating Model instances."""
 
-    _chat_registry: ClassVar[dict[str, Callable[..., ChatModel]]] = {}
-    _embedding_registry: ClassVar[dict[str, Callable[..., EmbeddingModel]]] = {}
+    _chat_registry: ClassVar[dict[str, Callable[..., Any]]] = {}
+    _embedding_registry: ClassVar[dict[str, Callable[..., Any]]] = {}
 
     @classmethod
-    def register_chat(cls, model_type: str, creator: Callable[..., ChatModel]) -> None:
+    def register_chat(cls, model_type: str, creator: Callable[..., Any]) -> None:
         """Register a ChatModel implementation."""
         cls._chat_registry[model_type] = creator
 
     @classmethod
     def register_embedding(
-        cls, model_type: str, creator: Callable[..., EmbeddingModel]
+        cls, model_type: str, creator: Callable[..., Any]
     ) -> None:
         """Register an EmbeddingModel implementation."""
         cls._embedding_registry[model_type] = creator
 
     @classmethod
-    def create_chat_model(cls, model_type: str, **kwargs: Any) -> ChatModel:
+    def create_chat_model(cls, model_type: str, **kwargs: Any) -> Any:
         """
         Create a ChatModel instance.
 
@@ -48,16 +38,15 @@ class ModelFactory:
             **kwargs: Additional keyword arguments for the ChatModel constructor.
 
         Returns
-        -------
             A ChatModel instance.
         """
         if model_type not in cls._chat_registry:
-            msg = f"ChatMOdel implementation '{model_type}' is not registered."
+            msg = f"ChatModel implementation '{model_type}' is not registered."
             raise ValueError(msg)
         return cls._chat_registry[model_type](**kwargs)
 
     @classmethod
-    def create_embedding_model(cls, model_type: str, **kwargs: Any) -> EmbeddingModel:
+    def create_embedding_model(cls, model_type: str, **kwargs: Any) -> Any:
         """
         Create an EmbeddingModel instance.
 
@@ -66,7 +55,6 @@ class ModelFactory:
             **kwargs: Additional keyword arguments for the EmbeddingLLM constructor.
 
         Returns
-        -------
             An EmbeddingLLM instance.
         """
         if model_type not in cls._embedding_registry:
@@ -103,21 +91,10 @@ class ModelFactory:
 
 
 # --- Register default implementations ---
-ModelFactory.register_chat(
-    ModelType.AzureOpenAIChat.value, lambda **kwargs: AzureOpenAIChatFNLLM(**kwargs)
-)
-ModelFactory.register_chat(
-    ModelType.OpenAIChat.value, lambda **kwargs: OpenAIChatFNLLM(**kwargs)
-)
-ModelFactory.register_chat(ModelType.Chat, lambda **kwargs: LitellmChatModel(**kwargs))
+# Use SimpleChatModel and SimpleEmbeddingModel for all types
+ModelFactory.register_chat("openai", lambda **kwargs: SimpleChatModel(**kwargs))
+ModelFactory.register_chat("chat", lambda **kwargs: SimpleChatModel(**kwargs))
+ModelFactory.register_chat("azure", lambda **kwargs: SimpleChatModel(**kwargs))
 
-ModelFactory.register_embedding(
-    ModelType.AzureOpenAIEmbedding.value,
-    lambda **kwargs: AzureOpenAIEmbeddingFNLLM(**kwargs),
-)
-ModelFactory.register_embedding(
-    ModelType.OpenAIEmbedding.value, lambda **kwargs: OpenAIEmbeddingFNLLM(**kwargs)
-)
-ModelFactory.register_embedding(
-    ModelType.Embedding, lambda **kwargs: LitellmEmbeddingModel(**kwargs)
-)
+ModelFactory.register_embedding("openai", lambda **kwargs: SimpleEmbeddingModel(**kwargs))
+ModelFactory.register_embedding("embedding", lambda **kwargs: SimpleEmbeddingModel(**kwargs))

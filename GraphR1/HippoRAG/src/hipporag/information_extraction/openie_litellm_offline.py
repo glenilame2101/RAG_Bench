@@ -1,5 +1,5 @@
 """
-LiteLLM-based OpenIE for HippoRAG - uses litellm instead of vllm.
+OpenAI-based OpenIE for HippoRAG - uses direct OpenAI SDK instead of litellm.
 Works on CPU with OpenAI-compatible APIs.
 """
 import json
@@ -7,11 +7,11 @@ from typing import Dict, Tuple
 import os
 import time
 
-import litellm
+from openai import OpenAI
 from copy import deepcopy
 
 from ..information_extraction import OpenIE
-from .openie_openai import ChunkInfo
+from .openai_gpt import ChunkInfo
 from ..utils.misc_utils import NerRawOutput, TripleRawOutput
 from ..utils.logging_utils import get_logger
 from ..prompts import PromptTemplateManager
@@ -19,8 +19,8 @@ from ..prompts import PromptTemplateManager
 logger = get_logger(__name__)
 
 
-class LiteLLMOffline:
-    """LLM using litellm for OpenAI-compatible APIs (works on CPU)."""
+class OpenAIOffline:
+    """LLM using direct OpenAI SDK for OpenAI-compatible APIs (works on CPU)."""
 
     def __init__(self, global_config):
         self.global_config = global_config
@@ -28,14 +28,20 @@ class LiteLLMOffline:
         self.llm_base_url = getattr(global_config, 'llm_base_url', None)
         self.temperature = getattr(global_config, 'temperature', 0.0)
 
+        api_key = getattr(global_config, 'llm_api_key', None) or os.getenv("OPENAI_API_KEY", "")
+        if not api_key:
+            api_key = os.getenv("API_KEY", "")
+
+        self.client = OpenAI(api_key=api_key, base_url=self.llm_base_url)
+
         cache_dir = os.path.join(global_config.save_dir, "llm_cache")
         os.makedirs(cache_dir, exist_ok=True)
-        self.cache_file = os.path.join(cache_dir, f"{self.llm_name.replace('/', '_')}_litellm_cache.json")
+        self.cache_file = os.path.join(cache_dir, f"{self.llm_name.replace('/', '_')}_openai_cache.json")
 
         self.max_retries = 3
         self.retry_delay = 1.0
 
-        logger.info(f"[LiteLLM] Initialized with model: {self.llm_name}, base_url: {self.llm_base_url}")
+        logger.info(f"[OpenAI] Initialized with model: {self.llm_name}, base_url: {self.llm_base_url}")
 
     def _load_cache(self) -> Dict:
         if os.path.exists(self.cache_file):
@@ -58,21 +64,17 @@ class LiteLLMOffline:
         cache_key = self._get_cache_key(messages, max_tokens)
 
         if cache_key in cache:
-            logger.debug(f"[LiteLLM] Cache hit for key: {cache_key[:16]}...")
+            logger.debug(f"[OpenAI] Cache hit for key: {cache_key[:16]}...")
             return cache[cache_key]['response'], cache[cache_key]['metadata']
-
-        params = {
-            'model': self.llm_name,
-            'messages': messages,
-            'max_tokens': max_tokens,
-            'temperature': self.temperature,
-        }
-        if self.llm_base_url:
-            params['api_base'] = self.llm_base_url
 
         for attempt in range(self.max_retries):
             try:
-                response = litellm.completion(**params)
+                response = self.client.chat.completions.create(
+                    model=self.llm_name,
+                    messages=messages,
+                    max_tokens=max_tokens,
+                    temperature=self.temperature,
+                )
                 text = response.choices[0].message.content
                 metadata = {
                     'prompt_tokens': response.usage.prompt_tokens if hasattr(response, 'usage') else 0,
@@ -84,7 +86,7 @@ class LiteLLMOffline:
 
                 return text, metadata
             except Exception as e:
-                logger.warning(f"[LiteLLM] Attempt {attempt + 1} failed: {e}")
+                logger.warning(f"[OpenAI] Attempt {attempt + 1} failed: {e}")
                 if attempt < self.max_retries - 1:
                     time.sleep(self.retry_delay * (attempt + 1))
                 else:
@@ -105,7 +107,7 @@ class LiteLLMOffline:
                 total_prompt_tokens += metadata.get('prompt_tokens', 0)
                 total_completion_tokens += metadata.get('completion_tokens', 0)
             except Exception as e:
-                logger.error(f"[LiteLLM] batch_infer failed for message {i}: {e}")
+                logger.error(f"[OpenAI] batch_infer failed for message {i}: {e}")
                 all_responses.append("")
 
         metadata = {
@@ -116,18 +118,18 @@ class LiteLLMOffline:
         return all_responses, metadata
 
 
-class LiteLLMOfflineOpenIE(OpenIE):
-    """OpenIE implementation using LiteLLM instead of vllm."""
+class OpenAIOfflineOpenIE(OpenIE):
+    """OpenIE implementation using direct OpenAI SDK instead of litellm."""
 
     def __init__(self, global_config):
         self.prompt_template_manager = PromptTemplateManager(
             role_mapping={"system": "system", "user": "user", "assistant": "assistant"}
         )
-        self.llm_model = LiteLLMOffline(global_config)
+        self.llm_model = OpenAIOffline(global_config)
 
     def batch_openie(self, chunks: Dict[str, ChunkInfo]) -> Tuple[Dict[str, NerRawOutput], Dict[str, TripleRawOutput]]:
         """
-        Conduct batch OpenIE using LiteLLM, including NER and triple extraction.
+        Conduct batch OpenIE using OpenAI, including NER and triple extraction.
         """
         chunk_passages = {chunk_key: chunk["content"] for chunk_key, chunk in chunks.items()}
 

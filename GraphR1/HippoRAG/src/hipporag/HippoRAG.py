@@ -128,9 +128,9 @@ class HippoRAG:
         elif self.global_config.openie_mode == 'offline':
             llm_name = getattr(self.global_config, 'llm_name', '')
             if 'gpt-' in llm_name or 'miniMax' in llm_name or llm_name.startswith('anthropic') or llm_name.startswith('bedrock'):
-                # Lazy import LiteLLM version
-                from .information_extraction.openie_litellm_offline import LiteLLMOfflineOpenIE
-                self.openie = LiteLLMOfflineOpenIE(self.global_config)
+                # Lazy import OpenAI version
+                from .information_extraction.openie_litellm_offline import OpenAIOfflineOpenIE
+                self.openie = OpenAIOfflineOpenIE(self.global_config)
             else:
                 # Lazy import vLLM version
                 from .information_extraction.openie_vllm_offline import VLLMOfflineOpenIE
