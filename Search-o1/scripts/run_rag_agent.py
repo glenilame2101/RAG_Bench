@@ -6,7 +6,6 @@ import re
 import requests
 from tqdm import tqdm
 import numpy as np
-import torch
 from typing import Optional, Tuple, List, Dict
 import argparse
 
@@ -107,8 +106,10 @@ def parse_args():
     parser.add_argument(
         '--model_path',
         type=str,
-        required=True,
-        help="Path to the pre-trained model."
+        required=False,
+        default='',
+        help="Optional model label. Drives output-folder naming and the qwq/llama "
+             "prompt branches. If empty, falls back to $OPENAI_MODEL."
     )
 
     parser.add_argument(
@@ -165,8 +166,10 @@ def parse_args():
     parser.add_argument(
         '--bing_subscription_key',
         type=str,
-        required=True,
-        help="Bing Search API subscription key."
+        required=False,
+        default='',
+        help="Bing Search API subscription key. Required at runtime since this "
+             "script calls bing_web_search."
     )
 
     parser.add_argument(
@@ -190,7 +193,7 @@ def main():
     MAX_URL_FETCH = args.max_url_fetch
     MAX_TURN = args.max_turn
     top_k = args.top_k
-    model_path = args.model_path
+    model_path = args.model_path or os.environ.get('OPENAI_MODEL', '')
     temperature = args.temperature
     top_p = args.top_p
     top_k_sampling = args.top_k_sampling
@@ -272,12 +275,7 @@ def main():
     os.makedirs(output_dir, exist_ok=True)
 
     # Initialize the LLM
-    llm = build_llm(
-        args,
-        model=model_path,
-        tensor_parallel_size=torch.cuda.device_count(),
-        gpu_memory_utilization=0.95,
-    )
+    llm = build_llm(args, model=model_path)
 
     # ---------------------- Data Loading ----------------------
     with open(data_path, 'r', encoding='utf-8') as json_file:

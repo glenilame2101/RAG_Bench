@@ -1,7 +1,6 @@
 import csv
 import json
 import random
-import torch
 import re
 import os, time
 import numpy as np
@@ -55,10 +54,12 @@ def parse_args():
     )
     
     parser.add_argument(
-        '--model_path', 
-        type=str, 
-        required=True,
-        help="Path to the pre-trained model."
+        '--model_path',
+        type=str,
+        required=False,
+        default='',
+        help="Optional model label. Drives output-folder naming and the qwq/llama "
+             "prompt branches. If empty, falls back to $OPENAI_MODEL."
     )
     
     parser.add_argument(
@@ -105,7 +106,7 @@ def main():
     dataset_name = args.dataset_name
     split = args.split
     subset_num = args.subset_num
-    model_path = args.model_path
+    model_path = args.model_path or os.environ.get('OPENAI_MODEL', '')
     temperature = args.temperature
     top_p = args.top_p
     top_k = args.top_k
@@ -163,12 +164,7 @@ def main():
         output_dir = f'./outputs/runs.baselines/{dataset_name}.{model_short_name}.direct'
     os.makedirs(output_dir, exist_ok=True)
     
-    llm = build_llm(
-        args,
-        model=model_path,
-        tensor_parallel_size=torch.cuda.device_count(),
-        gpu_memory_utilization=0.95,
-    )
+    llm = build_llm(args, model=model_path)
     
     # Load data
     with open(data_path, mode='r', encoding='utf-8') as json_file:
@@ -177,7 +173,7 @@ def main():
     # prepare input
     input_list = []
     for item in filtered_data:
-        question = item['Question']
+        question = item.get('Question', item.get('question'))
         if dataset_name in ['nq', 'triviaqa', 'hotpotqa', 'musique', 'bamboogle', '2wiki']:
             if 'qwq' in model_path.lower() or 'deepseek' in model_path.lower() or 'sky-t1' in model_path.lower():
                 user_prompt = get_task_instruction_openqa(question, model_name='qwq')
