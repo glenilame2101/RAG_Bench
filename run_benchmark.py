@@ -80,7 +80,7 @@ RETRIEVER_CONFIG = {
         "endpoint": "/search",
         "script": GRAPHR1_DIR / "script_api_HypergraphRAG.py",
         "method": "graphsearch",
-        "venv": "venvs/hypergraphrag",
+        "venv": ".venv",
     },
 }
 

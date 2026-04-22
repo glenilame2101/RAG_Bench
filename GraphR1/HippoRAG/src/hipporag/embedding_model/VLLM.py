@@ -20,7 +20,10 @@ class VLLMEmbeddingModel(BaseEmbeddingModel):
         self.embedding_type = 'float'
         self.batch_size = 32
 
-        self.url = global_config.embedding_base_url
+        base_url = global_config.embedding_base_url
+        if not base_url.endswith("/v1"):
+            base_url = base_url + "/v1"
+        self.url = base_url + "/embeddings"
 
         self.search_query_instr = set([
             get_query_instruction('query_to_fact'),
@@ -39,7 +42,7 @@ class VLLMEmbeddingModel(BaseEmbeddingModel):
             "input": input_text,
         }
 
-        response = requests.post(self.base_url, headers=headers, json=payload)
+        response = requests.post(self.url, headers=headers, json=payload)
         response.raise_for_status()
         result = response.json()
         return np.array([result["data"][i]["embedding"] for i in range(len(result["data"]))])
@@ -51,7 +54,7 @@ class VLLMEmbeddingModel(BaseEmbeddingModel):
     def batch_encode(self, texts: List[str], **kwargs) -> None:
         if len(texts) < self.batch_size:
             return self.encode(texts)
-        
+
         results = []
         batch_indexes = list(range(0, len(texts), self.batch_size))
         for i in tqdm(batch_indexes, desc="Batch Encoding"):

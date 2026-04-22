@@ -22,8 +22,6 @@ from .llm import _get_llm_class, BaseLLM
 from .embedding_model import _get_embedding_model_class, BaseEmbeddingModel
 from .embedding_store import EmbeddingStore
 from .information_extraction import OpenIE
-from .information_extraction.openie_vllm_offline import VLLMOfflineOpenIE
-from .information_extraction.openie_transformers_offline import TransformersOfflineOpenIE
 from .evaluation.retrieval_eval import RetrievalRecall
 from .evaluation.qa_eval import QAExactMatch, QAF1Score
 from .prompts.linking import get_query_instruction
@@ -128,14 +126,30 @@ class HippoRAG:
         if self.global_config.openie_mode == 'online':
             self.openie = OpenIE(llm_model=self.llm_model)
         elif self.global_config.openie_mode == 'offline':
-            self.openie = VLLMOfflineOpenIE(self.global_config)
+            llm_name = getattr(self.global_config, 'llm_name', '')
+            if 'gpt-' in llm_name or 'miniMax' in llm_name or llm_name.startswith('anthropic') or llm_name.startswith('bedrock'):
+                # Lazy import LiteLLM version
+                from .information_extraction.openie_litellm_offline import LiteLLMOfflineOpenIE
+                self.openie = LiteLLMOfflineOpenIE(self.global_config)
+            else:
+                # Lazy import vLLM version
+                from .information_extraction.openie_vllm_offline import VLLMOfflineOpenIE
+                self.openie = VLLMOfflineOpenIE(self.global_config)
         elif self.global_config.openie_mode ==  'Transformers-offline':
+            from .information_extraction.openie_transformers_offline import TransformersOfflineOpenIE
             self.openie = TransformersOfflineOpenIE(self.global_config)
 
         self.graph = self.initialize_graph()
 
+        # For LiteLLM offline mode, we still need embedding model for retrieval
         if self.global_config.openie_mode == 'offline':
-            self.embedding_model = None
+            llm_name = getattr(self.global_config, 'llm_name', '')
+            if 'gpt-' in llm_name or 'miniMax' in llm_name or llm_name.startswith('anthropic') or llm_name.startswith('bedrock'):
+                self.embedding_model: BaseEmbeddingModel = _get_embedding_model_class(
+                    embedding_model_name=self.global_config.embedding_model_name)(global_config=self.global_config,
+                                                                                  embedding_model_name=self.global_config.embedding_model_name)
+            else:
+                self.embedding_model = None
         else:
             self.embedding_model: BaseEmbeddingModel = _get_embedding_model_class(
                 embedding_model_name=self.global_config.embedding_model_name)(global_config=self.global_config,

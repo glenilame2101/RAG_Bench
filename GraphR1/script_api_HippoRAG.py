@@ -11,7 +11,10 @@ import time
 from tqdm import tqdm
 
 import sys
-from Hipporag.src.hipporag import HippoRAG
+from pathlib import Path
+REPO_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO_ROOT / "GraphR1"))
+from HippoRAG.src.hipporag import HippoRAG
 # =====================================================
 
 # ================== Parameter parsing =========================
@@ -45,7 +48,7 @@ print("[DEBUG] HippoRAG2 LOADED")
 
 print("[Load] Initializing HippoRAG... (this may take time)")
 rag = HippoRAG(
-    save_dir=f"./HippoRAG/Graphrags/{data_source}/hipporag",
+    save_dir=f"{REPO_ROOT}/hippo_index/{data_source}/hipporag",
     llm_model_name=llm_model_name,
     llm_base_url=llm_base_url,
     embedding_model_name=embedding_model_name,

@@ -58,7 +58,7 @@ parser.add_argument('--embedding_model', default=None)
 parser.add_argument('--embedding_url', default=None, help='Embedding server base URL (e.g. http://127.0.0.1:8080/v1)')
 parser.add_argument('--llm_model', default="deepseek-chat")
 parser.add_argument('--max_workers', type=int, default=16)
-parser.add_argument('--working_dir', default="./LinearRAG/graphrags")
+parser.add_argument('--working_dir', default=f"{REPO_ROOT}/linear_index")
 args = parser.parse_args()
 
 # =============== Load Embedding Model =================

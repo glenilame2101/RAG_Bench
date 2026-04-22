@@ -66,7 +66,7 @@ class PromptTemplateManager:
                         module = importlib.import_module(module_name)
                     except ModuleNotFoundError:
                         module_name = f".prompts.templates.{script_name}"
-                        module = importlib.import_module(module_name, 'Hipporag.src.hipporag')
+                        module = importlib.import_module(module_name, 'HippoRAG.src.hipporag')
 
                     # spec = importlib.util.spec_from_file_location(script_name, script_path)
                     # module = importlib.util.module_from_spec(spec)

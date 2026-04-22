@@ -1,0 +1,55 @@
+{
+  "dataset": "bamboogle",
+  "retriever": "hipporag",
+  "metrics": {
+    "em": 0.0,
+    "f1": 0.0
+  },
+  "details": [
+    {
+      "question": "What university did Albert Einstein work at?",
+      "gold": [
+        "Princeton University"
+      ],
+      "retrieved": "",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Where was Marie Curie born?",
+      "gold": [
+        "Warsaw, Poland"
+      ],
+      "retrieved": "",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who won the Nobel Prize in Physics in 1903?",
+      "gold": [
+        "Marie Curie and Pierre Curie"
+      ],
+      "retrieved": "",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who did Marie Curie marry?",
+      "gold": [
+        "Pierre Curie"
+      ],
+      "retrieved": "",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What famous equation did Albert Einstein develop?",
+      "gold": [
+        "E=mc^2"
+      ],
+      "retrieved": "",
+      "em": 0.0,
+      "f1": 0.0
+    }
+  ]
+}
