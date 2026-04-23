@@ -21,7 +21,7 @@ REPO_ROOT = Path(__file__).resolve().parent
 # GraphR1/, so put GraphR1/ on sys.path.
 sys.path.insert(0, str(REPO_ROOT / "GraphR1"))
 
-from rag_clients import EmbeddingClient, LLMClient, load_env  # noqa: E402
+from rag_clients import EmbeddingCache, EmbeddingClient, LLMClient, load_env  # noqa: E402
 
 from LinearRAG.src.LinearRAG import LinearRAG  # noqa: E402
 from LinearRAG.src.config import LinearRAGConfig  # noqa: E402
@@ -109,6 +109,12 @@ def main() -> None:
         default=None,
         help="Index only the first N%% of the corpus (e.g., 10 = first 10%%)",
     )
+    parser.add_argument(
+        "--no-checkpoint",
+        action="store_true",
+        help="Disable embedding cache (default: cache every embedding to "
+             "<output-dir>/.embedding_cache/ so re-runs skip already-embedded text)",
+    )
     args = parser.parse_args()
 
     if args.partial_index is not None and not (0 < args.partial_index <= 100):
@@ -119,13 +125,26 @@ def main() -> None:
         raise SystemExit(f"No passages loaded from {args.corpus}")
     print(f"[Linear] Loaded {len(passages)} passages from {args.corpus}")
 
-    embedder = EmbeddingClient(base_url=args.embedding_base_url, model=args.embedding_model)
+    output_dir = Path(args.output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    # Wire a persistent embedding cache into the EmbeddingClient so LinearRAG's
+    # internal calls to embedder.encode(...) reuse previously-computed vectors
+    # across runs. The cache is content-addressed by (model, normalize, text).
+    embed_cache: Optional[EmbeddingCache] = None
+    if not args.no_checkpoint:
+        cache_dir = output_dir / ".embedding_cache"
+        cache_dir.mkdir(parents=True, exist_ok=True)
+        embed_cache = EmbeddingCache(cache_dir / "embeddings.sqlite")
+
+    embedder = EmbeddingClient(
+        base_url=args.embedding_base_url,
+        model=args.embedding_model,
+        cache=embed_cache,
+    )
     # LLMClient validates env early; LLM_Model below is what LinearRAG actually uses.
     LLMClient(base_url=args.llm_base_url, api_key=None, model=args.llm_model)
     llm = LLM_Model(args.llm_model)
-
-    output_dir = Path(args.output_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
 
     config = LinearRAGConfig(
         dataset_name=args.name,
@@ -143,7 +162,11 @@ def main() -> None:
 
     rag = LinearRAG(global_config=config)
     print(f"[Linear] Building index for dataset '{args.name}' under {output_dir}")
-    rag.index(passages)
+    try:
+        rag.index(passages)
+    finally:
+        if embed_cache is not None:
+            embed_cache.close()
 
     target_dir = output_dir / args.name
     print("[Linear] Files in index directory:")

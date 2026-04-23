@@ -12,7 +12,6 @@ from __future__ import annotations
 import argparse
 import json
 import os
-import shutil
 from pathlib import Path
 from typing import List, Optional
 
@@ -140,7 +139,8 @@ def main() -> None:
     parser.add_argument(
         "--no-checkpoint",
         action="store_true",
-        help="Disable embedding checkpointing (default: checkpoint every 1%% to <output-dir>/.checkpoint/)",
+        help="Disable embedding cache (default: cache every embedding to "
+             "<output-dir>/.embedding_cache/ so re-runs skip already-embedded text)",
     )
     args = parser.parse_args()
 
@@ -154,7 +154,7 @@ def main() -> None:
 
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
-    checkpoint_dir = None if args.no_checkpoint else output_dir / ".checkpoint"
+    checkpoint_dir = None if args.no_checkpoint else output_dir / ".embedding_cache"
 
     build_index(
         corpus=corpus,
@@ -165,9 +165,10 @@ def main() -> None:
         checkpoint_dir=checkpoint_dir,
     )
 
-    if checkpoint_dir is not None and checkpoint_dir.exists():
-        shutil.rmtree(checkpoint_dir)
-        print(f"[Dense] Cleaned up checkpoint dir {checkpoint_dir}")
+    # NOTE: do NOT remove the embedding cache on success. Keeping it means
+    # subsequent runs (e.g. widening --partial-index, rebuilding with a
+    # different FAISS layout, or recovering from a crash later in the
+    # pipeline) don't have to recompute embeddings.
 
 
 if __name__ == "__main__":

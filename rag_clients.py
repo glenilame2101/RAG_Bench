@@ -13,14 +13,108 @@ is used; otherwise a minimal parser walks the directory tree looking for a
 from __future__ import annotations
 
 import hashlib
-import json
 import os
+import sqlite3
+import threading
 from pathlib import Path
 from typing import Iterable, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 import requests
 from tqdm import tqdm
+
+
+class EmbeddingCache:
+    """Persistent, content-addressed cache for embedding vectors.
+
+    Keys are `sha256(model || normalize-flag || text)` so that:
+
+      * Re-running a build reuses previously-computed embeddings, even if the
+        input set changes (e.g. widening `--partial-index 0.1` -> `0.2`).
+      * Different models / normalization settings live side by side without
+        collisions.
+
+    Backed by SQLite (WAL mode) so the cache is a single portable file and is
+    safe to open from multiple processes. All values are stored as raw
+    float32 blobs.
+    """
+
+    def __init__(self, path: Union[str, Path]):
+        self.path = Path(path)
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        self._conn = sqlite3.connect(str(self.path), check_same_thread=False)
+        self._conn.execute("PRAGMA journal_mode=WAL")
+        self._conn.execute("PRAGMA synchronous=NORMAL")
+        self._conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS embeddings (
+                key        TEXT PRIMARY KEY,
+                model      TEXT NOT NULL,
+                dim        INTEGER NOT NULL,
+                normalized INTEGER NOT NULL,
+                vec        BLOB NOT NULL
+            )
+            """
+        )
+        self._conn.commit()
+        self._lock = threading.Lock()
+
+    @staticmethod
+    def make_key(model: str, text: str, normalized: bool) -> str:
+        h = hashlib.sha256()
+        h.update(model.encode("utf-8"))
+        h.update(b"\x00")
+        h.update(b"N" if normalized else b"R")
+        h.update(b"\x00")
+        h.update(text.encode("utf-8", errors="replace"))
+        return h.hexdigest()
+
+    def get_many(self, keys: Sequence[str]) -> dict:
+        """Return {key: np.ndarray} for all keys that are present."""
+        if not keys:
+            return {}
+        out: dict = {}
+        with self._lock:
+            cur = self._conn.cursor()
+            # SQLite parameter limit is ~999; chunk conservatively.
+            for i in range(0, len(keys), 500):
+                chunk = list(keys[i : i + 500])
+                placeholders = ",".join("?" * len(chunk))
+                rows = cur.execute(
+                    f"SELECT key, dim, vec FROM embeddings WHERE key IN ({placeholders})",
+                    chunk,
+                ).fetchall()
+                for key, dim, blob in rows:
+                    out[key] = np.frombuffer(blob, dtype=np.float32).reshape(int(dim))
+        return out
+
+    def put_many(self, items: Iterable[Tuple[str, str, int, bool, np.ndarray]]) -> None:
+        """Upsert a batch of (key, model, dim, normalized, vec) rows."""
+        rows = [
+            (k, m, int(d), 1 if n else 0, np.asarray(v, dtype=np.float32).tobytes())
+            for (k, m, d, n, v) in items
+        ]
+        if not rows:
+            return
+        with self._lock:
+            self._conn.executemany(
+                "INSERT OR REPLACE INTO embeddings (key, model, dim, normalized, vec) VALUES (?, ?, ?, ?, ?)",
+                rows,
+            )
+            self._conn.commit()
+
+    def close(self) -> None:
+        with self._lock:
+            try:
+                self._conn.close()
+            except Exception:
+                pass
+
+    def __enter__(self) -> "EmbeddingCache":
+        return self
+
+    def __exit__(self, *_exc) -> None:
+        self.close()
 
 
 def _parse_env_file(path: Path) -> None:
@@ -90,11 +184,13 @@ class EmbeddingClient:
         base_url: Optional[str] = None,
         model: Optional[str] = None,
         timeout: float = 60.0,
+        cache: Optional[EmbeddingCache] = None,
     ):
         self.base_url = _normalize_base_url(_resolve(base_url, "EMBEDDING_BASE_URL"))
         self.model = _resolve(model, "EMBEDDING_MODEL")
         self.api_key = os.getenv("OPENAI_API_KEY", "")
         self.timeout = timeout
+        self.cache = cache
 
         if not self.base_url:
             raise ValueError("EMBEDDING_BASE_URL is not set (and no override given)")
@@ -128,6 +224,16 @@ class EmbeddingClient:
         if not texts:
             return np.zeros((0, 0), dtype=np.float32)
 
+        # If a cache is wired in at construction time, transparently dedupe
+        # against it so repeat calls (e.g. from LinearRAG) are free.
+        if self.cache is not None:
+            return self.encode_with_cache(
+                texts,
+                cache=self.cache,
+                batch_size=batch_size,
+                normalize=normalize,
+            )
+
         out: List[np.ndarray] = []
         for start in range(0, len(texts), max(1, batch_size)):
             batch = texts[start : start + batch_size]
@@ -146,17 +252,84 @@ class EmbeddingClient:
             return self.encode([text])[0]
         return self.encode(text)
 
-    def _fingerprint(self, texts: Sequence[str]) -> str:
-        """Stable hash of the input set; used to refuse mismatched resumes."""
-        h = hashlib.sha256()
-        h.update(self.model.encode("utf-8"))
-        h.update(str(len(texts)).encode("utf-8"))
-        if texts:
-            h.update(texts[0][:1000].encode("utf-8", errors="replace"))
-            h.update(texts[-1][:1000].encode("utf-8", errors="replace"))
-            mid = texts[len(texts) // 2]
-            h.update(mid[:1000].encode("utf-8", errors="replace"))
-        return h.hexdigest()
+    def encode_with_cache(
+        self,
+        texts: Sequence[str],
+        cache: EmbeddingCache,
+        batch_size: int = 32,
+        normalize: bool = True,
+        save_every: Optional[int] = None,
+    ) -> np.ndarray:
+        """Embed `texts`, consulting `cache` first and only calling the
+        embeddings API for keys that aren't present.
+
+        New vectors are persisted in chunks of `save_every` so an interrupted
+        run can resume with no lost work. Unlike the previous chunk-file
+        checkpoint scheme, the cache is content-addressed: changing the input
+        order or widening `--partial-index` still produces cache hits.
+        """
+        texts = list(texts)
+        n_total = len(texts)
+        if n_total == 0:
+            return np.zeros((0, 0), dtype=np.float32)
+
+        keys = [EmbeddingCache.make_key(self.model, t, normalize) for t in texts]
+        cached = cache.get_many(keys)
+        missing = [i for i, k in enumerate(keys) if k not in cached]
+
+        if not missing:
+            print(f"[Embed] Cache hit: {n_total}/{n_total} (no API calls needed)")
+            return np.vstack([cached[k] for k in keys])
+
+        print(
+            f"[Embed] Cache hit: {n_total - len(missing)}/{n_total}; "
+            f"embedding {len(missing)} new texts via {self.base_url} ({self.model})"
+        )
+
+        if save_every is None:
+            # Flush roughly every 1% of the work, but never less often than
+            # one batch (so interrupts lose at most one batch of progress).
+            save_every = max(batch_size, n_total // 100)
+
+        pending: List[Tuple[str, str, int, bool, np.ndarray]] = []
+        bar = tqdm(
+            total=len(missing),
+            desc="[Embed] Embedding",
+            unit="chunk",
+        )
+        try:
+            for start in range(0, len(missing), batch_size):
+                idx_batch = missing[start : start + batch_size]
+                batch_texts = [texts[i] for i in idx_batch]
+                data = self._post({"model": self.model, "input": batch_texts})
+                items = data.get("data") or []
+                if len(items) != len(idx_batch):
+                    raise RuntimeError(
+                        f"Embeddings endpoint returned {len(items)} vectors for "
+                        f"{len(idx_batch)} inputs"
+                    )
+                for j, item in enumerate(items):
+                    vec = np.asarray(item["embedding"], dtype=np.float32)
+                    if normalize:
+                        norm = float(np.linalg.norm(vec))
+                        if norm > 0.0:
+                            vec = vec / norm
+                    i_orig = idx_batch[j]
+                    cached[keys[i_orig]] = vec
+                    pending.append(
+                        (keys[i_orig], self.model, int(vec.shape[0]), normalize, vec)
+                    )
+                bar.update(len(idx_batch))
+
+                if len(pending) >= save_every:
+                    cache.put_many(pending)
+                    pending = []
+            if pending:
+                cache.put_many(pending)
+        finally:
+            bar.close()
+
+        return np.vstack([cached[k] for k in keys])
 
     def encode_with_checkpoint(
         self,
@@ -166,17 +339,13 @@ class EmbeddingClient:
         normalize: bool = True,
         save_every_pct: float = 1.0,
     ) -> np.ndarray:
-        """Embed `texts`, saving partial progress to `checkpoint_dir` every
-        `save_every_pct` percent of total work.
+        """Embed `texts`, persisting progress to an on-disk cache so repeat /
+        interrupted runs reuse already-computed embeddings.
 
-        On re-invocation with the same input set, picks up where it left off.
-        Refuses to resume if model name or input fingerprint differ.
-
-        Layout under `checkpoint_dir`:
-            state.json       — {model, total, completed, fingerprint, ...}
-            emb_000000.npy   — first chunk of saved embeddings
-            emb_000001.npy   — ...
-            (concatenated in order to produce the final array)
+        The cache file is `<checkpoint_dir>/embeddings.sqlite`. It is
+        content-addressed by (model, normalize-flag, text), so re-runs with a
+        different `--partial-index`, different document ordering, or an
+        overlapping corpus all produce cache hits.
         """
         texts = list(texts)
         n_total = len(texts)
@@ -185,111 +354,15 @@ class EmbeddingClient:
 
         ckpt_dir = Path(checkpoint_dir)
         ckpt_dir.mkdir(parents=True, exist_ok=True)
-        state_path = ckpt_dir / "state.json"
-
-        fingerprint = self._fingerprint(texts)
-
-        completed = 0
-        loaded_chunks: List[np.ndarray] = []
-        if state_path.exists():
-            try:
-                state = json.loads(state_path.read_text(encoding="utf-8"))
-            except json.JSONDecodeError as exc:
-                raise SystemExit(
-                    f"Checkpoint state at {state_path} is corrupt ({exc}). "
-                    f"Delete the directory to start over."
-                )
-            if state.get("fingerprint") != fingerprint:
-                raise SystemExit(
-                    f"Checkpoint at {ckpt_dir} was created from a different input set "
-                    f"(model/count/text fingerprint mismatch). Delete the directory or "
-                    f"use a different --output-dir."
-                )
-            completed = int(state.get("completed", 0))
-            for f in sorted(ckpt_dir.glob("emb_*.npy")):
-                loaded_chunks.append(np.load(f))
-            loaded_count = sum(c.shape[0] for c in loaded_chunks)
-            if loaded_count != completed:
-                raise SystemExit(
-                    f"Checkpoint inconsistent: state.json says {completed} done but "
-                    f"found {loaded_count} embeddings on disk in {ckpt_dir}."
-                )
-            if completed >= n_total:
-                print(f"[Embed] Checkpoint already complete ({completed}/{n_total})")
-                return np.vstack(loaded_chunks)
-            print(f"[Embed] Resuming from checkpoint: {completed}/{n_total} done")
-
         save_every = max(batch_size, int(n_total * save_every_pct / 100))
-        next_chunk_index = len(loaded_chunks)
-        new_chunks: List[np.ndarray] = []
-        pending: List[np.ndarray] = []
-        pending_count = 0
-
-        bar = tqdm(
-            total=n_total,
-            initial=completed,
-            desc="[Embed] Embedding",
-            unit="chunk",
-        )
-        try:
-            for start in range(completed, n_total, batch_size):
-                batch = texts[start : start + batch_size]
-                data = self._post({"model": self.model, "input": batch})
-                for item in data["data"]:
-                    vec = np.asarray(item["embedding"], dtype=np.float32)
-                    if normalize:
-                        norm = float(np.linalg.norm(vec))
-                        if norm > 0.0:
-                            vec = vec / norm
-                    pending.append(vec)
-                pending_count += len(batch)
-                bar.update(len(batch))
-
-                if pending_count >= save_every:
-                    arr = np.vstack(pending)
-                    np.save(ckpt_dir / f"emb_{next_chunk_index:06d}.npy", arr)
-                    new_chunks.append(arr)
-                    next_chunk_index += 1
-                    completed += pending_count
-                    state_path.write_text(
-                        json.dumps(
-                            {
-                                "model": self.model,
-                                "total": n_total,
-                                "completed": completed,
-                                "batch_size": batch_size,
-                                "normalize": normalize,
-                                "fingerprint": fingerprint,
-                            }
-                        ),
-                        encoding="utf-8",
-                    )
-                    pending = []
-                    pending_count = 0
-
-            if pending:
-                arr = np.vstack(pending)
-                np.save(ckpt_dir / f"emb_{next_chunk_index:06d}.npy", arr)
-                new_chunks.append(arr)
-                completed += pending_count
-                state_path.write_text(
-                    json.dumps(
-                        {
-                            "model": self.model,
-                            "total": n_total,
-                            "completed": completed,
-                            "batch_size": batch_size,
-                            "normalize": normalize,
-                            "fingerprint": fingerprint,
-                        }
-                    ),
-                    encoding="utf-8",
-                )
-        finally:
-            bar.close()
-
-        all_chunks = loaded_chunks + new_chunks
-        return np.vstack(all_chunks)
+        with EmbeddingCache(ckpt_dir / "embeddings.sqlite") as cache:
+            return self.encode_with_cache(
+                texts,
+                cache=cache,
+                batch_size=batch_size,
+                normalize=normalize,
+                save_every=save_every,
+            )
 
 
 class RerankerClient:
@@ -378,6 +451,7 @@ class LLMClient:
 
 
 __all__ = [
+    "EmbeddingCache",
     "EmbeddingClient",
     "LLMClient",
     "RerankerClient",

@@ -13,7 +13,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import shutil
 from pathlib import Path
 from typing import List, Optional, Tuple
 
@@ -174,7 +173,8 @@ def main() -> None:
     parser.add_argument(
         "--no-checkpoint",
         action="store_true",
-        help="Disable embedding checkpointing (default: checkpoint every 1%% to <output-dir>/.checkpoint/)",
+        help="Disable embedding cache (default: cache every embedding to "
+             "<output-dir>/.embedding_cache/ so re-runs skip already-embedded text)",
     )
     args = parser.parse_args()
 
@@ -188,7 +188,7 @@ def main() -> None:
 
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
-    checkpoint_dir = None if args.no_checkpoint else output_dir / ".checkpoint"
+    checkpoint_dir = None if args.no_checkpoint else output_dir / ".embedding_cache"
 
     embedder = EmbeddingClient(base_url=args.embedding_base_url, model=args.embedding_model)
     build_hypergraph_index(
@@ -199,9 +199,8 @@ def main() -> None:
         checkpoint_dir=checkpoint_dir,
     )
 
-    if checkpoint_dir is not None and checkpoint_dir.exists():
-        shutil.rmtree(checkpoint_dir)
-        print(f"[Hypergraph] Cleaned up checkpoint dir {checkpoint_dir}")
+    # NOTE: do NOT remove the embedding cache on success; entities and
+    # hyperedges extracted next time often overlap heavily with this run.
 
 
 if __name__ == "__main__":

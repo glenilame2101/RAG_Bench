@@ -10,7 +10,6 @@ from __future__ import annotations
 import argparse
 import json
 import pickle
-import shutil
 from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -254,7 +253,8 @@ def main() -> None:
     parser.add_argument(
         "--no-checkpoint",
         action="store_true",
-        help="Disable embedding checkpointing (default: checkpoint every 1%% to <output-dir>/.checkpoint/)",
+        help="Disable embedding cache (default: cache every embedding to "
+             "<output-dir>/.embedding_cache/ so re-runs skip already-embedded text)",
     )
     args = parser.parse_args()
 
@@ -268,7 +268,7 @@ def main() -> None:
 
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
-    checkpoint_dir = None if args.no_checkpoint else output_dir / ".checkpoint"
+    checkpoint_dir = None if args.no_checkpoint else output_dir / ".embedding_cache"
 
     embedder = EmbeddingClient(base_url=args.embedding_base_url, model=args.embedding_model)
     tree = build_raptor_tree(
@@ -286,9 +286,9 @@ def main() -> None:
         pickle.dump(tree, fh)
     print(f"[Raptor] Wrote {tree_path}")
 
-    if checkpoint_dir is not None and checkpoint_dir.exists():
-        shutil.rmtree(checkpoint_dir)
-        print(f"[Raptor] Cleaned up checkpoint dir {checkpoint_dir}")
+    # NOTE: do NOT remove the embedding cache on success; keep it so
+    # subsequent runs (widening --partial-index, tuning --num-layers, etc.)
+    # reuse the already-computed chunk embeddings.
 
 
 if __name__ == "__main__":
