@@ -180,10 +180,11 @@ bigger batches = fewer round-trips = faster indexing.
   at 96; Voyage at 128. Read your provider's docs.
 - **Self-hosted** (llama.cpp, vLLM, TEI, Ollama): the only caps are GPU
   memory and the server's own `--max-batch-size` (or equivalent). Try 128;
-  if the server returns 4xx, raise its limit. Note that the
-  `EmbeddingClient` has a 60-second request timeout — on slow hardware,
-  very large batches can time out even when the server would eventually
-  reply.
+  if the server returns 4xx, raise its limit. `EmbeddingClient` uses a
+  300-second request timeout and retries up to 3 times on `Timeout` /
+  `ConnectionError` (with exponential backoff). 5xx responses are not
+  retried — on llama.cpp those are usually permanent conditions like
+  oversized input, which `--max-chars` is the right fix for.
 - **llama.cpp specifically:** `-np N` controls server-side parallel slots,
   not batch capacity. Concurrent client requests against `-np 1` queue
   rather than parallelize, so the only useful lever is `--batch-size`.

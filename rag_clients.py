@@ -135,12 +135,14 @@ class EmbeddingClient:
         self,
         base_url: Optional[str] = None,
         model: Optional[str] = None,
-        timeout: float = 60.0,
+        timeout: float = 300.0,
+        max_retries: int = 3,
     ):
         self.base_url = _normalize_base_url(_resolve(base_url, "EMBEDDING_BASE_URL"))
         self.model = _resolve(model, "EMBEDDING_MODEL")
         self.api_key = os.getenv("OPENAI_API_KEY", "")
         self.timeout = timeout
+        self.max_retries = max_retries
 
         if not self.base_url:
             raise ValueError("EMBEDDING_BASE_URL is not set (and no override given)")
@@ -148,17 +150,42 @@ class EmbeddingClient:
             raise ValueError("EMBEDDING_MODEL is not set (and no override given)")
 
     def _post(self, payload: dict) -> dict:
+        # Retries cover transient network failures (read timeout, connection
+        # reset) — NOT 5xx responses, which on llama.cpp typically mean a
+        # permanent condition like oversized input that retry won't fix.
+        from tenacity import (
+            Retrying,
+            stop_after_attempt,
+            wait_exponential,
+            retry_if_exception_type,
+        )
+
         headers = {"Content-Type": "application/json"}
         if self.api_key:
             headers["Authorization"] = f"Bearer {self.api_key}"
-        resp = requests.post(
-            f"{self.base_url}/embeddings",
-            json=payload,
-            headers=headers,
-            timeout=self.timeout,
+
+        retrying = Retrying(
+            reraise=True,
+            stop=stop_after_attempt(self.max_retries),
+            wait=wait_exponential(multiplier=2, min=2, max=30),
+            retry=retry_if_exception_type(
+                (
+                    requests.exceptions.Timeout,
+                    requests.exceptions.ConnectionError,
+                )
+            ),
         )
-        resp.raise_for_status()
-        return resp.json()
+        for attempt in retrying:
+            with attempt:
+                resp = requests.post(
+                    f"{self.base_url}/embeddings",
+                    json=payload,
+                    headers=headers,
+                    timeout=self.timeout,
+                )
+                resp.raise_for_status()
+                return resp.json()
+        raise RuntimeError("unreachable")  # retrying loop always returns or raises
 
     def encode(
         self,
