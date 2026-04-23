@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import shutil
 from pathlib import Path
 from typing import List, Optional, Tuple
 
@@ -103,6 +104,7 @@ def build_hypergraph_index(
     output_dir: Path,
     embedder: EmbeddingClient,
     batch_size: int,
+    checkpoint_dir: Optional[Path] = None,
 ) -> None:
     print(f"[Hypergraph] Extracting entities + hyperedges from {len(texts)} docs...")
     entity_list, hyperedge_list = extract_entities_and_hyperedges(texts)
@@ -113,8 +115,24 @@ def build_hypergraph_index(
     print(f"[Hypergraph] {len(entity_list)} entities, {len(hyperedge_list)} hyperedges")
 
     print(f"[Hypergraph] Embedding via {embedder.base_url} ({embedder.model})")
-    entity_emb = embedder.encode(entity_list, batch_size=batch_size, normalize=True)
-    hyper_emb = embedder.encode(hyperedge_list, batch_size=batch_size, normalize=True)
+    if checkpoint_dir is not None:
+        entity_emb = embedder.encode_with_checkpoint(
+            entity_list,
+            checkpoint_dir=checkpoint_dir / "entities",
+            batch_size=batch_size,
+            normalize=True,
+            save_every_pct=1.0,
+        )
+        hyper_emb = embedder.encode_with_checkpoint(
+            hyperedge_list,
+            checkpoint_dir=checkpoint_dir / "hyperedges",
+            batch_size=batch_size,
+            normalize=True,
+            save_every_pct=1.0,
+        )
+    else:
+        entity_emb = embedder.encode(entity_list, batch_size=batch_size, normalize=True)
+        hyper_emb = embedder.encode(hyperedge_list, batch_size=batch_size, normalize=True)
     if entity_emb.size == 0:
         raise RuntimeError("No entity embeddings generated")
 
@@ -153,6 +171,11 @@ def main() -> None:
         default=None,
         help="Index only the first N%% of the corpus (e.g., 10 = first 10%%)",
     )
+    parser.add_argument(
+        "--no-checkpoint",
+        action="store_true",
+        help="Disable embedding checkpointing (default: checkpoint every 1%% to <output-dir>/.checkpoint/)",
+    )
     args = parser.parse_args()
 
     if args.partial_index is not None and not (0 < args.partial_index <= 100):
@@ -163,13 +186,22 @@ def main() -> None:
         raise SystemExit(f"No documents loaded from {args.corpus}")
     print(f"[Hypergraph] Loaded {len(texts)} documents from {args.corpus}")
 
+    output_dir = Path(args.output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    checkpoint_dir = None if args.no_checkpoint else output_dir / ".checkpoint"
+
     embedder = EmbeddingClient(base_url=args.embedding_base_url, model=args.embedding_model)
     build_hypergraph_index(
         texts=texts,
-        output_dir=Path(args.output_dir),
+        output_dir=output_dir,
         embedder=embedder,
         batch_size=args.batch_size,
+        checkpoint_dir=checkpoint_dir,
     )
+
+    if checkpoint_dir is not None and checkpoint_dir.exists():
+        shutil.rmtree(checkpoint_dir)
+        print(f"[Hypergraph] Cleaned up checkpoint dir {checkpoint_dir}")
 
 
 if __name__ == "__main__":
