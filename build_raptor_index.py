@@ -4,6 +4,7 @@ Usage:
     python build_raptor_index.py --corpus <path> --output-dir <dir>
 
 The output directory will contain `tree.pkl` (a pickled RaptorTree).
+`--corpus` may be JSONL, Parquet, or a directory of `*.txt` files.
 """
 from __future__ import annotations
 
@@ -18,63 +19,13 @@ import numpy as np
 from sklearn.cluster import KMeans, MiniBatchKMeans
 from tqdm import tqdm
 
+from corpus_loader import load_corpus as _load_corpus
 from rag_clients import EmbeddingClient, load_env
 
 
-TEXT_FIELDS = ("contents", "text", "content", "document", "body")
-
-
 def load_corpus(corpus_path: str, partial_pct: Optional[float] = None) -> List[str]:
-    path = Path(corpus_path)
-    if path.is_dir():
-        files = sorted(path.glob("*.txt"))
-        if partial_pct is not None:
-            n = max(1, int(len(files) * partial_pct / 100))
-            print(f"[Raptor] --partial-index {partial_pct}%: using {n} of {len(files)} files")
-            files = files[:n]
-        out = []
-        for file_path in tqdm(files, desc="[Raptor] Loading files", unit="file"):
-            content = file_path.read_text(encoding="utf-8").strip()
-            if content:
-                out.append(content)
-        return out
-    if not path.is_file():
-        raise FileNotFoundError(f"Corpus path not found: {path}")
-
-    target_lines: Optional[int] = None
-    if partial_pct is not None:
-        print(f"[Raptor] --partial-index {partial_pct}%: counting lines in {path}...")
-        with path.open("r", encoding="utf-8") as fh:
-            total = sum(1 for _ in fh)
-        target_lines = max(1, int(total * partial_pct / 100))
-        print(f"[Raptor] Loading first {target_lines} of {total} lines")
-
-    out = []
-    with path.open("r", encoding="utf-8") as fh:
-        bar = tqdm(fh, desc="[Raptor] Loading corpus", unit=" line", total=target_lines)
-        for i, raw in enumerate(bar):
-            if target_lines is not None and i >= target_lines:
-                break
-            line = raw.strip()
-            if not line:
-                continue
-            try:
-                doc = json.loads(line)
-            except json.JSONDecodeError:
-                continue
-            text = None
-            for field in TEXT_FIELDS:
-                if field in doc:
-                    text = doc[field]
-                    break
-            if text is None:
-                text = (doc.get("question", "") + " " + doc.get("answer", "")).strip()
-            if isinstance(text, list):
-                text = " ".join(str(t) for t in text)
-            text = str(text).strip()
-            if text:
-                out.append(text)
-    return out
+    docs = _load_corpus(corpus_path, partial_pct=partial_pct, label="Raptor")
+    return [d["text"] for d in docs]
 
 
 class TreeNode:

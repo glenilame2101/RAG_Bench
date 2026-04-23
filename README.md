@@ -50,9 +50,20 @@ python run_benchmark.py --retriever dense \
     --corpus ./mycorpus.jsonl --index-dir ./indexes/dense
 ```
 
-`--corpus` accepts either a JSONL file (one JSON document per line, with any
-of `contents`, `text`, `content`, `document`, `body`) or a directory of
-`*.txt` files. Nothing is hardcoded — every path comes in via the CLI.
+`--corpus` accepts three formats, auto-detected from the path:
+
+- **JSONL file** (one JSON document per line)
+- **Parquet file** (one document per row; columns follow the same field
+  priority — requires `pyarrow`, already in `requirements.txt`)
+- **Directory of `*.txt` files** (one document per file; id = file stem)
+
+For JSONL and Parquet, the text is read from the first of these fields
+that's present and non-empty: `contents`, `text`, `content`, `document`,
+`body`. As a last resort it concatenates `question` + `answer` for
+QA-style corpora. Document ids come from `id`, `_id`, `doc_id`, or
+`document_id` (falling back to row index). Nothing is hardcoded — every
+path comes in via the CLI, and all six builders share the same loader
+(`corpus_loader.py`).
 
 ## `.env` contract
 
@@ -150,10 +161,12 @@ python build_raptor_index.py --corpus ./corpus.jsonl \
     --output-dir ./indexes/raptor --partial-index 10
 ```
 
-Useful for smoke-tests, parameter sweeps, or staging a small index before
-committing to a full multi-hour run. For JSONL the builder does a fast
-streaming line-count first (no JSON parsing), then loads only the first
-`N%` of lines. For directories it takes the first `N%` of `*.txt` files
+Useful for smoke-tests, parameter sweeps, or staging a small index
+before committing to a full multi-hour run. For JSONL the builder does
+a fast streaming line-count first (no JSON parsing), then loads only
+the first `N%` of lines. For Parquet it reads `num_rows` from the file
+metadata (O(1)) and then streams the first `N%` of rows in row-group
+batches. For directories it takes the first `N%` of `*.txt` files
 sorted alphabetically.
 
 ### `--batch-size`
