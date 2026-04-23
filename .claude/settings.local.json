@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python *)",
+      "Bash(.venv/Scripts/python *)",
+      "Bash(.venv/Scripts/python -c ' *)",
+      "Read(//tmp/**)"
+    ]
+  }
+}

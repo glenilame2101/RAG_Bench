@@ -30,6 +30,7 @@ hypergraph_index/
 linear_index/
 graphrags/
 indexes/
+CorpusIndex/
 
 # OS cruft
 .DS_Store
