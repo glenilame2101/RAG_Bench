@@ -56,6 +56,7 @@ def build_hypergraph_index(
     embedder: EmbeddingClient,
     batch_size: int,
     checkpoint_dir: Optional[Path] = None,
+    max_chars: Optional[int] = None,
 ) -> None:
     print(f"[Hypergraph] Extracting entities + hyperedges from {len(texts)} docs...")
     entity_list, hyperedge_list = extract_entities_and_hyperedges(texts)
@@ -73,6 +74,7 @@ def build_hypergraph_index(
             batch_size=batch_size,
             normalize=True,
             save_every_pct=1.0,
+            max_chars=max_chars,
         )
         hyper_emb = embedder.encode_with_checkpoint(
             hyperedge_list,
@@ -80,10 +82,15 @@ def build_hypergraph_index(
             batch_size=batch_size,
             normalize=True,
             save_every_pct=1.0,
+            max_chars=max_chars,
         )
     else:
-        entity_emb = embedder.encode(entity_list, batch_size=batch_size, normalize=True)
-        hyper_emb = embedder.encode(hyperedge_list, batch_size=batch_size, normalize=True)
+        entity_emb = embedder.encode(
+            entity_list, batch_size=batch_size, normalize=True, max_chars=max_chars
+        )
+        hyper_emb = embedder.encode(
+            hyperedge_list, batch_size=batch_size, normalize=True, max_chars=max_chars
+        )
     if entity_emb.size == 0:
         raise RuntimeError("No entity embeddings generated")
 
@@ -131,6 +138,15 @@ def main() -> None:
              "a larger --partial-index reuses embeddings from any previous run "
              "that shares the same prefix.",
     )
+    parser.add_argument(
+        "--max-chars",
+        type=int,
+        default=8000,
+        help="Truncate each text (entity/hyperedge) to this many characters "
+             "before embedding (default: 8000, safe for any script under a "
+             "typical 8192-token embedding context). Pass 0 to disable. "
+             "Changing this value invalidates an existing checkpoint.",
+    )
     args = parser.parse_args()
 
     if args.partial_index is not None and not (0 < args.partial_index <= 100):
@@ -152,6 +168,7 @@ def main() -> None:
         embedder=embedder,
         batch_size=args.batch_size,
         checkpoint_dir=checkpoint_dir,
+        max_chars=args.max_chars if args.max_chars > 0 else None,
     )
 
 

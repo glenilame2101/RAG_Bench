@@ -166,6 +166,7 @@ class EmbeddingClient:
         batch_size: int = 32,
         normalize: bool = True,
         show_progress_bar: bool = False,
+        max_chars: Optional[int] = None,
         **_unused,
     ) -> np.ndarray:
         if isinstance(texts, str):
@@ -173,6 +174,12 @@ class EmbeddingClient:
         texts = list(texts)
         if not texts:
             return np.zeros((0, 0), dtype=np.float32)
+
+        if max_chars and max_chars > 0:
+            n_truncated = sum(1 for t in texts if len(t) > max_chars)
+            if n_truncated > 0:
+                print(f"[Embed] Truncating {n_truncated}/{len(texts)} texts to {max_chars} chars")
+            texts = [t[:max_chars] for t in texts]
 
         out: List[np.ndarray] = []
         bar = tqdm(total=len(texts), desc="[Embed] Embedding", unit="chunk")
@@ -202,17 +209,20 @@ class EmbeddingClient:
         texts: Sequence[str],
         prefix_len: Optional[int] = None,
         normalize: bool = True,
+        max_chars: Optional[int] = None,
     ) -> str:
         """Stable hash over the first `prefix_len` texts (or all, if None).
 
-        Covers (model, normalize flag, prefix length, first/middle/last text
-        of the prefix). Used to validate resumable checkpoints: two runs that
-        share the same prefix produce the same hash and may resume.
+        Covers (model, normalize flag, max_chars truncation setting, prefix
+        length, first/middle/last text of the prefix). Used to validate
+        resumable checkpoints: two runs that share the same prefix AND
+        the same truncation setting produce the same hash and may resume.
         """
         n = len(texts) if prefix_len is None else prefix_len
         h = hashlib.sha256()
         h.update(self.model.encode("utf-8"))
         h.update(b"norm=1" if normalize else b"norm=0")
+        h.update(f"max_chars={max_chars or 0}".encode("utf-8"))
         h.update(str(n).encode("utf-8"))
         if n > 0:
             h.update(texts[0][:1000].encode("utf-8", errors="replace"))
@@ -227,6 +237,7 @@ class EmbeddingClient:
         batch_size: int = 32,
         normalize: bool = True,
         save_every_pct: float = 1.0,
+        max_chars: Optional[int] = None,
     ) -> np.ndarray:
         """Embed `texts`, saving partial progress to `checkpoint_dir` every
         `save_every_pct` percent of total work.
@@ -247,6 +258,12 @@ class EmbeddingClient:
         n_total = len(texts)
         if n_total == 0:
             return np.zeros((0, 0), dtype=np.float32)
+
+        if max_chars and max_chars > 0:
+            n_truncated = sum(1 for t in texts if len(t) > max_chars)
+            if n_truncated > 0:
+                print(f"[Embed] Truncating {n_truncated}/{n_total} texts to {max_chars} chars")
+            texts = [t[:max_chars] for t in texts]
 
         ckpt_dir = Path(checkpoint_dir)
         ckpt_dir.mkdir(parents=True, exist_ok=True)
@@ -281,14 +298,15 @@ class EmbeddingClient:
                         f"point at a different checkpoint dir."
                     )
                 expected_fp = self._fingerprint(
-                    texts, prefix_len=completed, normalize=normalize
+                    texts, prefix_len=completed, normalize=normalize, max_chars=max_chars
                 )
                 saved_fp = state.get("prefix_fingerprint")
                 if saved_fp != expected_fp:
                     raise SystemExit(
                         f"Checkpoint at {ckpt_dir} was built from a different input "
-                        f"prefix (model/normalize/text mismatch over first {completed} "
-                        f"items). Delete the directory or use a different checkpoint dir."
+                        f"prefix or different settings (model / normalize / max_chars / "
+                        f"text mismatch over first {completed} items). Delete the "
+                        f"directory or use a different checkpoint dir."
                     )
             if completed == n_total:
                 print(f"[Embed] Checkpoint covers request ({completed}/{n_total})")
@@ -309,8 +327,10 @@ class EmbeddingClient:
                         "completed": completed,
                         "batch_size": batch_size,
                         "normalize": normalize,
+                        "max_chars": max_chars or 0,
                         "prefix_fingerprint": self._fingerprint(
-                            texts, prefix_len=completed, normalize=normalize
+                            texts, prefix_len=completed, normalize=normalize,
+                            max_chars=max_chars,
                         ),
                     }
                 ),

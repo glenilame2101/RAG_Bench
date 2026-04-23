@@ -93,6 +93,7 @@ def build_raptor_tree(
     cluster_size: int,
     batch_size: int,
     checkpoint_dir: Optional[Path] = None,
+    max_chars: Optional[int] = None,
 ) -> RaptorTree:
     print(f"[Raptor] Chunking {len(texts)} documents...")
     all_chunks = [chunk for text in texts for chunk in chunk_text(text, max_tokens)]
@@ -107,9 +108,12 @@ def build_raptor_tree(
             batch_size=batch_size,
             normalize=True,
             save_every_pct=1.0,
+            max_chars=max_chars,
         )
     else:
-        embeddings = embedder.encode(all_chunks, batch_size=batch_size, normalize=True)
+        embeddings = embedder.encode(
+            all_chunks, batch_size=batch_size, normalize=True, max_chars=max_chars
+        )
 
     node_id_counter = 0
     level_nodes: Dict[int, List[TreeNode]] = defaultdict(list)
@@ -209,6 +213,15 @@ def main() -> None:
              "acts as a prefix cache — re-running with a larger --partial-index "
              "reuses chunk embeddings from any previous run that shares the same prefix.",
     )
+    parser.add_argument(
+        "--max-chars",
+        type=int,
+        default=8000,
+        help="Truncate each chunk to this many characters before embedding "
+             "(default: 8000, safe for any script under a typical 8192-token "
+             "embedding context). Pass 0 to disable. Changing this value "
+             "invalidates an existing checkpoint.",
+    )
     args = parser.parse_args()
 
     if args.partial_index is not None and not (0 < args.partial_index <= 100):
@@ -232,6 +245,7 @@ def main() -> None:
         cluster_size=args.cluster_size,
         batch_size=args.batch_size,
         checkpoint_dir=checkpoint_dir,
+        max_chars=args.max_chars if args.max_chars > 0 else None,
     )
 
     tree_path = output_dir / "tree.pkl"

@@ -35,6 +35,7 @@ def build_index(
     embedding_model: str | None,
     batch_size: int,
     checkpoint_dir: Optional[Path] = None,
+    max_chars: Optional[int] = None,
 ) -> None:
     embedder = EmbeddingClient(base_url=embedding_base_url, model=embedding_model)
     print(f"[Dense] Embedding {len(corpus)} documents via {embedder.base_url} ({embedder.model})")
@@ -48,9 +49,12 @@ def build_index(
             batch_size=batch_size,
             normalize=True,
             save_every_pct=1.0,
+            max_chars=max_chars,
         )
     else:
-        embeddings = embedder.encode(texts, batch_size=batch_size, normalize=True)
+        embeddings = embedder.encode(
+            texts, batch_size=batch_size, normalize=True, max_chars=max_chars
+        )
     if embeddings.size == 0:
         raise RuntimeError("No embeddings generated — corpus likely empty")
 
@@ -92,6 +96,15 @@ def main() -> None:
              "acts as a prefix cache — re-running with a larger --partial-index "
              "reuses embeddings from any previous run that shares the same prefix.",
     )
+    parser.add_argument(
+        "--max-chars",
+        type=int,
+        default=8000,
+        help="Truncate each text to this many characters before embedding "
+             "(default: 8000, safe for any script under a typical 8192-token "
+             "embedding context). Pass 0 to disable. Changing this value "
+             "invalidates an existing checkpoint.",
+    )
     args = parser.parse_args()
 
     if args.partial_index is not None and not (0 < args.partial_index <= 100):
@@ -113,6 +126,7 @@ def main() -> None:
         embedding_model=args.embedding_model,
         batch_size=args.batch_size,
         checkpoint_dir=checkpoint_dir,
+        max_chars=args.max_chars if args.max_chars > 0 else None,
     )
 
 

@@ -188,6 +188,32 @@ bigger batches = fewer round-trips = faster indexing.
   not batch capacity. Concurrent client requests against `-np 1` queue
   rather than parallelize, so the only useful lever is `--batch-size`.
 
+### `--max-chars N` (dense, raptor, hypergraph)
+
+Truncate each text to `N` characters before sending it to the embeddings
+endpoint. Default: **8000**. Pass `--max-chars 0` to disable.
+
+Why this exists: if any text's token count exceeds the embedding server's
+context window, the whole batch fails with HTTP 500 (e.g. llama.cpp:
+`input (13918 tokens) is too large to process`). Client-side truncation
+avoids that. 8000 chars is a conservative cap that stays under an
+8192-token context for any script — English prose is ~4 chars/token, but
+Chinese/Arabic/code-heavy text can be ~1–2 chars/token. If your corpus
+is monolingual English wiki text, you can raise this (e.g. `--max-chars
+24000`) to retain more of each document. If you have CJK, code, or mixed
+content, keep it at 8000 or lower.
+
+The full document text is still stored in the output artifacts
+(`corpus.jsonl`, `tree.pkl`, hypergraph KV stores) — only the text sent
+to the embedding endpoint is truncated. This matches how any
+fixed-context embedding model behaves internally.
+
+`max_chars` is part of the checkpoint fingerprint, so changing the
+value between runs invalidates the existing `.checkpoint/` and forces
+you to delete it or point to a different output dir. This is
+intentional: mixing embeddings computed at different truncation points
+in the same index would be silently wrong.
+
 ### Checkpointing (dense, raptor, hypergraph)
 
 Three builders — `build_dense_index.py`, `build_raptor_index.py`, and
