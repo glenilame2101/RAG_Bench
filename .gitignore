@@ -16,6 +16,9 @@ env/
 .env
 !.env.example
 
+# Corporate CA bundles (per-machine, never committed)
+cert/
+
 # Logs & local outputs
 *.log
 logs/

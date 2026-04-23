@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import shutil
 from pathlib import Path
 from typing import List, Optional
 
@@ -86,12 +87,23 @@ def build_index(
     embedding_base_url: str | None,
     embedding_model: str | None,
     batch_size: int,
+    checkpoint_dir: Optional[Path] = None,
 ) -> None:
     embedder = EmbeddingClient(base_url=embedding_base_url, model=embedding_model)
     print(f"[Dense] Embedding {len(corpus)} documents via {embedder.base_url} ({embedder.model})")
 
     texts = [doc["contents"] for doc in corpus]
-    embeddings = embedder.encode(texts, batch_size=batch_size, normalize=True)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    if checkpoint_dir is not None:
+        embeddings = embedder.encode_with_checkpoint(
+            texts,
+            checkpoint_dir=checkpoint_dir,
+            batch_size=batch_size,
+            normalize=True,
+            save_every_pct=1.0,
+        )
+    else:
+        embeddings = embedder.encode(texts, batch_size=batch_size, normalize=True)
     if embeddings.size == 0:
         raise RuntimeError("No embeddings generated — corpus likely empty")
 
@@ -101,7 +113,6 @@ def build_index(
     index = faiss.IndexFlatIP(dim)
     index.add(embeddings.astype(np.float32))
 
-    output_dir.mkdir(parents=True, exist_ok=True)
     index_path = output_dir / "dense_index.faiss"
     corpus_path = output_dir / "corpus.jsonl"
     faiss.write_index(index, str(index_path))
@@ -126,6 +137,11 @@ def main() -> None:
         default=None,
         help="Index only the first N%% of the corpus (e.g., 10 = first 10%%)",
     )
+    parser.add_argument(
+        "--no-checkpoint",
+        action="store_true",
+        help="Disable embedding checkpointing (default: checkpoint every 1%% to <output-dir>/.checkpoint/)",
+    )
     args = parser.parse_args()
 
     if args.partial_index is not None and not (0 < args.partial_index <= 100):
@@ -136,13 +152,22 @@ def main() -> None:
         raise SystemExit(f"No documents loaded from {args.corpus}")
     print(f"[Dense] Loaded {len(corpus)} documents from {args.corpus}")
 
+    output_dir = Path(args.output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    checkpoint_dir = None if args.no_checkpoint else output_dir / ".checkpoint"
+
     build_index(
         corpus=corpus,
-        output_dir=Path(args.output_dir),
+        output_dir=output_dir,
         embedding_base_url=args.embedding_base_url,
         embedding_model=args.embedding_model,
         batch_size=args.batch_size,
+        checkpoint_dir=checkpoint_dir,
     )
+
+    if checkpoint_dir is not None and checkpoint_dir.exists():
+        shutil.rmtree(checkpoint_dir)
+        print(f"[Dense] Cleaned up checkpoint dir {checkpoint_dir}")
 
 
 if __name__ == "__main__":

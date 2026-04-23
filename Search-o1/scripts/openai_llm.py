@@ -27,23 +27,66 @@ from typing import Any, List, Optional, Sequence, Union
 # ---------------------------------------------------------------------------
 # .env loading
 # ---------------------------------------------------------------------------
+def _configure_ca_bundle() -> Optional[str]:
+    """Configure a company CA bundle for TLS-inspecting corporate proxies.
+
+    Resolution order:
+      1. ``$COMPANY_CA_CERT`` — explicit path override
+      2. ``cert/knapp.pem`` found by walking upward from the cwd
+
+    When a bundle is located, sets ``REQUESTS_CA_BUNDLE`` and
+    ``SSL_CERT_FILE`` in ``os.environ`` (with ``setdefault`` so any
+    preexisting user value wins). Both ``requests`` and ``httpx`` honor
+    these, so every HTTP call in the stack picks up the bundle automatically.
+
+    Returns the absolute path to the bundle, or ``None`` if none was found
+    (in which case the process uses the system default CA store).
+    """
+    override = os.environ.get("COMPANY_CA_CERT", "").strip()
+    candidates: list[str] = []
+    if override:
+        candidates.append(override)
+
+    current = os.getcwd()
+    while True:
+        candidates.append(os.path.join(current, "cert", "knapp.pem"))
+        parent = os.path.dirname(current)
+        if parent == current:
+            break
+        current = parent
+
+    for candidate in candidates:
+        if candidate and os.path.isfile(candidate):
+            abs_path = os.path.abspath(candidate)
+            os.environ.setdefault("REQUESTS_CA_BUNDLE", abs_path)
+            os.environ.setdefault("SSL_CERT_FILE", abs_path)
+            print(f"[ca-bundle] Using company CA bundle: {abs_path}")
+            return abs_path
+    return None
+
+
 def load_env_file(path: Optional[str] = None) -> None:
     """Load ``.env`` from *path* or walk upward from the cwd to find one.
 
     Silently no-ops if ``python-dotenv`` is not installed or no file is found.
     The three variables this project cares about are ``URL``, ``MODEL_NAME``
     and ``OPENAI_API_KEY``.
+
+    After loading, probes for a company CA bundle at ``cert/knapp.pem`` (or
+    ``$COMPANY_CA_CERT``) and wires it into the HTTP client stack if present.
     """
     try:
         from dotenv import load_dotenv, find_dotenv
     except ImportError:
+        _configure_ca_bundle()
         return
     if path and os.path.isfile(path):
         load_dotenv(path, override=False)
-        return
-    discovered = find_dotenv(usecwd=True)
-    if discovered:
-        load_dotenv(discovered, override=False)
+    else:
+        discovered = find_dotenv(usecwd=True)
+        if discovered:
+            load_dotenv(discovered, override=False)
+    _configure_ca_bundle()
 
 
 def _normalize_base_url(url: str) -> str:
@@ -128,10 +171,21 @@ class OpenAILLM:
 
         self.model_name = model_name
         self.base_url = _normalize_base_url(base_url)
+
+        # If a company CA bundle is configured, pass an httpx.Client with
+        # verify= explicitly. Relying on SSL_CERT_FILE alone works for current
+        # httpx versions but explicit pass-through survives library upgrades.
+        ca_bundle = os.environ.get("SSL_CERT_FILE") or os.environ.get("REQUESTS_CA_BUNDLE")
+        http_client = None
+        if ca_bundle and os.path.isfile(ca_bundle):
+            import httpx
+            http_client = httpx.Client(verify=ca_bundle, timeout=timeout)
+
         self._client = OpenAI(
             base_url=self.base_url,
             api_key=api_key or "EMPTY",
             timeout=timeout,
+            http_client=http_client,
         )
         self._max_workers = max_workers
 

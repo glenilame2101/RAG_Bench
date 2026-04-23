@@ -74,6 +74,48 @@ these per command with the matching `--*-base-url` / `--*-model` flag.
 `.env.example` ships a working template against a local llama.cpp instance
 plus a remote MiniMax LLM.
 
+## Corporate TLS-inspecting proxies
+
+If your network sits behind a TLS-inspecting proxy (Zscaler, Netskope,
+Palo Alto, etc.) the public CAs in your system trust store will fail to
+verify the proxy's substituted certificate, producing
+`SSLError: CERTIFICATE_VERIFY_FAILED` on every outbound HTTPS call.
+
+To avoid hand-patching every HTTP client, drop your company CA bundle at
+the repo root and the stack will pick it up automatically:
+
+```
+RAGSearch/
+├── cert/
+│   └── knapp.pem        # your corporate CA bundle (not committed)
+├── .env
+└── ...
+```
+
+Both `rag_clients.load_env()` (used by builders/servers) and
+`openai_llm.load_env_file()` (used by Search-o1 client scripts) probe for
+this file at startup. When found they:
+
+- Set `REQUESTS_CA_BUNDLE` and `SSL_CERT_FILE` in the process environment
+  (so `requests` and `httpx` honor it transparently)
+- Pass `verify=<bundle>` explicitly to the OpenAI SDK's underlying
+  `httpx.Client`
+
+You'll see one log line on startup confirming the bundle was loaded:
+
+```
+[ca-bundle] Using company CA bundle: /abs/path/to/cert/knapp.pem
+```
+
+If `cert/knapp.pem` is absent the helper is a silent no-op and the system
+default CA store is used — fine for non-corporate machines.
+
+**Override paths:** set `COMPANY_CA_CERT=/some/other/path.pem` in `.env`
+or the shell environment to point at a bundle outside the default
+`cert/knapp.pem` location.
+
+`cert/` is gitignored by convention — keep it out of version control.
+
 ## Available retrievers
 
 | Retriever  | Default port | Builder                       | Server                  | Extras                  |

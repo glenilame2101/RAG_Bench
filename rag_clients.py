@@ -38,6 +38,43 @@ def _parse_env_file(path: Path) -> None:
                 os.environ[key] = value
 
 
+def _configure_ca_bundle() -> Optional[str]:
+    """Configure a company CA bundle for TLS-inspecting corporate proxies.
+
+    Resolution order:
+      1. ``$COMPANY_CA_CERT`` — explicit path override
+      2. ``cert/knapp.pem`` found by walking upward from the cwd
+
+    When a bundle is located, sets ``REQUESTS_CA_BUNDLE`` and
+    ``SSL_CERT_FILE`` in ``os.environ`` (with ``setdefault`` so any
+    preexisting user value wins). Both ``requests`` and ``httpx`` honor
+    these, so every HTTP call in the stack picks up the bundle automatically.
+
+    Returns the absolute path to the bundle, or ``None`` if none was found.
+    """
+    override = os.environ.get("COMPANY_CA_CERT", "").strip()
+    candidates: List[str] = []
+    if override:
+        candidates.append(override)
+
+    current = os.getcwd()
+    while True:
+        candidates.append(os.path.join(current, "cert", "knapp.pem"))
+        parent = os.path.dirname(current)
+        if parent == current:
+            break
+        current = parent
+
+    for candidate in candidates:
+        if candidate and os.path.isfile(candidate):
+            abs_path = os.path.abspath(candidate)
+            os.environ.setdefault("REQUESTS_CA_BUNDLE", abs_path)
+            os.environ.setdefault("SSL_CERT_FILE", abs_path)
+            print(f"[ca-bundle] Using company CA bundle: {abs_path}")
+            return abs_path
+    return None
+
+
 def load_env(start: Optional[Path] = None) -> Optional[Path]:
     """Load .env into os.environ. Returns the path actually loaded, or None.
 
@@ -47,24 +84,33 @@ def load_env(start: Optional[Path] = None) -> Optional[Path]:
          for a `.env` sibling.
 
     Existing environment variables win over .env values.
+
+    After loading, also probes for a company CA bundle at ``cert/knapp.pem``
+    (or ``$COMPANY_CA_CERT``) and wires it into the HTTP client stack if
+    present.
     """
+    loaded: Optional[Path] = None
     try:
         from dotenv import load_dotenv, find_dotenv  # type: ignore
 
         discovered = find_dotenv(usecwd=True)
         if discovered:
             load_dotenv(discovered, override=False)
-            return Path(discovered)
+            loaded = Path(discovered)
     except ImportError:
         pass
 
-    base = (start or Path(__file__).resolve().parent).resolve()
-    for parent in (base, *base.parents):
-        candidate = parent / ".env"
-        if candidate.is_file():
-            _parse_env_file(candidate)
-            return candidate
-    return None
+    if loaded is None:
+        base = (start or Path(__file__).resolve().parent).resolve()
+        for parent in (base, *base.parents):
+            candidate = parent / ".env"
+            if candidate.is_file():
+                _parse_env_file(candidate)
+                loaded = candidate
+                break
+
+    _configure_ca_bundle()
+    return loaded
 
 
 def _normalize_base_url(url: str) -> str:
@@ -129,16 +175,21 @@ class EmbeddingClient:
             return np.zeros((0, 0), dtype=np.float32)
 
         out: List[np.ndarray] = []
-        for start in range(0, len(texts), max(1, batch_size)):
-            batch = texts[start : start + batch_size]
-            data = self._post({"model": self.model, "input": batch})
-            for item in data["data"]:
-                vec = np.asarray(item["embedding"], dtype=np.float32)
-                if normalize:
-                    norm = float(np.linalg.norm(vec))
-                    if norm > 0.0:
-                        vec = vec / norm
-                out.append(vec)
+        bar = tqdm(total=len(texts), desc="[Embed] Embedding", unit="chunk")
+        try:
+            for start in range(0, len(texts), max(1, batch_size)):
+                batch = texts[start : start + batch_size]
+                data = self._post({"model": self.model, "input": batch})
+                for item in data["data"]:
+                    vec = np.asarray(item["embedding"], dtype=np.float32)
+                    if normalize:
+                        norm = float(np.linalg.norm(vec))
+                        if norm > 0.0:
+                            vec = vec / norm
+                    out.append(vec)
+                bar.update(len(batch))
+        finally:
+            bar.close()
         return np.vstack(out) if out else np.zeros((0, 0), dtype=np.float32)
 
     def __call__(self, text):
@@ -361,7 +412,20 @@ class LLMClient:
             raise ValueError("OPENAI_BASE_URL is not set (and no override given)")
         if not self.model:
             raise ValueError("OPENAI_MODEL is not set (and no override given)")
-        self._client = OpenAI(base_url=self.base_url, api_key=self.api_key, timeout=timeout)
+
+        # Honor a company CA bundle if one was configured by load_env().
+        ca_bundle = os.environ.get("SSL_CERT_FILE") or os.environ.get("REQUESTS_CA_BUNDLE")
+        http_client = None
+        if ca_bundle and os.path.isfile(ca_bundle):
+            import httpx
+            http_client = httpx.Client(verify=ca_bundle, timeout=timeout)
+
+        self._client = OpenAI(
+            base_url=self.base_url,
+            api_key=self.api_key,
+            timeout=timeout,
+            http_client=http_client,
+        )
 
     def chat(self, messages: Iterable[dict], **kwargs) -> str:
         resp = self._client.chat.completions.create(
