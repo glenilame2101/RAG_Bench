@@ -197,16 +197,27 @@ class EmbeddingClient:
             return self.encode([text])[0]
         return self.encode(text)
 
-    def _fingerprint(self, texts: Sequence[str]) -> str:
-        """Stable hash of the input set; used to refuse mismatched resumes."""
+    def _fingerprint(
+        self,
+        texts: Sequence[str],
+        prefix_len: Optional[int] = None,
+        normalize: bool = True,
+    ) -> str:
+        """Stable hash over the first `prefix_len` texts (or all, if None).
+
+        Covers (model, normalize flag, prefix length, first/middle/last text
+        of the prefix). Used to validate resumable checkpoints: two runs that
+        share the same prefix produce the same hash and may resume.
+        """
+        n = len(texts) if prefix_len is None else prefix_len
         h = hashlib.sha256()
         h.update(self.model.encode("utf-8"))
-        h.update(str(len(texts)).encode("utf-8"))
-        if texts:
+        h.update(b"norm=1" if normalize else b"norm=0")
+        h.update(str(n).encode("utf-8"))
+        if n > 0:
             h.update(texts[0][:1000].encode("utf-8", errors="replace"))
-            h.update(texts[-1][:1000].encode("utf-8", errors="replace"))
-            mid = texts[len(texts) // 2]
-            h.update(mid[:1000].encode("utf-8", errors="replace"))
+            h.update(texts[n - 1][:1000].encode("utf-8", errors="replace"))
+            h.update(texts[n // 2][:1000].encode("utf-8", errors="replace"))
         return h.hexdigest()
 
     def encode_with_checkpoint(
@@ -220,11 +231,14 @@ class EmbeddingClient:
         """Embed `texts`, saving partial progress to `checkpoint_dir` every
         `save_every_pct` percent of total work.
 
-        On re-invocation with the same input set, picks up where it left off.
-        Refuses to resume if model name or input fingerprint differ.
+        The checkpoint is a persistent prefix cache: if a previous run embedded
+        the first K texts and the current run starts with those same K texts
+        (prefix-fingerprint match), resume from K instead of recomputing.
+        If the new run requests fewer texts than are saved, returns the
+        first n_total from the saved embeddings.
 
         Layout under `checkpoint_dir`:
-            state.json       — {model, total, completed, fingerprint, ...}
+            state.json       — {model, completed, prefix_fingerprint, ...}
             emb_000000.npy   — first chunk of saved embeddings
             emb_000001.npy   — ...
             (concatenated in order to produce the final array)
@@ -238,8 +252,6 @@ class EmbeddingClient:
         ckpt_dir.mkdir(parents=True, exist_ok=True)
         state_path = ckpt_dir / "state.json"
 
-        fingerprint = self._fingerprint(texts)
-
         completed = 0
         loaded_chunks: List[np.ndarray] = []
         if state_path.exists():
@@ -250,12 +262,6 @@ class EmbeddingClient:
                     f"Checkpoint state at {state_path} is corrupt ({exc}). "
                     f"Delete the directory to start over."
                 )
-            if state.get("fingerprint") != fingerprint:
-                raise SystemExit(
-                    f"Checkpoint at {ckpt_dir} was created from a different input set "
-                    f"(model/count/text fingerprint mismatch). Delete the directory or "
-                    f"use a different --output-dir."
-                )
             completed = int(state.get("completed", 0))
             for f in sorted(ckpt_dir.glob("emb_*.npy")):
                 loaded_chunks.append(np.load(f))
@@ -265,8 +271,27 @@ class EmbeddingClient:
                     f"Checkpoint inconsistent: state.json says {completed} done but "
                     f"found {loaded_count} embeddings on disk in {ckpt_dir}."
                 )
-            if completed >= n_total:
-                print(f"[Embed] Checkpoint already complete ({completed}/{n_total})")
+            if completed > 0:
+                if n_total < completed:
+                    raise SystemExit(
+                        f"Checkpoint at {ckpt_dir} already holds {completed} embeddings "
+                        f"but this run only needs {n_total}. Refusing to truncate — the "
+                        f"stored fingerprint covers {completed} items and can't verify "
+                        f"a shorter prefix. Use --no-checkpoint, delete {ckpt_dir}, or "
+                        f"point at a different checkpoint dir."
+                    )
+                expected_fp = self._fingerprint(
+                    texts, prefix_len=completed, normalize=normalize
+                )
+                saved_fp = state.get("prefix_fingerprint")
+                if saved_fp != expected_fp:
+                    raise SystemExit(
+                        f"Checkpoint at {ckpt_dir} was built from a different input "
+                        f"prefix (model/normalize/text mismatch over first {completed} "
+                        f"items). Delete the directory or use a different checkpoint dir."
+                    )
+            if completed == n_total:
+                print(f"[Embed] Checkpoint covers request ({completed}/{n_total})")
                 return np.vstack(loaded_chunks)
             print(f"[Embed] Resuming from checkpoint: {completed}/{n_total} done")
 
@@ -275,6 +300,22 @@ class EmbeddingClient:
         new_chunks: List[np.ndarray] = []
         pending: List[np.ndarray] = []
         pending_count = 0
+
+        def _write_state() -> None:
+            state_path.write_text(
+                json.dumps(
+                    {
+                        "model": self.model,
+                        "completed": completed,
+                        "batch_size": batch_size,
+                        "normalize": normalize,
+                        "prefix_fingerprint": self._fingerprint(
+                            texts, prefix_len=completed, normalize=normalize
+                        ),
+                    }
+                ),
+                encoding="utf-8",
+            )
 
         bar = tqdm(
             total=n_total,
@@ -302,19 +343,7 @@ class EmbeddingClient:
                     new_chunks.append(arr)
                     next_chunk_index += 1
                     completed += pending_count
-                    state_path.write_text(
-                        json.dumps(
-                            {
-                                "model": self.model,
-                                "total": n_total,
-                                "completed": completed,
-                                "batch_size": batch_size,
-                                "normalize": normalize,
-                                "fingerprint": fingerprint,
-                            }
-                        ),
-                        encoding="utf-8",
-                    )
+                    _write_state()
                     pending = []
                     pending_count = 0
 
@@ -323,19 +352,7 @@ class EmbeddingClient:
                 np.save(ckpt_dir / f"emb_{next_chunk_index:06d}.npy", arr)
                 new_chunks.append(arr)
                 completed += pending_count
-                state_path.write_text(
-                    json.dumps(
-                        {
-                            "model": self.model,
-                            "total": n_total,
-                            "completed": completed,
-                            "batch_size": batch_size,
-                            "normalize": normalize,
-                            "fingerprint": fingerprint,
-                        }
-                    ),
-                    encoding="utf-8",
-                )
+                _write_state()
         finally:
             bar.close()
 

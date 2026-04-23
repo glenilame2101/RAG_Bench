@@ -175,54 +175,81 @@ bigger batches = fewer round-trips = faster indexing.
   not batch capacity. Concurrent client requests against `-np 1` queue
   rather than parallelize, so the only useful lever is `--batch-size`.
 
-### Checkpointing (raptor)
+### Checkpointing (dense, raptor, hypergraph)
 
-`build_raptor_index.py` checkpoints embeddings to disk **every 1%** of
-total chunks by default, so a crashed or interrupted run does not throw
-away the embeddings already computed. Re-run the same command to resume.
+Three builders — `build_dense_index.py`, `build_raptor_index.py`, and
+`build_hypergraph_index.py` — checkpoint embeddings to disk **every 1%**
+of total work by default. The checkpoint serves two purposes:
+
+1. **Crash recovery.** A crashed or Ctrl-C'd run loses at most the last
+   <1% of embeddings; re-run the same command to resume.
+2. **Prefix cache across `--partial-index` runs.** A run that embedded
+   the first `K` items leaves those embeddings on disk. A later run
+   asking for the same first `K` items, *or any prefix-extending
+   superset*, skips those `K` and embeds only the new items.
+
+Example — staging a dense index in growing slices without re-embedding
+the overlap:
 
 ```bash
-# First run — crashes at 47%.
-python build_raptor_index.py --corpus ./corpus.jsonl \
-    --output-dir ./indexes/raptor --batch-size 64
+# Run 1: embed the first 0.1% of the corpus (e.g., 200 docs).
+python build_dense_index.py --corpus ./corpus.jsonl \
+    --output-dir ./indexes/dense --partial-index 0.1
 
-# Same command again — resumes from the last 1% boundary, then finishes.
-python build_raptor_index.py --corpus ./corpus.jsonl \
-    --output-dir ./indexes/raptor --batch-size 64
+# Run 2: embed the first 0.2% (400 docs). The first 200 are reused
+# from the checkpoint; only the new 200 hit the embedding endpoint.
+python build_dense_index.py --corpus ./corpus.jsonl \
+    --output-dir ./indexes/dense --partial-index 0.2
+
+# Run 3: full corpus. Reuses everything already cached; embeds the rest.
+python build_dense_index.py --corpus ./corpus.jsonl \
+    --output-dir ./indexes/dense
 ```
+
+Each run overwrites the final artifact (`dense_index.faiss`,
+`tree.pkl`, or the hypergraph `index_*.bin`) to reflect the current
+`--partial-index` slice, but the checkpoint directory persists.
 
 Layout under `<output-dir>/.checkpoint/`:
 
 ```
-state.json           # {model, total, completed, fingerprint, ...}
+state.json           # {model, completed, prefix_fingerprint, ...}
 emb_000000.npy       # one slice of saved embeddings (float32, normalized)
 emb_000001.npy
 ...
 ```
 
-After `tree.pkl` is written successfully the `.checkpoint/` directory is
-auto-deleted.
+Hypergraph has two subdirs (`.checkpoint/entities/` and
+`.checkpoint/hyperedges/`) since it runs two independent embedding
+passes.
 
 Safety guards:
 
-- A SHA-256 fingerprint of `(model name, total count, first/middle/last
-  text)` is stored in `state.json`. If you re-run with a different model
-  or a different corpus, the script refuses to mix incompatible vectors
-  and tells you to delete the directory.
+- A SHA-256 **prefix fingerprint** of `(model name, normalize flag,
+  completed count, first/middle/last text of the completed prefix)`
+  is stored in `state.json`. Re-running against the same corpus prefix
+  matches; re-running with a different model, a different corpus, or a
+  reordered prefix produces a clean `SystemExit` telling you to delete
+  the directory or point at a different one.
+- **Going backwards** is refused: if the cache holds 400 items but your
+  new `--partial-index` asks for only 100, the script errors out rather
+  than silently truncating. Use `--no-checkpoint`, delete
+  `.checkpoint/`, or use a separate `--output-dir`.
 - If the on-disk count of embeddings disagrees with `state.json`
   (interrupted mid-flush), the script errors out instead of producing a
   corrupt array.
-- A SIGINT/Ctrl-C between flushes loses at most the last <1% of work.
 
 Pass `--no-checkpoint` to disable. Storage cost is roughly
-`4 KB × num_chunks` for a 1024-dim model like bge-m3 (≈ 4 GB per million
-chunks) at peak, freed once `tree.pkl` is written. Make sure
-`--output-dir` lives on a drive with room.
+`4 KB × num_items` for a 1024-dim model like bge-m3 (≈ 4 GB per million
+items). Unlike earlier versions, the checkpoint is **not** auto-deleted
+after the final artifact is written — it stays so the next
+`--partial-index` run can reuse it. Delete `.checkpoint/` manually
+once you're done growing the index.
 
-The dense, hypergraph, linear, hipporag, and graphrag builders do not yet
-have checkpointing — linear/hipporag/graphrag delegate the embedding loop
-to vendored library code, so adding it there means modifying their
-internals rather than a one-flag change.
+The linear, hipporag, and graphrag builders still don't have
+checkpointing: they delegate the embedding loop to vendored library
+code, so adding it there means modifying their internals rather than a
+one-flag change.
 
 ## Project layout
 

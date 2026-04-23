@@ -10,7 +10,6 @@ from __future__ import annotations
 import argparse
 import json
 import pickle
-import shutil
 from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -254,7 +253,10 @@ def main() -> None:
     parser.add_argument(
         "--no-checkpoint",
         action="store_true",
-        help="Disable embedding checkpointing (default: checkpoint every 1%% to <output-dir>/.checkpoint/)",
+        help="Disable embedding checkpointing. Default: checkpoint every 1%% to "
+             "<output-dir>/.checkpoint/. The checkpoint persists across runs and "
+             "acts as a prefix cache — re-running with a larger --partial-index "
+             "reuses chunk embeddings from any previous run that shares the same prefix.",
     )
     args = parser.parse_args()
 
@@ -285,10 +287,6 @@ def main() -> None:
     with tree_path.open("wb") as fh:
         pickle.dump(tree, fh)
     print(f"[Raptor] Wrote {tree_path}")
-
-    if checkpoint_dir is not None and checkpoint_dir.exists():
-        shutil.rmtree(checkpoint_dir)
-        print(f"[Raptor] Cleaned up checkpoint dir {checkpoint_dir}")
 
 
 if __name__ == "__main__":
