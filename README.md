@@ -12,6 +12,48 @@ Two of the six retrievers (HippoRAG, GraphRAG) need extra packages that are
 not pinned in `requirements.txt` because they pull in heavy deps the rest of
 the stack avoids — see [Optional retriever extras](#optional-retriever-extras).
 
+## Loading a Wikipedia parquet into ChromaDB
+
+`load_to_chroma.py` reads a parquet file that already contains pre-computed
+embedding vectors and bulk-loads them into a local ChromaDB collection.
+No embeddings are (re-)computed — the script just transfers data.
+
+```bash
+# 1. Create and activate a venv (Python 3.10+)
+python -m venv .venv
+source .venv/bin/activate   # Linux / Mac
+.venv\Scripts\activate      # Windows
+
+# 2. Install dependencies
+pip install chromadb pyarrow pandas tqdm
+
+# 3. Load the parquet
+python load_to_chroma.py --parquet data/wiki.parquet --collection wikipedia
+```
+
+### CLI options
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--parquet` | *(required)* | Path to the parquet file |
+| `--collection` | `wikipedia` | ChromaDB collection name |
+| `--persist-dir` | `./chroma_db` | Directory ChromaDB writes to |
+| `--batch-size` | `5000` | Rows per `collection.add()` call (Chroma max ≈ 5461) |
+| `--limit` | *(none)* | Stop after N rows (handy for smoke-tests) |
+
+Example with all options:
+
+```bash
+python load_to_chroma.py \
+    --parquet data/wiki.parquet \
+    --collection wikipedia \
+    --persist-dir ./chroma_db \
+    --batch-size 5000 \
+    --limit 10000
+```
+
+---
+
 ## Quick start
 
 ```bash
