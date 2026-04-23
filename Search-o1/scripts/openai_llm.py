@@ -182,8 +182,15 @@ class OpenAILLM:
             kwargs["top_p"] = float(top_p)
 
         stop = _get("stop")
-        if stop:
-            kwargs["stop"] = list(stop) if not isinstance(stop, str) else [stop]
+        if stop is not None:
+            # Normalize to list and remove empty strings (OpenAI rejects empty stop strings)
+            if isinstance(stop, str):
+                stop_list = [stop]
+            else:
+                stop_list = list(stop)
+            stop_list = [s for s in stop_list if s]
+            if stop_list:
+                kwargs["stop"] = stop_list
 
         presence_penalty = _get("presence_penalty")
         if presence_penalty:
@@ -324,6 +331,21 @@ def add_backend_args(parser) -> None:
         default=default_model,
         help="Model name sent in chat.completions requests (reads $OPENAI_MODEL by default).",
     )
+    # Default CA bundle: prefer env, else try repo-relative `certs/knapp.pem`.
+    default_ca = os.environ.get("REQUESTS_CA_BUNDLE") or os.environ.get("OPENAI_CA_BUNDLE") or ""
+    if not default_ca:
+        repo_cert = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "..", "..", "certs", "knapp.pem")
+        )
+        if os.path.exists(repo_cert):
+            default_ca = repo_cert
+
+    parser.add_argument(
+        "--ca_bundle",
+        type=str,
+        default=default_ca,
+        help="Path to a CA bundle file to verify TLS for the OpenAI endpoint (sets REQUESTS_CA_BUNDLE and SSL_CERT_FILE).",
+    )
     parser.add_argument(
         "--tokenizer_path",
         type=str,
@@ -355,6 +377,22 @@ def build_llm(args, model: str, **_unused: Any):
             or os.environ.get("OPENAI_MODEL", "")
             or model
         )
+        # Configure CA bundle / certs: prefer CLI/env, else fallback to repo certs.
+        ca_bundle = getattr(args, "ca_bundle", "") or os.environ.get("REQUESTS_CA_BUNDLE", "") or os.environ.get("OPENAI_CA_BUNDLE", "")
+        if ca_bundle:
+            os.environ["REQUESTS_CA_BUNDLE"] = ca_bundle
+            os.environ["SSL_CERT_FILE"] = ca_bundle
+            print(f"[build_llm] Using CA bundle: {ca_bundle}")
+        else:
+            repo_cert = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "certs", "knapp.pem"))
+            repo_certs_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "certs"))
+            if os.path.exists(repo_cert):
+                os.environ["REQUESTS_CA_BUNDLE"] = repo_cert
+                os.environ["SSL_CERT_FILE"] = repo_cert
+                print(f"[build_llm] Using repo CA bundle: {repo_cert}")
+            elif os.path.isdir(repo_certs_dir):
+                os.environ["SSL_CERT_DIR"] = repo_certs_dir
+                print(f"[build_llm] Using repo certs directory as SSL_CERT_DIR: {repo_certs_dir}")
         max_workers = int(getattr(args, "openai_max_workers", 16) or 16)
         print(
             f"[build_llm] Using OpenAI-compatible backend: "

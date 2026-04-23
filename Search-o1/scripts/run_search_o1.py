@@ -282,23 +282,19 @@ def main():
     if repetition_penalty is None:
         repetition_penalty = 1.05 if 'qwq' in model_path.lower() else 1.0
 
-    # Data paths based on dataset
+    # Data paths based on dataset (resolve relative to this script)
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    data_root = os.path.abspath(os.path.join(script_dir, '..', 'data'))
+
     if dataset_name == 'livecode':
-        data_path = f'./data/LiveCodeBench/{split}.json'
+        data_path = os.path.join(data_root, 'LiveCodeBench', f'{split}.json')
     elif dataset_name in ['math500', 'gpqa', 'aime', 'amc']:
-        data_path = f'./data/{dataset_name.upper()}/{split}.json'
+        data_path = os.path.join(data_root, dataset_name.upper(), f'{split}.json')
     else:
-         
         folder_name = dataset_name
         if dataset_name == '2wiki':
             folder_name = '2wikimultihopqa'
-        
-        #data_path = f'./data/QA_Datasets/{dataset_name}.json'
-         
-        data_path = f'./data/{folder_name}/{split}.json'
-        #data_path = f'./data/QA_Datasets/{dataset_name}.json'
-         
-        #data_path = f'./data/{dataset_name}/{split}.json'
+        data_path = os.path.join(data_root, folder_name, f'{split}.json')
 
     print('-----------------------')
     print(f'Using {dataset_name} {split} set.')

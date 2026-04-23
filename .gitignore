@@ -30,6 +30,7 @@ hypergraph_index/
 linear_index/
 graphrags/
 indexes/
+CorpusIndex/
 
 # OS cruft
 .DS_Store
@@ -42,5 +43,6 @@ Thumbs.db
 # Datasets (large, fetched separately)
 Search-o1/data/
 
+certs/
 
-docs\superpowers
+CorpusIndex/
