@@ -14,6 +14,7 @@
 # huggingface-hub, gritlm, boto3, umap-learn. Anything that pulls model weights
 # from HuggingFace or requires a GPU does not belong in this base stack.
 
+chromadb>=0.5
 openai>=1.40
 python-dotenv>=1.0
 requests>=2.31
