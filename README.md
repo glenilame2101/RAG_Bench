@@ -1,73 +1,75 @@
 # RAGSearch
 
-A small set of retrieval-only RAG backends — Dense (FAISS), HippoRAG,
-RAPTOR, HypergraphRAG, LinearRAG, and GraphRAG — that all talk to your own
-OpenAI-compatible HTTP endpoints (LLM, embeddings, optional reranker).
+A small set of retrieval-only RAG backends — **Dense (FAISS)**,
+**HippoRAG**, **RAPTOR**, **HypergraphRAG**, **LinearRAG**, and
+**GraphRAG** — that all talk to your own OpenAI-compatible HTTP
+endpoints (LLM, embeddings, optional reranker).
 
-There is **no vLLM, no HuggingFace download, no transformers, no
-sentence-transformers, no per-retriever virtual environment**. One Python
-venv, one `requirements.txt`, one `.env` file with seven variables.
+> One Python venv. One `requirements.txt`. One `.env`. No vLLM, no
+> HuggingFace downloads, no transformers/sentence-transformers, no
+> per-retriever virtualenv.
 
-Two of the six retrievers (HippoRAG, GraphRAG) need extra packages that are
-not pinned in `requirements.txt` because they pull in heavy deps the rest of
-the stack avoids — see [Optional retriever extras](#optional-retriever-extras).
+---
+
+## Table of contents
+
+- [Quick start](#quick-start)
+- [The `.env` contract](#the-env-contract)
+- [Corpus formats](#corpus-formats)
+- [Available retrievers](#available-retrievers)
+- [Building large indexes](#building-large-indexes)
+  - [Partial indexing](#partial-indexing)
+  - [Batch size](#batch-size)
+  - [Truncation (`--max-chars`)](#truncation---max-chars)
+  - [Checkpointing](#checkpointing)
+- [Optional retriever extras](#optional-retriever-extras)
+- [Reranker support](#reranker-support)
+- [Project layout](#project-layout)
+- [Further reading](#further-reading)
+- [Migrating from older versions](#migrating-from-older-versions)
+
+---
 
 ## Quick start
 
 ```bash
-# 1. Create and activate a single venv (Python 3.10+)
+# 1. Create a venv (Python 3.10+)
 python -m venv .venv
 source .venv/bin/activate           # Linux / Mac
 .venv\Scripts\activate              # Windows
 
-# 2. Install everything
+# 2. Install
 pip install -r requirements.txt
 
-# 3. spaCy needs the English model once (used by LinearRAG NER)
+# 3. spaCy English model (used by LinearRAG NER)
 python -m spacy download en_core_web_sm
 
-# 4. Configure your endpoints
+# 4. Configure endpoints
 cp .env.example .env                # then edit .env
+```
 
-# 5. Build an index for the retriever you want
-python build_dense_index.py      --corpus ./mycorpus.jsonl --output-dir ./indexes/dense
-python build_raptor_index.py     --corpus ./mycorpus.jsonl --output-dir ./indexes/raptor
-python build_hypergraph_index.py --corpus ./mycorpus.jsonl --output-dir ./indexes/hyper
-python build_hipporag_index.py   --corpus ./mycorpus.jsonl --output-dir ./indexes/hippo     # needs torch
-python build_linear_index.py     --corpus ./mycorpus.jsonl --output-dir ./indexes/linear
-python build_graphrag_index.py   --corpus ./mycorpus.jsonl --output-dir ./indexes/graphrag  # needs graphrag + lancedb
+Build and serve any retriever:
 
-# 6. Serve the index (same path you built into)
-python serve_dense.py      --index-dir ./indexes/dense    --port 8306
-python serve_raptor.py     --index-dir ./indexes/raptor   --port 8346
-python serve_hypergraph.py --index-dir ./indexes/hyper    --port 8336
-python serve_hipporag.py   --index-dir ./indexes/hippo    --port 8316
-python serve_linear.py     --index-dir ./indexes/linear   --port 8356
-python serve_graphrag.py   --index-dir ./indexes/graphrag --port 8326
+```bash
+# Dense (FAISS) — example
+python build_dense_index.py --corpus ./mycorpus.jsonl --output-dir ./indexes/dense
+python serve_dense.py      --index-dir ./indexes/dense --port 8306
+```
 
-# 7. Or build + serve + evaluate in one command
+Or do build + serve + evaluate in one shot:
+
+```bash
 python run_benchmark.py --retriever dense \
     --corpus ./mycorpus.jsonl --index-dir ./indexes/dense
 ```
 
-`--corpus` accepts three formats, auto-detected from the path:
+Every retriever follows the same shape — see the [retrievers table](#available-retrievers).
 
-- **JSONL file** (one JSON document per line)
-- **Parquet file** (one document per row; columns follow the same field
-  priority — requires `pyarrow`, already in `requirements.txt`)
-- **Directory of `*.txt` files** (one document per file; id = file stem)
+---
 
-For JSONL and Parquet, the text is read from the first of these fields
-that's present and non-empty: `contents`, `text`, `content`, `document`,
-`body`. As a last resort it concatenates `question` + `answer` for
-QA-style corpora. Document ids come from `id`, `_id`, `doc_id`, or
-`document_id` (falling back to row index). Nothing is hardcoded — every
-path comes in via the CLI, and all six builders share the same loader
-(`corpus_loader.py`).
+## The `.env` contract
 
-## `.env` contract
-
-The seven variables every entry point reads (no aliases, no fallbacks):
+Seven variables. No aliases, no fallbacks:
 
 | Variable             | Purpose                                          |
 |----------------------|--------------------------------------------------|
@@ -79,182 +81,170 @@ The seven variables every entry point reads (no aliases, no fallbacks):
 | `RERANKER_BASE_URL`  | OpenAI-compatible `/v1/rerank` endpoint (opt.)   |
 | `RERANKER_MODEL`     | Reranker model name (opt.)                       |
 
-Trailing `/v1` is added automatically if missing. You can override any of
-these per command with the matching `--*-base-url` / `--*-model` flag.
+Notes:
 
-`.env.example` ships a working template against a local llama.cpp instance
-plus a remote MiniMax LLM.
+- Trailing `/v1` is added automatically if missing.
+- Override any of these per command with the matching `--*-base-url` /
+  `--*-model` flag.
+- `.env.example` ships a working template against a local llama.cpp
+  instance plus a remote MiniMax LLM.
 
-## Corporate TLS-inspecting proxies
+> **Self-hosting embeddings?** See [docs/TEI.md](docs/TEI.md) for the
+> recommended setup with HuggingFace's Text Embeddings Inference server.
+>
+> **Behind a corporate TLS-inspecting proxy?** See
+> [docs/CERTIFICATES.md](docs/CERTIFICATES.md).
 
-If your network sits behind a TLS-inspecting proxy (Zscaler, Netskope,
-Palo Alto, etc.) the public CAs in your system trust store will fail to
-verify the proxy's substituted certificate, producing
-`SSLError: CERTIFICATE_VERIFY_FAILED` on every outbound HTTPS call.
+---
 
-To avoid hand-patching every HTTP client, drop your company CA bundle at
-the repo root and the stack will pick it up automatically:
+## Corpus formats
 
-```
-RAGSearch/
-├── cert/
-│   └── knapp.pem        # your corporate CA bundle (not committed)
-├── .env
-└── ...
-```
+`--corpus` accepts three formats, auto-detected from the path:
 
-Both `rag_clients.load_env()` (used by builders/servers) and
-`openai_llm.load_env_file()` (used by Search-o1 client scripts) probe for
-this file at startup. When found they:
+- **JSONL file** — one JSON document per line.
+- **Parquet file** — one document per row (requires `pyarrow`, already
+  pinned).
+- **Directory of `*.txt` files** — one document per file; id = file
+  stem.
 
-- Set `REQUESTS_CA_BUNDLE` and `SSL_CERT_FILE` in the process environment
-  (so `requests` and `httpx` honor it transparently)
-- Pass `verify=<bundle>` explicitly to the OpenAI SDK's underlying
-  `httpx.Client`
+For JSONL and Parquet, the text is read from the first of these fields
+that's present and non-empty: `contents`, `text`, `content`, `document`,
+`body`. As a last resort it concatenates `question` + `answer` for
+QA-style corpora.
 
-You'll see one log line on startup confirming the bundle was loaded:
+Document ids come from `id`, `_id`, `doc_id`, or `document_id` (falling
+back to row index). Nothing is hardcoded — every path comes in via the
+CLI, and all six builders share the same loader (`corpus_loader.py`).
 
-```
-[ca-bundle] Using company CA bundle: /abs/path/to/cert/knapp.pem
-```
-
-If `cert/knapp.pem` is absent the helper is a silent no-op and the system
-default CA store is used — fine for non-corporate machines.
-
-**Override paths:** set `COMPANY_CA_CERT=/some/other/path.pem` in `.env`
-or the shell environment to point at a bundle outside the default
-`cert/knapp.pem` location.
-
-`cert/` is gitignored by convention — keep it out of version control.
+---
 
 ## Available retrievers
 
-| Retriever  | Default port | Builder                       | Server                  | Extras                  |
-|------------|--------------|-------------------------------|-------------------------|-------------------------|
-| dense      | 8306         | `build_dense_index.py`        | `serve_dense.py`        | —                       |
-| raptor     | 8346         | `build_raptor_index.py`       | `serve_raptor.py`       | —                       |
-| hypergraph | 8336         | `build_hypergraph_index.py`   | `serve_hypergraph.py`   | —                       |
-| hipporag   | 8316         | `build_hipporag_index.py`     | `serve_hipporag.py`     | `pip install torch`     |
-| linear     | 8356         | `build_linear_index.py`       | `serve_linear.py`       | —                       |
-| graphrag   | 8326         | `build_graphrag_index.py`     | `serve_graphrag.py`     | `pip install graphrag lancedb` |
+| Retriever  | Default port | Builder                       | Server                  | Extras                              |
+|------------|--------------|-------------------------------|-------------------------|-------------------------------------|
+| dense      | 8306         | `build_dense_index.py`        | `serve_dense.py`        | —                                   |
+| raptor     | 8346         | `build_raptor_index.py`       | `serve_raptor.py`       | —                                   |
+| hypergraph | 8336         | `build_hypergraph_index.py`   | `serve_hypergraph.py`   | —                                   |
+| hipporag   | 8316         | `build_hipporag_index.py`     | `serve_hipporag.py`     | `pip install torch`                 |
+| linear     | 8356         | `build_linear_index.py`       | `serve_linear.py`       | —                                   |
+| graphrag   | 8326         | `build_graphrag_index.py`     | `serve_graphrag.py`     | `pip install graphrag lancedb`      |
 
 Every server exposes:
 
-- `POST /search`  — body `{"queries": ["..."]}`, returns `[{"results": "..."}, ...]`
-- `GET  /status`  — `{"status": "ok", "retriever": "<name>", ...}`
+- `POST /search` — body `{"queries": ["..."]}`, returns `[{"results": "..."}, ...]`
+- `GET  /status` — `{"status": "ok", "retriever": "<name>", ...}`
 
-`serve_dense.py` additionally keeps `POST /retrieve` for compatibility with
-the Search-o1 client scripts.
+`serve_dense.py` additionally keeps `POST /retrieve` for compatibility
+with the Search-o1 client scripts.
+
+---
 
 ## Building large indexes
 
 Every builder shows tqdm progress bars during corpus loading and (where
-applicable) per-document loops. For multi-GB corpora the following flags
-matter:
+applicable) per-document loops. For multi-GB corpora the flags below
+matter most.
 
-### `--partial-index N` (all six builders)
-
-Index only the first `N%` of the corpus. `N` is a number in `(0, 100]`.
+### Partial indexing
 
 ```bash
 python build_raptor_index.py --corpus ./corpus.jsonl \
     --output-dir ./indexes/raptor --partial-index 10
 ```
 
-Useful for smoke-tests, parameter sweeps, or staging a small index
-before committing to a full multi-hour run. For JSONL the builder does
-a fast streaming line-count first (no JSON parsing), then loads only
-the first `N%` of lines. For Parquet it reads `num_rows` from the file
-metadata (O(1)) and then streams the first `N%` of rows in row-group
-batches. For directories it takes the first `N%` of `*.txt` files
-sorted alphabetically.
+`--partial-index N` indexes only the first **N%** of the corpus
+(`0 < N ≤ 100`). Useful for smoke-tests, parameter sweeps, or staging a
+small index before committing to a multi-hour run.
 
-### `--batch-size`
+How it slices, by format:
 
-Default is 32. This is the number of texts sent per request to your
-embeddings endpoint. Each request has fixed network/server overhead, so
-bigger batches = fewer round-trips = faster indexing.
+- **JSONL** — fast streaming line-count, then loads the first N% of lines.
+- **Parquet** — reads `num_rows` from file metadata (O(1)), streams the
+  first N% of rows in row-group batches.
+- **Directory** — first N% of `*.txt` files, sorted alphabetically.
 
-- **Hosted endpoints** (OpenAI, Cohere, Voyage, Together, …): start at 128.
-  OpenAI accepts up to 2048 inputs / ~300k tokens per request; Cohere caps
-  at 96; Voyage at 128. Read your provider's docs.
-- **Self-hosted** (llama.cpp, vLLM, TEI, Ollama): the only caps are GPU
-  memory and the server's own `--max-batch-size` (or equivalent). Try 128;
-  if the server returns 4xx, raise its limit. `EmbeddingClient` uses a
-  300-second request timeout and retries up to 3 times on `Timeout` /
-  `ConnectionError` (with exponential backoff). 5xx responses are not
-  retried — on llama.cpp those are usually permanent conditions like
-  oversized input, which `--max-chars` is the right fix for.
-- **llama.cpp specifically:** `-np N` controls server-side parallel slots,
-  not batch capacity. Concurrent client requests against `-np 1` queue
-  rather than parallelize, so the only useful lever is `--batch-size`.
+### Batch size
 
-### `--max-chars N` (dense, raptor, hypergraph)
+`--batch-size` (default **32**) controls how many texts go in each
+embeddings request. Bigger batches = fewer round-trips = faster.
 
-Truncate each text to `N` characters before sending it to the embeddings
-endpoint. Default: **8000**. Pass `--max-chars 0` to disable.
+| Backend                                     | Recommended start | Notes                                                                 |
+|---------------------------------------------|-------------------|-----------------------------------------------------------------------|
+| Hosted (OpenAI, Cohere, Voyage, Together)   | 128               | OpenAI ≤ 2048 / ~300k tokens; Cohere ≤ 96; Voyage ≤ 128.              |
+| Self-hosted (TEI, llama.cpp, vLLM, Ollama)  | 128               | Bound by GPU memory and the server's own `--max-batch-size`.          |
+| llama.cpp specifically                      | tune `--batch-size` | `-np N` controls parallel slots, NOT batch capacity.                |
 
-Why this exists: if any text's token count exceeds the embedding server's
-context window, the whole batch fails with HTTP 500 (e.g. llama.cpp:
+`EmbeddingClient` uses a 300-second timeout and retries up to 3 times on
+`Timeout` / `ConnectionError` (exponential backoff). 5xx is **not**
+retried — on llama.cpp those usually mean a permanent condition like
+oversized input, which `--max-chars` is the right fix for.
+
+### Truncation (`--max-chars`)
+
+Available on **dense, raptor, hypergraph**. Truncates each text to N
+characters before sending it to the embeddings endpoint. **Default:
+8000.** Pass `--max-chars 0` to disable.
+
+Why this exists: if a single text exceeds the embedding server's context
+window, the whole batch fails (e.g. llama.cpp:
 `input (13918 tokens) is too large to process`). Client-side truncation
-avoids that. 8000 chars is a conservative cap that stays under an
-8192-token context for any script — English prose is ~4 chars/token, but
-Chinese/Arabic/code-heavy text can be ~1–2 chars/token. If your corpus
-is monolingual English wiki text, you can raise this (e.g. `--max-chars
-24000`) to retain more of each document. If you have CJK, code, or mixed
-content, keep it at 8000 or lower.
+avoids that.
 
-The full document text is still stored in the output artifacts
-(`corpus.jsonl`, `tree.pkl`, hypergraph KV stores) — only the text sent
-to the embedding endpoint is truncated. This matches how any
-fixed-context embedding model behaves internally.
+Tuning guidance:
 
-`max_chars` is part of the checkpoint fingerprint, so changing the
-value between runs invalidates the existing `.checkpoint/` and forces
-you to delete it or point to a different output dir. This is
-intentional: mixing embeddings computed at different truncation points
-in the same index would be silently wrong.
+- 8000 chars stays under an 8192-token context for any script.
+- English prose ≈ 4 chars/token. CJK, code, and mixed text can be
+  1–2 chars/token.
+- Monolingual English wiki? Raise to e.g. `--max-chars 24000`.
+- Mixed/CJK/code corpora? Keep at 8000 or lower.
 
-### Checkpointing (dense, raptor, hypergraph)
+> The full document is still stored in the output artifacts
+> (`corpus.jsonl`, `tree.pkl`, hypergraph KV stores). Only the text sent
+> to the embedding endpoint is truncated.
 
-Three builders — `build_dense_index.py`, `build_raptor_index.py`, and
-`build_hypergraph_index.py` — checkpoint embeddings to disk **every 1%**
-of total work by default. The checkpoint serves two purposes:
+`max_chars` is part of the checkpoint fingerprint, so changing it
+between runs invalidates the existing `.checkpoint/`. This is
+intentional — mixing embeddings computed at different truncation
+points in the same index would be silently wrong.
+
+### Checkpointing
+
+Available on **dense, raptor, hypergraph**. Embeddings are persisted to
+disk **every 1%** of total work. The checkpoint serves two purposes:
 
 1. **Crash recovery.** A crashed or Ctrl-C'd run loses at most the last
-   <1% of embeddings; re-run the same command to resume.
+   <1% of embeddings; rerun the same command to resume.
 2. **Prefix cache across `--partial-index` runs.** A run that embedded
-   the first `K` items leaves those embeddings on disk. A later run
-   asking for the same first `K` items, *or any prefix-extending
-   superset*, skips those `K` and embeds only the new items.
+   the first K items leaves them on disk. A later run asking for the
+   same first K (or a prefix-extending superset) skips them and only
+   embeds the new items.
 
 Example — staging a dense index in growing slices without re-embedding
-the overlap:
+overlap:
 
 ```bash
-# Run 1: embed the first 0.1% of the corpus (e.g., 200 docs).
+# Run 1: first 0.1% of the corpus (e.g., 200 docs).
 python build_dense_index.py --corpus ./corpus.jsonl \
     --output-dir ./indexes/dense --partial-index 0.1
 
-# Run 2: embed the first 0.2% (400 docs). The first 200 are reused
-# from the checkpoint; only the new 200 hit the embedding endpoint.
+# Run 2: first 0.2% (400 docs). The first 200 are reused.
 python build_dense_index.py --corpus ./corpus.jsonl \
     --output-dir ./indexes/dense --partial-index 0.2
 
-# Run 3: full corpus. Reuses everything already cached; embeds the rest.
+# Run 3: full corpus. Reuses everything cached; embeds the rest.
 python build_dense_index.py --corpus ./corpus.jsonl \
     --output-dir ./indexes/dense
 ```
 
-Each run overwrites the final artifact (`dense_index.faiss`,
-`tree.pkl`, or the hypergraph `index_*.bin`) to reflect the current
-`--partial-index` slice, but the checkpoint directory persists.
+Each run overwrites the final artifact (`dense_index.faiss`, `tree.pkl`,
+hypergraph `index_*.bin`) to reflect the current `--partial-index`
+slice, but the checkpoint directory persists.
 
 Layout under `<output-dir>/.checkpoint/`:
 
 ```
 state.json           # {model, completed, prefix_fingerprint, ...}
-emb_000000.npy       # one slice of saved embeddings (float32, normalized)
+emb_000000.npy       # first slice of saved embeddings (float32, normalized)
 emb_000001.npy
 ...
 ```
@@ -263,44 +253,107 @@ Hypergraph has two subdirs (`.checkpoint/entities/` and
 `.checkpoint/hyperedges/`) since it runs two independent embedding
 passes.
 
-Safety guards:
+**Safety guards:**
 
 - A SHA-256 **prefix fingerprint** of `(model name, normalize flag,
-  completed count, first/middle/last text of the completed prefix)`
-  is stored in `state.json`. Re-running against the same corpus prefix
-  matches; re-running with a different model, a different corpus, or a
-  reordered prefix produces a clean `SystemExit` telling you to delete
-  the directory or point at a different one.
-- **Going backwards** is refused: if the cache holds 400 items but your
-  new `--partial-index` asks for only 100, the script errors out rather
-  than silently truncating. Use `--no-checkpoint`, delete
-  `.checkpoint/`, or use a separate `--output-dir`.
+  completed count, first/middle/last text of the completed prefix)` is
+  stored in `state.json`. Reruns against the same prefix match;
+  different model / corpus / reordered prefix produces a clean
+  `SystemExit`.
+- **Going backwards is refused.** If the cache holds 400 items but your
+  new `--partial-index` asks for only 100, the script errors out
+  rather than silently truncating. Use `--no-checkpoint`, delete
+  `.checkpoint/`, or pick a different `--output-dir`.
 - If the on-disk count of embeddings disagrees with `state.json`
-  (interrupted mid-flush), the script errors out instead of producing a
+  (interrupted mid-flush), the script errors instead of producing a
   corrupt array.
 
-Pass `--no-checkpoint` to disable. Storage cost is roughly
-`4 KB × num_items` for a 1024-dim model like bge-m3 (≈ 4 GB per million
-items). Unlike earlier versions, the checkpoint is **not** auto-deleted
-after the final artifact is written — it stays so the next
-`--partial-index` run can reuse it. Delete `.checkpoint/` manually
-once you're done growing the index.
+**Storage cost:** roughly `4 KB × num_items` for a 1024-dim model like
+bge-m3 (≈ 4 GB per million items).
 
-The linear, hipporag, and graphrag builders still don't have
-checkpointing: they delegate the embedding loop to vendored library
-code, so adding it there means modifying their internals rather than a
-one-flag change.
+**Disabling:** pass `--no-checkpoint`.
+
+> The checkpoint is **not** auto-deleted after the final artifact is
+> written — it stays so the next `--partial-index` run can reuse it.
+> Delete `.checkpoint/` manually once you're done growing the index.
+
+The linear, hipporag, and graphrag builders don't have checkpointing:
+they delegate the embedding loop to vendored library code, so adding
+it there means modifying their internals rather than a one-flag change.
+
+---
+
+## Optional retriever extras
+
+Two retrievers need packages deliberately kept out of `requirements.txt`
+so the base venv stays light. Install them only when you actually want
+that retriever.
+
+### HippoRAG
+
+The vendored HippoRAG calls `torch` in one place
+(`utils/embed_utils.retrieve_knn`) for entity-entity KNN:
+
+```bash
+pip install torch
+```
+
+CPU-only is fine — the function falls back to CPU when CUDA isn't
+present.
+
+### GraphRAG
+
+GraphRAG uses Microsoft's `graphrag` package and its LanceDB vector
+store. Both pull in heavy transitive deps (dspy, fastlite, etc.) that
+the rest of the stack doesn't need:
+
+```bash
+pip install graphrag lancedb
+```
+
+`build_graphrag_index.py` writes a `settings.yaml` into your
+`--output-dir` that uses `${VAR}` substitution against the same `.env`
+contract. The LLM hits `OPENAI_BASE_URL` / `OPENAI_MODEL` and the
+embedder hits `EMBEDDING_BASE_URL` / `EMBEDDING_MODEL`. No
+GraphRAG-specific config files to maintain.
+
+> **Heads-up on cost.** GraphRAG is the most LLM-expensive retriever
+> here: every chunk costs entity + relationship extraction, every
+> community costs a summarization pass, and every `/search` call invokes
+> the LLM at retrieval time. Plan to use it against small corpora
+> (HotpotQA-distractor, sample wikis) unless you have a local LLM with
+> serious throughput.
+
+---
+
+## Reranker support
+
+If `RERANKER_BASE_URL` and `RERANKER_MODEL` are set, retrievers that
+benefit from query-time reranking (currently HypergraphRAG and HippoRAG
+fact reranking) will use the endpoint via `POST /v1/rerank`.
+
+If those vars are unset, retrievers degrade gracefully to passthrough
+ranking — no errors, no warnings beyond a single startup log line.
+
+> TEI can serve a reranker model on the same OpenAI-compatible
+> protocol — see [docs/TEI.md](docs/TEI.md#use-tei-as-a-reranker-too).
+
+---
 
 ## Project layout
 
 ```
-RAGSearch/
+RAG_Bench/
 ├── .env / .env.example              # canonical config
 ├── requirements.txt                 # single, flat
 ├── rag_clients.py                   # shared HTTP clients (Embedding/Reranker/LLM)
-├── build_<retriever>_index.py       # five builders (CLI: --corpus, --output-dir)
-├── serve_<retriever>.py             # five servers   (CLI: --index-dir, --port)
+├── corpus_loader.py                 # shared corpus loader for all builders
+├── build_<retriever>_index.py       # six builders (CLI: --corpus, --output-dir)
+├── serve_<retriever>.py             # six servers   (CLI: --index-dir, --port)
 ├── run_benchmark.py                 # build/serve/eval orchestrator
+├── docs/
+│   ├── TEI.md                       # Text Embeddings Inference setup
+│   └── CERTIFICATES.md              # Corporate TLS / CA bundle setup
 ├── GraphR1/
 │   ├── HippoRAG/src/hipporag/       # vendored HippoRAG, OpenAI-only
 │   ├── LinearRAG/src/               # vendored LinearRAG
@@ -312,69 +365,34 @@ RAGSearch/
     └── scripts/                     # agent client (run_search_o1*.py + helpers)
 ```
 
-## Optional retriever extras
+---
 
-Two retrievers need packages that are deliberately kept out of
-`requirements.txt` so the base venv stays light. Install them only when you
-actually want that retriever.
+## Further reading
 
-### HippoRAG
+- **[docs/TEI.md](docs/TEI.md)** — Run HuggingFace's Text Embeddings
+  Inference server and point the stack at it.
+- **[docs/CERTIFICATES.md](docs/CERTIFICATES.md)** — Corporate
+  TLS-inspecting proxy / CA bundle setup.
 
-The vendored HippoRAG still calls `torch` in one place
-(`utils/embed_utils.retrieve_knn`) for entity-entity KNN. Install once into
-the same venv:
-
-```bash
-pip install torch
-```
-
-CPU-only is fine — the function falls back to CPU when CUDA isn't present.
-
-### GraphRAG
-
-GraphRAG uses Microsoft's `graphrag` package and its LanceDB vector store.
-Both pull in heavy transitive deps (dspy, fastlite, etc.) that the rest of
-the stack doesn't need:
-
-```bash
-pip install graphrag lancedb
-```
-
-`build_graphrag_index.py` writes a `settings.yaml` into your `--output-dir`
-that uses `${VAR}` substitution against the same `.env` contract — the LLM
-hits `OPENAI_BASE_URL` / `OPENAI_MODEL` and the embedder hits
-`EMBEDDING_BASE_URL` / `EMBEDDING_MODEL`. No GraphRAG-specific config files
-to maintain.
-
-GraphRAG is the most LLM-expensive retriever in the set: every chunk costs
-entity + relationship extraction, every community costs a summarization
-pass, and every `/search` call invokes the LLM once at retrieval time.
-Plan to use it against small corpora (HotpotQA-distractor, sample wikis)
-unless you have a local LLM with serious throughput.
-
-## Reranker support
-
-If you set `RERANKER_BASE_URL` and `RERANKER_MODEL` in `.env`, retrievers
-that benefit from query-time reranking (currently HypergraphRAG and
-HippoRAG fact reranking) will use that endpoint via `POST /v1/rerank`.
-If those vars are unset, retrievers degrade gracefully to a passthrough
-ranking — no errors, no warnings beyond a single startup log line.
+---
 
 ## Migrating from older versions
 
-The legacy environment variable names (`URL`, `MODEL_NAME`, `LLM_BASE_URL`,
-`EMBEDDING_URL`, `EMBEDDING_MODEL_NAME`, `REMOTE_MODEL_NAME`) have been
-collapsed into the seven names above. Update your `.env` accordingly.
+The legacy environment variable names (`URL`, `MODEL_NAME`,
+`LLM_BASE_URL`, `EMBEDDING_URL`, `EMBEDDING_MODEL_NAME`,
+`REMOTE_MODEL_NAME`) have been collapsed into the seven names above.
+Update your `.env` accordingly.
 
 The per-retriever `requirements.txt` files, the `venvs/` per-backend
 virtualenvs, the `script_api_*.py` server scripts under `GraphR1/`, the
 `vllm_infer/` runner, the `lcb_runner/` LiveCodeBench evaluator, and the
-`graphr1/` Search-R1 trainer have all been removed. If you depended on any
-of those, pin the previous tag.
+`graphr1/` Search-R1 trainer have all been removed. If you depended on
+any of those, pin the previous tag.
 
 The GraphRAG retriever was originally removed in the same refactor (its
 `graphrag` PyPI package pulled in dspy/litellm and other deps the base
 stack avoids). It has since been added back as an **opt-in extra** —
-`build_graphrag_index.py` and `serve_graphrag.py` are first-class scripts
-matching the other retrievers' shape, but you must `pip install graphrag
-lancedb` separately. See [Optional retriever extras](#optional-retriever-extras).
+`build_graphrag_index.py` and `serve_graphrag.py` are first-class
+scripts matching the other retrievers' shape, but you must `pip install
+graphrag lancedb` separately. See
+[Optional retriever extras](#optional-retriever-extras).
