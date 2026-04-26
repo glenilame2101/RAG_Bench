@@ -196,7 +196,11 @@ class EmbeddingClient:
         max_chars: Optional[int] = None,
         **_unused,
     ) -> np.ndarray:
-        if isinstance(texts, str):
+        # Match sentence-transformers semantics: a single string returns a 1-D
+        # vector; a list returns a 2-D array. Vendored libs (LinearRAG, etc.)
+        # rely on this distinction in np.dot calls.
+        was_string = isinstance(texts, str)
+        if was_string:
             texts = [texts]
         texts = list(texts)
         if not texts:
@@ -224,7 +228,8 @@ class EmbeddingClient:
                 bar.update(len(batch))
         finally:
             bar.close()
-        return np.vstack(out) if out else np.zeros((0, 0), dtype=np.float32)
+        arr = np.vstack(out) if out else np.zeros((0, 0), dtype=np.float32)
+        return arr[0] if was_string else arr
 
     def __call__(self, text):
         if isinstance(text, str):

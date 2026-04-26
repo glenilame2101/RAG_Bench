@@ -33,7 +33,11 @@ def _extract_ner_from_response(real_response):
     if match is None:
         # If pattern doesn't match, return an empty list
         return []
-    return eval(match.group())["named_entities"]
+    parsed = eval(match.group()).get("named_entities", [])
+    # LLMs occasionally emit lazy placeholders like `[..., "foo"]`; eval()
+    # turns `...` into Python's Ellipsis, which then fails json.dumps in
+    # triple_extraction. Drop anything that isn't a non-empty string.
+    return [e for e in parsed if isinstance(e, str) and e]
 
 
 class OpenIE:

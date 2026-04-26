@@ -1,9 +1,9 @@
 {
   "retriever": "dense",
-  "corpus": "C:\\Users\\gleni\\Desktop\\Knapp Projects\\OpenCodeRAGSearch\\RAGSearch\\Search-o1\\data\\FlashRAG_datasets\\bamboogle\\test.jsonl",
+  "corpus": "C:\\Users\\gleni\\Desktop\\Knapp Projects\\RAG_Bench\\Search-o1\\data\\FlashRAG_datasets\\bamboogle\\test.jsonl",
   "metrics": {
     "em": 0.0,
-    "f1": 0.001549435292572403
+    "f1": 0.0017813203939882533
   },
   "details": [
     {
@@ -11,7 +11,7 @@
       "gold": [
         "james madison"
       ],
-      "retrieved": "\"École nationale d'administration\"\nENA, has the effect of perpetuating an intellectually brilliant yet out-of-touch ruling elite. Yannick Blanc, a former senior civil servant, has also suggested that",
+      "retrieved": "\"Kathleen Sullivan (journalist)\"\nKathleen Sullivan (journalist) Kathleen Sullivan (born May 17, 1953) is an American television journalist. She was hired as CNN anchor by former president Reese Schonf",
       "em": 0.0,
       "f1": 0.0
     },
@@ -20,7 +20,7 @@
       "gold": [
         "Titan IIIE"
       ],
-      "retrieved": "\"Operation Jupiter (Norway)\"\nin Norway was \"\"sufficient to make a successful invasion improbable\"\". The idea for an attack on northern Norway might be traced to Joseph Stalin's first wartime message t",
+      "retrieved": "\"Hubble Space Telescope\"\nby the time it was due to be observed. Engineering support for HST is provided by NASA and contractor personnel at the Goddard Space Flight Center in Greenbelt, Maryland, sout",
       "em": 0.0,
       "f1": 0.0
     },
@@ -29,7 +29,7 @@
       "gold": [
         "1999"
       ],
-      "retrieved": "\"David Grubbs\"\nVandermark, Damon Locks, and Ian Williams) profiled in Augusto Contento's 2012 documentary film \"\"Parallax Sounds\"\". Grubbs lives in Brooklyn with his wife, Cathy Bowman, and their son ",
+      "retrieved": "\"The Paris Wife\"\n20, and Richardson was 28. They married in 1921 and soon moved to Paris. There they met Ezra Pound, F. Scott Fitzgerald, Gertrude Stein and James Joyce. Their marriage fell apart as H",
       "em": 0.0,
       "f1": 0.0
     },
@@ -38,25 +38,25 @@
       "gold": [
         "David Dinkins"
       ],
-      "retrieved": "\"Jonathan Larson\"\nJonathan Larson Jonathan David Larson (February 4, 1960 – January 25, 1996) was an American composer and playwright noted for exploring the social issues of multiculturalism, addicti",
+      "retrieved": "\"Economy of Egypt\"\nThe majority of its younger population is struggling with unemployment and destitution, and heightening food prices in Cairo. According to an Associated Press report, nearly half of",
       "em": 0.0,
-      "f1": 0.006410256410256411
+      "f1": 0.0
     },
     {
       "question": "When did the last king from Britain's House of Hanover die?",
       "gold": [
         "20 June 1837"
       ],
-      "retrieved": "Absalon\ndragged forth and burnt. The whole population of Garz was then baptized, and Absalon laid the foundations of twelve churches in the isle of Rügen. Rügen was then subjected to Absalon's Bishopr",
+      "retrieved": "\"House of Hanover\"\narchitecture gives distinction to the architectural styles current between 1714 and 1830 in most English-speaking countries. House of Hanover The House of Hanover (), whose members ",
       "em": 0.0,
-      "f1": 0.00625
+      "f1": 0.0
     },
     {
       "question": "When did the president who set the precedent of a two term limit enter office?",
       "gold": [
         "April 30, 1789"
       ],
-      "retrieved": "\"École nationale d'administration\"\nENA, has the effect of perpetuating an intellectually brilliant yet out-of-touch ruling elite. Yannick Blanc, a former senior civil servant, has also suggested that",
+      "retrieved": "\"Meriden, Kansas\"\nindividuals and 9.2% had someone living alone who was 65 years of age or older. The average household size was 2.58 and the average family size was 3.12. The median age in the city w",
       "em": 0.0,
       "f1": 0.0
     },
@@ -65,16 +65,16 @@
       "gold": [
         "March 4, 1797"
       ],
-      "retrieved": "\"Rajendra Singh (RSS)\"\nideological lines, as well as with academics, social workers and intellectuals. 1998 saw the pragmatic shift of Indian politics when the main opposition party, the Bharatiya Jan",
+      "retrieved": "\"Limington, Maine\"\n2010, there were 3,713 people, 1,392 households, and 1,029 families residing in the town. The population density was . There were 1,615 housing units at an average density of . The ",
       "em": 0.0,
-      "f1": 0.005865102639296187
+      "f1": 0.0
     },
     {
       "question": "How many people died in the second most powerful earthquake ever recorded?",
       "gold": [
         "131"
       ],
-      "retrieved": "\"Yury of Zvenigorod\"\npreparing a new campaign against Vasily when he died suddenly, on 5 July 1434, succeeded by his eldest son, Vasily Kosoy. Yury of Zvenigorod Yury Dmitrievich (26 November 1374, Pe",
+      "retrieved": "\"Epoch of Extreme Inundations\"\nThe largest intra-continental lake system of today (the Great Lakes of North America) is six times smaller (245,000 km), with a water volume 30 times smaller (22,700 km)",
       "em": 0.0,
       "f1": 0.0
     },
@@ -83,7 +83,7 @@
       "gold": [
         "Yes"
       ],
-      "retrieved": "\"Kao Chin Su-mei\"\nKao Chin Su-mei Kao Chin Su-mei (born September 21, 1965), also known as Chin Su-mei, May Chin and Ciwas Ali, is a Taiwanese politician and retired actress and singer. She is of Manc",
+      "retrieved": "\"Kathleen Sullivan (journalist)\"\nKathleen Sullivan (journalist) Kathleen Sullivan (born May 17, 1953) is an American television journalist. She was hired as CNN anchor by former president Reese Schonf",
       "em": 0.0,
       "f1": 0.0
     },
@@ -92,16 +92,16 @@
       "gold": [
         "The Formation of Vegetable Mould Through the Action of Worms"
       ],
-      "retrieved": "\"Last Man on Earth (album)\"\nreflect upon Wainwright's troubled relationship with his father, Loudon Wainwright, Jr., a subject that has populated many of his earlier recordings. \"\"Last Man on Earth\"\" ",
+      "retrieved": "\"Anaïs Nin\"\ndecades and even up until her death. Her journals, many of which were published during her lifetime, detail her private thoughts and personal relationships. Her journals also describe her",
       "em": 0.0,
-      "f1": 0.012084592145015106
+      "f1": 0.01916932907348243
     },
     {
       "question": "When was the company that built the first steam locomotive to carry passengers on a public rail line founded?",
       "gold": [
         "1823"
       ],
-      "retrieved": "\"Edlington railway station\"\nfor a waiting shelter. The large station sign was removed in the late 1920s and replaced by a simple \"\"Edlington\"\". The station was opened for passengers on 3 June 1912 and",
+      "retrieved": "\"Eckwersheim derailment\"\nline during the fourth phase of tests. The train reached a maximum speed of on sections where the speed limit will be . As the train approached the flying junction in the comm",
       "em": 0.0,
       "f1": 0.0
     },
@@ -110,7 +110,7 @@
       "gold": [
         "Erika Cheung"
       ],
-      "retrieved": "\"Evan Morris\"\nEvan Morris Evan L. Morris (January 26, 1977 – July 9, 2015) was a lobbyist for Genentech and its parent corporation Roche in Washington, D.C. He began his career in Washington as an int",
+      "retrieved": "\"The Kingdom (miniseries)\"\nHelmer) and the subsequent death of Kirsten Rolffes (who played Mrs Drusse) in 2000, the likelihood of a third series is now very remote. Von Trier actually wrote the third ",
       "em": 0.0,
       "f1": 0.0
     },
@@ -119,7 +119,7 @@
       "gold": [
         "Titanium"
       ],
-      "retrieved": "\"Ambrosini SAI.207\"\nAmbrosini SAI.207 The Ambrosini SAI.207 was a light fighter interceptor built entirely from wood and developed in Italy during World War II. Powered by a single 750 hp Isotta Frasc",
+      "retrieved": "\"Power Jets WU\"\nnecessary, and the \"\"straight-through\"\" design became practicable, as implemented in the design of the unbuilt W.2Y and the later re-designed W.2B/500 - Rover B.26, later to become the",
       "em": 0.0,
       "f1": 0.0
     },
@@ -128,7 +128,7 @@
       "gold": [
         "Lockheed Corporation"
       ],
-      "retrieved": "\"Ambrosini SAI.207\"\ntail-wheel undercarriage, developed from the Ambrosini SAI.7. Of wooden construction, giving a light structure, power was supplied by Isotta-Fraschini Delta R.C.40 engine, cooling ",
+      "retrieved": "\"The Deadlines\"\nthe place where Nirvana had made their last studio album. Soon after recording their first album, Jones left the band and was replaced by Thomas Demise. The album had not yet been rele",
       "em": 0.0,
       "f1": 0.0
     },
@@ -137,16 +137,16 @@
       "gold": [
         "May 29, 1932"
       ],
-      "retrieved": "\"Jonathan Larson\"\nJonathan Larson Jonathan David Larson (February 4, 1960 – January 25, 1996) was an American composer and playwright noted for exploring the social issues of multiculturalism, addicti",
+      "retrieved": "KXTN-FM\nTurner Broadcasting System. In 1974, KBUC-FM moved from 106.3 to 107.5 to make way for a new station, KTUF 106.3 (now KTKX 106.7). The move also included a power increase to 100,000 watts and ",
       "em": 0.0,
-      "f1": 0.005865102639296187
+      "f1": 0.0
     },
     {
       "question": "When did the author of Annabel Lee enlist in the army?",
       "gold": [
         "1827"
       ],
-      "retrieved": "\"Navy Records Society\"\nof Sir Julian Corbett, and took over Corbett's task of editing \"\"The Private papers of George, 2nd Earl Spencer\"\", contributing vols 3 and 4 in 1924 (vols 58 and 59). Richmond e",
+      "retrieved": "\"Paulo Costa (fighter)\"\nUFC 212. He won the via fight TKO in the second round. After the fight with Bamgbose, UFC offered a new contract but the parties wouldn't come to an agreement with the financia",
       "em": 0.0,
       "f1": 0.0
     },
@@ -155,7 +155,7 @@
       "gold": [
         "Jewish"
       ],
-      "retrieved": "\"Johann Michael Feder\"\nvols., of the \"\"Prakt.-theol. Magazin für katholische Geistliche\"\" (1798–1800), and of the \"\"Würzburger Gelehrten Anzeigen\"\" (1788–92). He also wrote several volumes of sermons.",
+      "retrieved": "\"Degen, Switzerland\"\npopulation are between 20 and 29 years old. 34 people or 13.8% are between 30 and 39, 36 people or 14.6% are between 40 and 49, and 40 people or 16.2% are between 50 and 59. The s",
       "em": 0.0,
       "f1": 0.0
     },
@@ -164,7 +164,7 @@
       "gold": [
         "Jane Shirley Smith"
       ],
-      "retrieved": "\"Linda Thompson (actress)\"\nLinda Thompson (actress) Linda Diane Thompson (born May 23, 1950) is an American songwriter/lyricist, former actress and beauty pageant winner. She was married to Olympic de",
+      "retrieved": "\"Bob Casey Jr.\"\ndegree from the Columbus School of Law at The Catholic University of America in 1988. Between college and law school, Casey served as a member of the Jesuit Volunteer Corps, and spent ",
       "em": 0.0,
       "f1": 0.0
     },
@@ -173,16 +173,16 @@
       "gold": [
         "November 6, 1905"
       ],
-      "retrieved": "\"Yury of Zvenigorod\"\npreparing a new campaign against Vasily when he died suddenly, on 5 July 1434, succeeded by his eldest son, Vasily Kosoy. Yury of Zvenigorod Yury Dmitrievich (26 November 1374, Pe",
+      "retrieved": "\"Fairfield, Kentucky\"\nto the United States Census Bureau, the city has a total area of , o which is land and 3.33% is water. As of the census of 2000, there were 72 people, 27 households, and 23 famil",
       "em": 0.0,
-      "f1": 0.006493506493506494
+      "f1": 0.0
     },
     {
       "question": "What is the primary male hormone derived from?",
       "gold": [
         "cholesterol"
       ],
-      "retrieved": "\"The Darling Buds of May (TV series)\"\nin series one reveals her middle name to be Jane. Mariette and Charlie continue the family penchant for elaborate naming by christening their son John Marlborough",
+      "retrieved": "\"Japanese name\"\nthe surname and which is the given name is usually apparent, no matter which order the names are presented in. This thus makes it unlikely that the two names will be confused, for exam",
       "em": 0.0,
       "f1": 0.0
     },
@@ -191,16 +191,16 @@
       "gold": [
         "Quezon City"
       ],
-      "retrieved": "\"The Holocaust in Serbia\"\nGerman Military Commander in Serbia appointed a Serbian civil puppet government to carry out administrative tasks in accordance with German direction and supervision. The pol",
+      "retrieved": "\"East Tennessee\"\nin the landmark U.S. Supreme Court case \"\"Baker v. Carr\"\". In the decades after this case, the 3rd District has been redrawn several times, and a new 4th District was carved in part o",
       "em": 0.0,
-      "f1": 0.0
+      "f1": 0.013114754098360654
     },
     {
       "question": "Where was the person who shared the Nobel Prize in Physics in 1954 with Max Born born?",
       "gold": [
         "Oranienburg, Germany"
       ],
-      "retrieved": "\"Linda Thompson (actress)\"\nLinda Thompson (actress) Linda Diane Thompson (born May 23, 1950) is an American songwriter/lyricist, former actress and beauty pageant winner. She was married to Olympic de",
+      "retrieved": "\"Frank E. Rodgers\"\nFrank E. Rodgers Francis E. Rodgers (November 15, 1909 – February 8, 2000) was an American Democratic Party politician who was among the longest-serving Mayors in U.S. history, firs",
       "em": 0.0,
       "f1": 0.0
     },
@@ -209,25 +209,25 @@
       "gold": [
         "January 8, 1891"
       ],
-      "retrieved": "\"Linda Thompson (actress)\"\nLinda Thompson (actress) Linda Diane Thompson (born May 23, 1950) is an American songwriter/lyricist, former actress and beauty pageant winner. She was married to Olympic de",
+      "retrieved": "\"Nickel (United States coin)\"\nincreasing use of nickels there. Good economic conditions and high demand for nickels for use in coin-operated devices caused the piece to circulate throughout the nation",
       "em": 0.0,
-      "f1": 0.00591715976331361
+      "f1": 0.0
     },
     {
       "question": "What was the founding date of the university in which Plotonium was discovered?",
       "gold": [
         "March 23, 1868"
       ],
-      "retrieved": "\"Dibba Al-Hisn\"\nis believed to be the site where the Portuguese during the Habsburg Dynasty built a fort and a wall around the city. In August 1648, the Arabs besieged Muscat, Oman, and on October 31,",
+      "retrieved": "\"Ricarda Huch\"\nTönnies. Because German universities did not allow women to graduate, Huch left Braunschweig in 1887 and moved to Zurich to take the entrance examinations for the University of Zurich. ",
       "em": 0.0,
-      "f1": 0.00641025641025641
+      "f1": 0.0
     },
     {
       "question": "The material out of which the Great Sphinx of Giza is made of is mainly composed of what mineral?",
       "gold": [
         "calcite"
       ],
-      "retrieved": "\"Manufacture nationale de Sèvres\"\nnew shapes. Slipcasting is the main technique for \"\"hollow\"\" wares like vases. The kaolin was brought, traditionally, from Saint-Yrieix near Limoges. Nowadays there ",
+      "retrieved": "Chimborazo\non top of another. Chimborazo shows four summits; Whymper, Veintimilla, Politecnica, and Nicolas Martínez. The Whymper peak is the highest point on the mountain at 6,263 meters. The Veintim",
       "em": 0.0,
       "f1": 0.0
     },
@@ -236,7 +236,7 @@
       "gold": [
         "Mercia"
       ],
-      "retrieved": "\"Eikon Basilike\"\nand Shakespeare and that even then were serving Counter-Reformation Catholicism. This unbookish—indeed anti-bookish—book thus turned print against itself\"\". In Helgerson's view, \"\"Eik",
+      "retrieved": "\"George Washington Vanderbilt III\"\nGeorge Washington Vanderbilt III George Washington Vanderbilt III (September 23, 1914 – June 24, 1961) was a yachtsman and a scientific explorer who was a member of ",
       "em": 0.0,
       "f1": 0.0
     },
@@ -245,7 +245,7 @@
       "gold": [
         "Centrifugal Force"
       ],
-      "retrieved": "\"Yass, New South Wales\"\nonwards noted that the Mill bought wheat locally but also from the surrounding district and harder wheat from the Gunnedah district was imported to blend with the softer \"\"sout",
+      "retrieved": "\"History of trigonometry\"\ncontain the earliest surviving tables of sine values and versine (1 − cosine) values, in 3.75° intervals from 0° to 90°, to an accuracy of 4 decimal places. They used the wor",
       "em": 0.0,
       "f1": 0.0
     },
@@ -254,16 +254,16 @@
       "gold": [
         "l"
       ],
-      "retrieved": "\"École nationale d'administration\"\nENA, has the effect of perpetuating an intellectually brilliant yet out-of-touch ruling elite. Yannick Blanc, a former senior civil servant, has also suggested that",
+      "retrieved": "\"Samuel T. Cohen\"\ndeleted scenes. During the interview, Cohen asserts that the neutron bomb conforms to just war theories. Samuel T. Cohen Samuel Theodore Cohen (January 25, 1921 – November 28, 2010) ",
       "em": 0.0,
-      "f1": 0.0
+      "f1": 0.005780346820809248
     },
     {
       "question": "In what year was the government department where the internet originated at founded?",
       "gold": [
         "1947"
       ],
-      "retrieved": "\"AT&T Corp. v. Excel Communications, Inc.\"\ntelecom sector at the birth of telecom deregulation. It started its business by selling franchises through the business model of network marketing or multi-l",
+      "retrieved": "\"Economy of Egypt\"\nThe majority of its younger population is struggling with unemployment and destitution, and heightening food prices in Cairo. According to an Associated Press report, nearly half of",
       "em": 0.0,
       "f1": 0.0
     },
@@ -272,7 +272,7 @@
       "gold": [
         "pilot"
       ],
-      "retrieved": "\"Saiju Kurup\"\nSaiju Kurup Saiju Kurup is an Indian actor who works in Malayalam and Tamil cinema. He debuted in the critically acclaimed movie \"\"Mayookham\"\" (2005) by Hariharan. He has starred in seve",
+      "retrieved": "\"Sweetness in the Salt\"\nSweetness in the Salt Sweetness in the Salt (Traditional Chinese: ) is a TVB costume drama series released overseas in December 2008. Nip Chi Yuen (Ma Steven), who works in the",
       "em": 0.0,
       "f1": 0.0
     },
@@ -281,34 +281,34 @@
       "gold": [
         "November 20, 1889"
       ],
-      "retrieved": "\"Lucy Filippini\"\nJune 1930. Her statue can be seen in the south nave of St. Peter's Basilica. Her feast day is March 25. Lucy Filippini Lucy Filippini () (13 January 1672 – 25 March 1732) is venerated",
+      "retrieved": "\"Sarah Hoolt\"\n2012 - Woman grandmaster (WGM) title. Sarah Hoolt Sarah Hoolt (born 30 April 1988) is a German chess player who holds the title of Woman grandmaster (WGM, 2012). From 2001 to 2006 Sarah ",
       "em": 0.0,
-      "f1": 0.0
+      "f1": 0.006825938566552901
     },
     {
       "question": "When did the person who gave the Checkers speech die?",
       "gold": [
         "April 22, 1994"
       ],
-      "retrieved": "\"Peter Kierkegaard\"\nPoul Egede Kierkegaard. From 4 September 1867, to 6 March 1868, he was in the Cabinet of Frijs. Peter Kierkegaard Peter Christian Kierkegaard (6 July 1805 – 24 February 1888), was ",
+      "retrieved": "\"No eres tú, soy yo\"\nNo eres tú, soy yo No eres tú, soy yo () is a 2010 Mexican romantic comedy directed by Alejandro Springall starring Eugenio Derbez, Alejandra Barros and Martina García and based ",
       "em": 0.0,
-      "f1": 0.006309148264984228
+      "f1": 0.0
     },
     {
       "question": "When was the philosopher that formulated the hard problem of consciousness born?",
       "gold": [
         "April 20, 1966"
       ],
-      "retrieved": "\"Jonathan Larson\"\nJonathan Larson Jonathan David Larson (February 4, 1960 – January 25, 1996) was an American composer and playwright noted for exploring the social issues of multiculturalism, addicti",
+      "retrieved": "\"Hazel Green, Alabama\"\nwas 363 people per square mile (139.6/km²). There were 1,434 housing units at an average density of 143.4 per square mile (55.2/km²). The racial makeup of the community was 88.9",
       "em": 0.0,
-      "f1": 0.0
+      "f1": 0.014652014652014652
     },
     {
       "question": "What is the capital of the second largest state in the US by area?",
       "gold": [
         "Austin"
       ],
-      "retrieved": "\"Malibu, California\"\nuse. Because of the failure to adequately address sewage disposal problems in the heart of the city, the local water board ordered Malibu in November 2009 to build a sewage plant ",
+      "retrieved": "\"Geography of Estonia\"\nand Emajõgi are among the most important of the country's many rivers. A small, recent cluster of meteorite craters, the largest of which is called Kaali are found near Saaremaa",
       "em": 0.0,
       "f1": 0.0
     },
@@ -317,7 +317,7 @@
       "gold": [
         "320 km/h"
       ],
-      "retrieved": "\"Distant Early Warning Line\"\nand Canada to aerial bombing attacks, and its concluding recommendation was that a \"\"distant early warning line\"\" of search radar stations be built across the Arctic borde",
+      "retrieved": "\"Agatha Christie: An Autobiography\"\nAgatha Christie: An Autobiography An Autobiography is the title of the recollections of crime writer Agatha Christie published posthumously by Collins in the UK and",
       "em": 0.0,
       "f1": 0.0
     },
@@ -326,25 +326,25 @@
       "gold": [
         "Alexander the Great"
       ],
-      "retrieved": "Absalon\ncity of \"\"Havn\"\" (English: Harbour), and built there a castle in the coastal defense against the Wends. Havn quickly expanded as one of Scandinavia's most important centers of trade, and event",
+      "retrieved": "\"Longford, Kansas\"\ncity was 96.81% White, 2.13% African American, and 1.06% from two or more races. There were 41 households out of which 26.8% had children under the age of 18 living with them, 58.5%",
       "em": 0.0,
-      "f1": 0.006269592476489028
+      "f1": 0.012422360248447206
     },
     {
       "question": "What is the capital of the country where yoga originated?",
       "gold": [
         "New Delhi"
       ],
-      "retrieved": "\"Arts Olympiad\"\nArts Olympiad The Arts Olympiad is an international art competition for children ages 8 to 12 organized by International Child Art Foundation with one million participants from seventy",
+      "retrieved": "\"Nikola Kovačević\"\nMatijasević and sister of volleyball players' manager Georges Matijasević. On August 25, 2016 his wife gave birth to their son Noa. In season 2012/2013 played for Polish club from",
       "em": 0.0,
-      "f1": 0.0
+      "f1": 0.006349206349206348
     },
     {
       "question": "The fourth largest city in Germany was originally called what?",
       "gold": [
         "Colonia Claudia Ara Agrippinensium"
       ],
-      "retrieved": "\"Gau Halle-Merseburg\"\nGauleiter, Ernst and Hinkler, both died in the final month of the war, the former killed in action, the latter through suicide. Jordan, the third Gauleiter, was sentenced to 25 y",
+      "retrieved": "Cologne\nCologne Cologne (; , , ) is the largest city of Germany's most populous federal state of North Rhine-Westphalia, and its 1,075,935 (2016) inhabitants make it the fourth most populous city in G",
       "em": 0.0,
       "f1": 0.0
     },
@@ -353,16 +353,16 @@
       "gold": [
         "September 13, 1993"
       ],
-      "retrieved": "\"Last Man on Earth (album)\"\nreflect upon Wainwright's troubled relationship with his father, Loudon Wainwright, Jr., a subject that has populated many of his earlier recordings. \"\"Last Man on Earth\"\" ",
+      "retrieved": "KXFF\nto the current KXFF. KXFF KXFF (106.1 FM) is a radio station broadcasting an adult hits format. Licensed to Colorado City, Arizona, United States, the station is currently owned by Cherry Creek R",
       "em": 0.0,
-      "f1": 0.005934718100890207
+      "f1": 0.0
     },
     {
       "question": "What was the job of the father of the founder of psychoanalysis?",
       "gold": [
         "wool merchant"
       ],
-      "retrieved": "\"Jonathan Larson\"\nJonathan Larson Jonathan David Larson (February 4, 1960 – January 25, 1996) was an American composer and playwright noted for exploring the social issues of multiculturalism, addicti",
+      "retrieved": "\"Gustav Bychowski\"\nlatter looks specifically at Julius Caesar, Oliver Cromwell, Maximilien Robespierre, Adolf Hitler and Joseph Stalin. The psychoanalyst Frank M. Lachmann describes Bychowski as not b",
       "em": 0.0,
       "f1": 0.0
     },
@@ -371,7 +371,7 @@
       "gold": [
         "10.8"
       ],
-      "retrieved": "\"The Darling Buds of May (TV series)\"\nin series one reveals her middle name to be Jane. Mariette and Charlie continue the family penchant for elaborate naming by christening their son John Marlborough",
+      "retrieved": "\"Basil and Barney's Swap Shop\"\na certain point, the points become positive until finally off the scale. If the bed goes off the scale the child on the end of the bed slides into a tank of green colour",
       "em": 0.0,
       "f1": 0.0
     },
@@ -380,16 +380,16 @@
       "gold": [
         "Democratic Party"
       ],
-      "retrieved": "\"École nationale d'administration\"\nENA, has the effect of perpetuating an intellectually brilliant yet out-of-touch ruling elite. Yannick Blanc, a former senior civil servant, has also suggested that",
+      "retrieved": "\"Kenya–Tanzania relations\"\nKenyatta made one of his state visits to Tanzania by road. On 7 July 2000, Tanzania and Kenya along with Uganda reestablished the EAC. The EAC has contributed a great deal i",
       "em": 0.0,
-      "f1": 0.011695906432748537
+      "f1": 0.0
     },
     {
       "question": "The most populous city in Punjab is how large (area wise)?",
       "gold": [
         "310 square kilometers"
       ],
-      "retrieved": "\"Economy of Chittagong\"\nJames Finlay PLC, BOC Bangldesh Ltd., GEC Bangladesh Ltd., Coats Thread, Berger, KAFCO, and Duncan. Economy of Chittagong The economy of Chittagong is one of the largest and mo",
+      "retrieved": "\"Rui Rio\"\nmedicinal purposes. ! align=\"\"center\"\" colspan=\"\"4\"\"|Ballot: 13 January 2018 ! align=\"\"center\"\" colspan=2 style=\"\"width: 60px\"\"|Candidate ! align=\"\"center\"\" style=\"\"width: 50px\"\"|Votes ! ali",
       "em": 0.0,
       "f1": 0.0
     },
@@ -398,7 +398,7 @@
       "gold": [
         "847"
       ],
-      "retrieved": "\"La Cañada Flintridge, California\"\nhigh desert area in the 18-wheeler. They traveled over the Angeles Crest Highway because, Bines said, he had received directions from his global positioning system ",
+      "retrieved": "Earthquake\nbetween 240,000 and 655,000 people, was the deadliest of the 20th century. The 1960 Chilean earthquake is the largest earthquake that has been measured on a seismograph, reaching 9.5 magnit",
       "em": 0.0,
       "f1": 0.0
     },
@@ -407,7 +407,7 @@
       "gold": [
         "52"
       ],
-      "retrieved": "\"La Cañada Flintridge, California\"\nhigh desert area in the 18-wheeler. They traveled over the Angeles Crest Highway because, Bines said, he had received directions from his global positioning system ",
+      "retrieved": "Earthquake\nbetween 240,000 and 655,000 people, was the deadliest of the 20th century. The 1960 Chilean earthquake is the largest earthquake that has been measured on a seismograph, reaching 9.5 magnit",
       "em": 0.0,
       "f1": 0.0
     },
@@ -416,7 +416,7 @@
       "gold": [
         "Thomas O. Paine"
       ],
-      "retrieved": "\"American Airlines Flight 77\"\nACFD Assistant Chief James Schwartz implemented an incident command system (ICS) to coordinate response efforts among multiple agencies. It took about an hour for the ICS",
+      "retrieved": "\"Apollo 10\"\nApollo 10 Apollo 10 was the fourth manned mission in the United States Apollo space program, and the second (after Apollo 8) to orbit the Moon. Launched on May 18, 1969, it was the F missi",
       "em": 0.0,
       "f1": 0.0
     },
@@ -425,16 +425,16 @@
       "gold": [
         "Lawrence Washington"
       ],
-      "retrieved": "\"Last Man on Earth (album)\"\nreflect upon Wainwright's troubled relationship with his father, Loudon Wainwright, Jr., a subject that has populated many of his earlier recordings. \"\"Last Man on Earth\"\" ",
+      "retrieved": "\"Forced marriage\"\nfor criminal prosecution to get protection. Forced marriage is common in Niger. Niger has the highest prevalence of child marriage in the world; and also the highest total fertility ",
       "em": 0.0,
-      "f1": 0.0
+      "f1": 0.006825938566552901
     },
     {
       "question": "Who is the mother of the father of George Washington?",
       "gold": [
         "Mildred Warner"
       ],
-      "retrieved": "\"Last Man on Earth (album)\"\nreflect upon Wainwright's troubled relationship with his father, Loudon Wainwright, Jr., a subject that has populated many of his earlier recordings. \"\"Last Man on Earth\"\" ",
+      "retrieved": "\"Kathleen Sullivan (journalist)\"\nKathleen Sullivan (journalist) Kathleen Sullivan (born May 17, 1953) is an American television journalist. She was hired as CNN anchor by former president Reese Schonf",
       "em": 0.0,
       "f1": 0.0
     },
@@ -443,16 +443,16 @@
       "gold": [
         "Hussein Onyango Obama"
       ],
-      "retrieved": "\"Linda Thompson (actress)\"\nLinda Thompson (actress) Linda Diane Thompson (born May 23, 1950) is an American songwriter/lyricist, former actress and beauty pageant winner. She was married to Olympic de",
+      "retrieved": "\"Barack Obama Sr.\"\nBarack Obama Sr. Barack Hussein Obama Sr. (; 18 June 1936 – 24 November 1982) was a Kenyan senior governmental economist and the father of Barack Obama, the 44th President of the Un",
       "em": 0.0,
-      "f1": 0.0
+      "f1": 0.013377926421404682
     },
     {
       "question": "Who is the mother of the father of Barack Obama?",
       "gold": [
         "Habiba Akumu Nyanjango"
       ],
-      "retrieved": "\"Linda Thompson (actress)\"\nLinda Thompson (actress) Linda Diane Thompson (born May 23, 1950) is an American songwriter/lyricist, former actress and beauty pageant winner. She was married to Olympic de",
+      "retrieved": "\"Barack Obama Sr.\"\nBarack Obama Sr. Barack Hussein Obama Sr. (; 18 June 1936 – 24 November 1982) was a Kenyan senior governmental economist and the father of Barack Obama, the 44th President of the Un",
       "em": 0.0,
       "f1": 0.0
     },
@@ -461,43 +461,43 @@
       "gold": [
         "William Russell Grace"
       ],
-      "retrieved": "\"La Mirada, California\"\neducation. La Mirada (Spanish for \"\"the look\"\") was the creation of two men, Andrew McNally, a printer and mapmaker from Chicago (see Rand McNally) and his son-in-law Edwin Nef",
+      "retrieved": "\"Gardendale, Alabama\"\nNazarene. GCA's mascot is \"\"King's Knights\"\". Gardendale was once home to the Rogers Area Vocational School which has now been demolished to make way for soccer & baseball fields",
       "em": 0.0,
-      "f1": 0.0
+      "f1": 0.006349206349206349
     },
     {
       "question": "Who was president of the U.S. when superconductivity was discovered?",
       "gold": [
         "William Howard Taft"
       ],
-      "retrieved": "\"Albert Spalding\"\nAlbert Spalding Albert Goodwill Spalding (September 2, 1849 – September 9, 1915) was an American pitcher, manager, and executive in the early years of professional baseball, and the ",
+      "retrieved": "\"Edward Jenner\"\nfull-blown infection. Later, he injected Phipps with variolous material, the routine method of immunization at that time. No disease followed. The boy was later challenged with variolo",
       "em": 0.0,
-      "f1": 0.006153846153846153
+      "f1": 0.0
     },
     {
       "question": "When was the person Russ Hanneman is based on born?",
       "gold": [
         "July 31, 1958"
       ],
-      "retrieved": "\"Jonathan Larson\"\nJonathan Larson Jonathan David Larson (February 4, 1960 – January 25, 1996) was an American composer and playwright noted for exploring the social issues of multiculturalism, addicti",
+      "retrieved": "\"Berlin Township, Wayne County, Pennsylvania\"\ntownship was 97.5% White, 0.6% Black or African American, 0.1% American Indian or Alaska Native, 0.7% Asian. 0.2% of the township's inhabitants classified",
       "em": 0.0,
-      "f1": 0.006369426751592356
+      "f1": 0.0
     },
     {
       "question": "When was the first location of the world's largest coffeehouse chain opened?",
       "gold": [
         "March 30, 1971"
       ],
-      "retrieved": "\"Raphael House\"\nRaphael House Raphael House is a shelter in the Tenderloin, San Francisco, California, that provides transitional housing and support programs for parents and children who are experien",
+      "retrieved": "\"Ek Main Aur Ekk Tu\"\nsoon as possible. Meanwhile, Riana, who is also unemployed and has not paid her rent, loses her house and an initially hesitant Rahul lets her stay with him till her problem gets ",
       "em": 0.0,
-      "f1": 0.006535947712418301
+      "f1": 0.0
     },
     {
       "question": "Who directed the highest grossing film?",
       "gold": [
         "James Cameroon"
       ],
-      "retrieved": "\"Jonathan Larson\"\nJonathan Larson Jonathan David Larson (February 4, 1960 – January 25, 1996) was an American composer and playwright noted for exploring the social issues of multiculturalism, addicti",
+      "retrieved": "California\nCalifornia California is a state in the Pacific Region of the United States. With 39.5 million residents, California is the most populous U.S. state and the third-largest by area. The state",
       "em": 0.0,
       "f1": 0.0
     },
@@ -506,7 +506,7 @@
       "gold": [
         "30 June 2011"
       ],
-      "retrieved": "\"Greeba Bridge\"\nGreeba Bridge Greeba Bridge (Scandinavian: Gnipa, \"\"a peak\"\" or previously Cronk Dhoo) is situated between the 6 and 7 road-side mile markers on the Snaefell Mountain Course used for t",
+      "retrieved": "\"Universidad del Istmo\"\nmotto, since this indicates the direction in which it wants to direct its education. It is a succinct but kaleidoscope-like formula, showing many perspectives, lights and edges",
       "em": 0.0,
       "f1": 0.0
     },
@@ -515,7 +515,7 @@
       "gold": [
         "GlaxoSmithKline"
       ],
-      "retrieved": "\"Evan Morris\"\nEvan Morris Evan L. Morris (January 26, 1977 – July 9, 2015) was a lobbyist for Genentech and its parent corporation Roche in Washington, D.C. He began his career in Washington as an int",
+      "retrieved": "\"1985 NCAA Division III football season\"\ntournament to determine the national champion of men's NCAA Division III college football. The championship Stagg Bowl game was held at Garrett-Harrison Stadiu",
       "em": 0.0,
       "f1": 0.0
     },
@@ -524,16 +524,16 @@
       "gold": [
         "2012"
       ],
-      "retrieved": "\"Horse Mesa Dam\"\nMormon Flat Dam. Horse Mesa Dam The Horse Mesa Dam is a concrete thin arch dam located in the Superstition Mountains, northeast of Phoenix in Maricopa County, Arizona. The dam is long",
+      "retrieved": "\"Royal Gorge Bridge\"\nM'Cid Bridge in Algeria in 1929 to become the highest bridge in the world with a deck height of , measured from the deck to the river surface below. The Liuguanghe Bridge in China",
       "em": 0.0,
-      "f1": 0.0
+      "f1": 0.006666666666666666
     },
     {
       "question": "In what year was the tallest fixed steel structure completed?",
       "gold": [
         "1988"
       ],
-      "retrieved": "\"Horse Mesa Dam\"\nMormon Flat Dam. Horse Mesa Dam The Horse Mesa Dam is a concrete thin arch dam located in the Superstition Mountains, northeast of Phoenix in Maricopa County, Arizona. The dam is long",
+      "retrieved": "\"Willis Tower\"\nunfinished World Trade Center to become the world's tallest building. The height was restricted by a limit imposed by the Federal Aviation Administration (FAA) to protect air traffic. T",
       "em": 0.0,
       "f1": 0.0
     },
@@ -542,7 +542,7 @@
       "gold": [
         "2012"
       ],
-      "retrieved": "\"Horse Mesa Dam\"\nMormon Flat Dam. Horse Mesa Dam The Horse Mesa Dam is a concrete thin arch dam located in the Superstition Mountains, northeast of Phoenix in Maricopa County, Arizona. The dam is long",
+      "retrieved": "\"2006 Buffalo Bills season\"\nquarter, the Titans regained the lead with kicker Rob Bironas getting a 42-yard and a 20-yard FG. Afterwards, the Bills came back with Lindell kicking a 36-yard and a 45-ya",
       "em": 0.0,
       "f1": 0.0
     },
@@ -551,7 +551,7 @@
       "gold": [
         "1935"
       ],
-      "retrieved": "\"Old Indian Meeting House\"\nOld Indian Meeting House The Old Indian Meeting House (also known as the Old Indian Church) is a historic meeting house at 410 Meetinghouse Road in Mashpee, Massachusetts. B",
+      "retrieved": "\"Willis Tower\"\nunfinished World Trade Center to become the world's tallest building. The height was restricted by a limit imposed by the Federal Aviation Administration (FAA) to protect air traffic. T",
       "em": 0.0,
       "f1": 0.0
     },
@@ -560,7 +560,7 @@
       "gold": [
         "China"
       ],
-      "retrieved": "\"Horse Mesa Dam\"\nMormon Flat Dam. Horse Mesa Dam The Horse Mesa Dam is a concrete thin arch dam located in the Superstition Mountains, northeast of Phoenix in Maricopa County, Arizona. The dam is long",
+      "retrieved": "\"Kenneth C. Martis\"\nnumbers for the partisan divide in each House. The map and pie chart on the lower left show the geographical pattern and partisan make-up of the Senate. The blue states have two Re",
       "em": 0.0,
       "f1": 0.0
     },
@@ -569,7 +569,7 @@
       "gold": [
         "2021"
       ],
-      "retrieved": "\"Mardi Gras World\"\nMardi Gras World Mardi Gras World (also known as Blaine Kern's Mardi Gras World, MGW) is a tourist attraction located in New Orleans. Guests tour the 300,000 square foot working war",
+      "retrieved": "\"Kenneth C. Martis\"\nnumbers for the partisan divide in each House. The map and pie chart on the lower left show the geographical pattern and partisan make-up of the Senate. The blue states have two Re",
       "em": 0.0,
       "f1": 0.0
     },
@@ -578,7 +578,7 @@
       "gold": [
         "1902"
       ],
-      "retrieved": "\"Horse Mesa Dam\"\nMormon Flat Dam. Horse Mesa Dam The Horse Mesa Dam is a concrete thin arch dam located in the Superstition Mountains, northeast of Phoenix in Maricopa County, Arizona. The dam is long",
+      "retrieved": "\"The Phantom of the Opera (1986 musical)\"\nand the 1988 Tony Award for Best Musical, and Michael Crawford (in the title role) won the Olivier and Tony Awards for Best Actor in a Musical. It is the long",
       "em": 0.0,
       "f1": 0.0
     },
@@ -587,7 +587,7 @@
       "gold": [
         "Saudi Arabia"
       ],
-      "retrieved": "\"Mardi Gras World\"\nMardi Gras World Mardi Gras World (also known as Blaine Kern's Mardi Gras World, MGW) is a tourist attraction located in New Orleans. Guests tour the 300,000 square foot working war",
+      "retrieved": "KQSF\nKQSF KQSF (95.7 FM, \"\"Q95-7\"\") is a radio station licensed to Dell Rapids, South Dakota; it serves the Sioux Falls, South Dakota area. It first began broadcasting in 1998 under the call sign KSOB",
       "em": 0.0,
       "f1": 0.0
     },
@@ -596,7 +596,7 @@
       "gold": [
         "1045 BC"
       ],
-      "retrieved": "\"École nationale d'administration\"\nENA, has the effect of perpetuating an intellectually brilliant yet out-of-touch ruling elite. Yannick Blanc, a former senior civil servant, has also suggested that",
+      "retrieved": "\"University of Portland\"\nuniversity opened its doors to 52 young men on September 5, 1901, with eight Roman Catholic priests from the local archdiocese serving as professors. At the request of the arc",
       "em": 0.0,
       "f1": 0.0
     },
@@ -605,16 +605,16 @@
       "gold": [
         "India and Bangladesh"
       ],
-      "retrieved": "\"Economy of Chittagong\"\nJames Finlay PLC, BOC Bangldesh Ltd., GEC Bangladesh Ltd., Coats Thread, Berger, KAFCO, and Duncan. Economy of Chittagong The economy of Chittagong is one of the largest and mo",
+      "retrieved": "Concorde\nanyway (as they had on the earlier subsonic Caravelle). As neither company had experience in the use of high-heat metals for airframes, a maximum speed of around Mach 2 was selected so alumin",
       "em": 0.0,
-      "f1": 0.012738853503184712
+      "f1": 0.00617283950617284
     },
     {
       "question": "What is the highest elevation (in meters) of the second largest island in the world?",
       "gold": [
         "4,884 m"
       ],
-      "retrieved": "Culebrita\nmile in length. It is roughly y-shaped with three branches extending from the island's center. There are six beaches on Culebrita, the chief one being \"\"Playa Tortuga\"\" (Turtle Beach) on the",
+      "retrieved": "\"Hwacheon County\"\nwere male; 11,351 were female. Only 90 of these people (0.38%) were foreign residents - 20 male and 70 female. The average household was home to 2.4 people, and 3,577 of the populati",
       "em": 0.0,
       "f1": 0.0
     },
@@ -623,25 +623,25 @@
       "gold": [
         "6,300 km"
       ],
-      "retrieved": "\"Mardi Gras World\"\nMardi Gras World Mardi Gras World (also known as Blaine Kern's Mardi Gras World, MGW) is a tourist attraction located in New Orleans. Guests tour the 300,000 square foot working war",
+      "retrieved": "\"Amazon River\"\non for many years, the historic consensus of geographic authorities has been to regard the Amazon as the second longest river in the world, with the Nile being the longest. However, the",
       "em": 0.0,
-      "f1": 0.006600660066006601
+      "f1": 0.0
     },
     {
       "question": "In what country is the third largest stadium in the world?",
       "gold": [
         "United States"
       ],
-      "retrieved": "\"Arsenal Stadium\"\nredeveloped as a residential development known as Highbury Square, with the Clock End and North Bank stands being demolished; parts of the East and West Stands remained and were inco",
+      "retrieved": "\"Environmental impact of transport\"\nhas 8.91 kg and diesel has 10.15 kg of CO per gallon. CO emissions originating from ethanol are disregarded by international agreements however so gasoline containi",
       "em": 0.0,
-      "f1": 0.006779661016949152
+      "f1": 0.0
     },
     {
       "question": "Who is the largest aircraft carrier in the world is named after?",
       "gold": [
         "Gerald R. Ford"
       ],
-      "retrieved": "\"M33 X-7\"\nX-7 one of the furthest confirmed stellar mass black holes known. M33 X-7 orbits a companion star that eclipses the black hole every 3.45 days. The companion star also has an unusually large",
+      "retrieved": "\"Gerhard Dengler\"\nfrom Karl-Eduard von Schnitzler. In 1959 he took on the vice-chairmanship of the National Presidium Council of the East German National Front, a political grouping of minor political",
       "em": 0.0,
       "f1": 0.0
     },
@@ -650,7 +650,7 @@
       "gold": [
         "1999"
       ],
-      "retrieved": "\"Old Indian Meeting House\"\nOld Indian Meeting House The Old Indian Meeting House (also known as the Old Indian Church) is a historic meeting house at 410 Meetinghouse Road in Mashpee, Massachusetts. B",
+      "retrieved": "Cat\nthink ancient Egypt was the site of cat domestication, owing to the clear depictions of house cats in Egyptian paintings about 3,600 years old. However, in 2004, a Neolithic grave excavated in Shi",
       "em": 0.0,
       "f1": 0.0
     },
@@ -659,7 +659,7 @@
       "gold": [
         "1810"
       ],
-      "retrieved": "\"Economy of Chittagong\"\nJames Finlay PLC, BOC Bangldesh Ltd., GEC Bangladesh Ltd., Coats Thread, Berger, KAFCO, and Duncan. Economy of Chittagong The economy of Chittagong is one of the largest and mo",
+      "retrieved": "\"Hyattsville, Maryland\"\ncity was 32.1 years. 22.2% of residents were under the age of 18; 12.6% were between the ages of 18 and 24; 34.7% were from 25 to 44; 23.2% were from 45 to 64; and 7.2% were 65",
       "em": 0.0,
       "f1": 0.0
     },
@@ -668,7 +668,7 @@
       "gold": [
         "Pavel Belyayev"
       ],
-      "retrieved": "\"Operation Jupiter (Norway)\"\nin Norway was \"\"sufficient to make a successful invasion improbable\"\". The idea for an attack on northern Norway might be traced to Joseph Stalin's first wartime message t",
+      "retrieved": "\"1992 South African apartheid referendum\"\nalso increase the political chaos in the country, and had no real reason to advocate that the whites oppose the negotiations. The ANC therefore advocated a \"\"",
       "em": 0.0,
       "f1": 0.0
     },
@@ -677,16 +677,16 @@
       "gold": [
         "George VI\n"
       ],
-      "retrieved": "\"Eikon Basilike\"\nand Shakespeare and that even then were serving Counter-Reformation Catholicism. This unbookish—indeed anti-bookish—book thus turned print against itself\"\". In Helgerson's view, \"\"Eik",
+      "retrieved": "\"Randy Kuhl\"\nallow illegal aliens to apply for driver's licenses. He also became a prominent opponent of the SCHIP expansion, a stance for which he earned significant animosity from various groups inc",
       "em": 0.0,
-      "f1": 0.005847953216374269
+      "f1": 0.0
     },
     {
       "question": "In 2016, who was the host of the longest running talk show?",
       "gold": [
         "Jimmy Fallon"
       ],
-      "retrieved": "\"The Alcoa Hour\"\nperformance in an episode titled \"\"Tragedy in a Temporary Town\"\", directed by Sidney Lumet. During the performance, Bridges inadvertently slipped some profanity in while ad-libbing. A",
+      "retrieved": "\"X Faktors\"\nX Faktors X Faktors is the Latvian version of \"\"The X Factor\"\", a series originating from the United Kingdom. Based on the original UK show, the concept of the series is to find new singin",
       "em": 0.0,
       "f1": 0.0
     },
@@ -695,7 +695,7 @@
       "gold": [
         "Drew Carey"
       ],
-      "retrieved": "\"The Alcoa Hour\"\nThe Alcoa Hour The Alcoa Hour is an American anthology television series that was aired live on NBC from 1955 to 1957. The series was sponsored by Alcoa. Like the \"\"Philco Television ",
+      "retrieved": "\"2016–17 Missouri Valley Conference men's basketball season\"\nstatistical guru Ken Pomeroy, the MVC had \"\"the most unusual conference table in the land\"\" for the season. The co-champions Illinois State",
       "em": 0.0,
       "f1": 0.0
     },
@@ -704,7 +704,7 @@
       "gold": [
         "Gaston Leroux"
       ],
-      "retrieved": "\"Jonathan Larson\"\nJonathan Larson Jonathan David Larson (February 4, 1960 – January 25, 1996) was an American composer and playwright noted for exploring the social issues of multiculturalism, addicti",
+      "retrieved": "\"Hoher Dachstein\"\nHoher Dachstein Hoher Dachstein () is a strongly karstic Austrian mountain, and the second highest mountain in the Northern Limestone Alps. It is situated at the border of Upper Aust",
       "em": 0.0,
       "f1": 0.0
     },
@@ -713,7 +713,7 @@
       "gold": [
         "Bermuda"
       ],
-      "retrieved": "\"Mardi Gras World\"\nMardi Gras World Mardi Gras World (also known as Blaine Kern's Mardi Gras World, MGW) is a tourist attraction located in New Orleans. Guests tour the 300,000 square foot working war",
+      "retrieved": "\"Kia Uvo\"\nwas discontinued, it is still used in 2015 LX, EX Sedonas. UVO eServices was the first UVO to interface with MyUVO.com and the UVO mobile app. It was introduced on 2013 model year Optima, Op",
       "em": 0.0,
       "f1": 0.0
     },
@@ -722,7 +722,7 @@
       "gold": [
         "1992"
       ],
-      "retrieved": "\"Greeba Bridge\"\nGreeba Bridge Greeba Bridge (Scandinavian: Gnipa, \"\"a peak\"\" or previously Cronk Dhoo) is situated between the 6 and 7 road-side mile markers on the Snaefell Mountain Course used for t",
+      "retrieved": "\"Li Binzhu\"\nas a principal in a high school and became a critic of the political movements Anti-Rightist Campaign and Great Leap Forward. In 1959, under political pressure, she finally had to annul he",
       "em": 0.0,
       "f1": 0.0
     },
@@ -731,7 +731,7 @@
       "gold": [
         "Cambridge Blue"
       ],
-      "retrieved": "\"Old Indian Meeting House\"\nOld Indian Meeting House The Old Indian Meeting House (also known as the Old Indian Church) is a historic meeting house at 410 Meetinghouse Road in Mashpee, Massachusetts. B",
+      "retrieved": "\"University of Portland\"\nuniversity opened its doors to 52 young men on September 5, 1901, with eight Roman Catholic priests from the local archdiocese serving as professors. At the request of the arc",
       "em": 0.0,
       "f1": 0.0
     },
@@ -740,7 +740,7 @@
       "gold": [
         "Tiberius"
       ],
-      "retrieved": "\"Kaikhosru Shapurji Sorabji\"\nSorabji's fugues as different from most others. Some of the subjects are among his most unconventional melodic creations, lacking the frequent changes of direction that ch",
+      "retrieved": "\"Economy of ancient Tamil country\"\nhave been unearthed; the number of gold coins discovered has been described as a quantity amounting to five coolly loads. The quantity of silver coins has been vario",
       "em": 0.0,
       "f1": 0.0
     },
@@ -749,7 +749,7 @@
       "gold": [
         "Tiberius"
       ],
-      "retrieved": "Absalon\ndragged forth and burnt. The whole population of Garz was then baptized, and Absalon laid the foundations of twelve churches in the isle of Rügen. Rügen was then subjected to Absalon's Bishopr",
+      "retrieved": "\"Kentucky Route 331\"\ncurves to the north-northeast. When it re-enters the city, it curves to the east-southeast and begins to curve back to the north-northwest. It leaves the city one final time for a",
       "em": 0.0,
       "f1": 0.0
     },
@@ -758,7 +758,7 @@
       "gold": [
         "MECC"
       ],
-      "retrieved": "\"The Alcoa Hour\"\nThe Alcoa Hour The Alcoa Hour is an American anthology television series that was aired live on NBC from 1955 to 1957. The series was sponsored by Alcoa. Like the \"\"Philco Television ",
+      "retrieved": "\"Wrecking Ball (Miley Cyrus song)\"\nand the 557,000 units moved by \"\"Roar\"\" by Katy Perry. In December, \"\"Wrecking Ball\"\" returned to the peak position after being stuck at number or two or three the p",
       "em": 0.0,
       "f1": 0.0
     },
@@ -767,7 +767,7 @@
       "gold": [
         "Jacob Freud"
       ],
-      "retrieved": "\"Jonathan Larson\"\nJonathan Larson Jonathan David Larson (February 4, 1960 – January 25, 1996) was an American composer and playwright noted for exploring the social issues of multiculturalism, addicti",
+      "retrieved": "\"Medford, Maine\"\nof the census of 2010, there were 254 people, 104 households, and 74 families residing in the town. The population density was . There were 164 housing units at an average density of ",
       "em": 0.0,
       "f1": 0.0
     },
@@ -776,16 +776,16 @@
       "gold": [
         "Sir Nicholas Bacon"
       ],
-      "retrieved": "\"Eikon Basilike\"\nand Shakespeare and that even then were serving Counter-Reformation Catholicism. This unbookish—indeed anti-bookish—book thus turned print against itself\"\". In Helgerson's view, \"\"Eik",
+      "retrieved": "\"Ernest Jones\"\nErnest Jones Alfred Ernest Jones (1 January 1879 – 11 February 1958) was a Welsh neurologist and psychoanalyst. A lifelong friend and colleague of Sigmund Freud from their first meeting",
       "em": 0.0,
-      "f1": 0.0
+      "f1": 0.006493506493506494
     },
     {
       "question": "Who is the father of the father of observational astronomy?",
       "gold": [
         "Vincenzo Galilei"
       ],
-      "retrieved": "\"La Mirada, California\"\neducation. La Mirada (Spanish for \"\"the look\"\") was the creation of two men, Andrew McNally, a printer and mapmaker from Chicago (see Rand McNally) and his son-in-law Edwin Nef",
+      "retrieved": "\"Oxford (CDP), New Jersey\"\nOxford (CDP), New Jersey Oxford is an unincorporated community and census-designated place (CDP) located within Oxford Township in Warren County, New Jersey, United States, ",
       "em": 0.0,
       "f1": 0.0
     },
@@ -794,7 +794,7 @@
       "gold": [
         "Yehuda Leib"
       ],
-      "retrieved": "Absalon\ncity of \"\"Havn\"\" (English: Harbour), and built there a castle in the coastal defense against the Wends. Havn quickly expanded as one of Scandinavia's most important centers of trade, and event",
+      "retrieved": "\"George Washington Vanderbilt III\"\nGeorge Washington Vanderbilt III George Washington Vanderbilt III (September 23, 1914 – June 24, 1961) was a yachtsman and a scientific explorer who was a member of ",
       "em": 0.0,
       "f1": 0.0
     },
@@ -803,7 +803,7 @@
       "gold": [
         "Maximilian Wundt"
       ],
-      "retrieved": "\"Jonathan Larson\"\nJonathan Larson Jonathan David Larson (February 4, 1960 – January 25, 1996) was an American composer and playwright noted for exploring the social issues of multiculturalism, addicti",
+      "retrieved": "\"Medard Boss\"\nformal psychoanalytic training at the Berlin Psychoanalytic Institute where his supervisory analyst was Karen Horney. While at BPI he studied with Hanns Sachs, Otto Fenichel, Wilhelm Rei",
       "em": 0.0,
       "f1": 0.0
     },
@@ -812,7 +812,7 @@
       "gold": [
         "Leo Wiener"
       ],
-      "retrieved": "\"Evan Morris\"\nEvan Morris Evan L. Morris (January 26, 1977 – July 9, 2015) was a lobbyist for Genentech and its parent corporation Roche in Washington, D.C. He began his career in Washington as an int",
+      "retrieved": "Cybernetics\nidea of the invisible hand is as anticipation of the operation of the feedback mechanism in cybernetics. In the same book, Law, Legislation and Liberty, Hayek mentions, along with cybernet",
       "em": 0.0,
       "f1": 0.0
     },
@@ -821,7 +821,7 @@
       "gold": [
         "Max Teller"
       ],
-      "retrieved": "\"Jonathan Larson\"\nJonathan Larson Jonathan David Larson (February 4, 1960 – January 25, 1996) was an American composer and playwright noted for exploring the social issues of multiculturalism, addicti",
+      "retrieved": "\"George Washington Vanderbilt III\"\nGeorge Washington Vanderbilt III George Washington Vanderbilt III (September 23, 1914 – June 24, 1961) was a yachtsman and a scientific explorer who was a member of ",
       "em": 0.0,
       "f1": 0.0
     },
@@ -830,16 +830,16 @@
       "gold": [
         "Julius Mathison Turing"
       ],
-      "retrieved": "\"Angelo Bissessarsingh\"\nAngelo Bissessarsingh Angelo Bissessarsingh (September 1982 – February 2, 2017) was an historian and author from Trinidad and Tobago. His written works include \"\"A Walk Back in",
+      "retrieved": "\"Massac, Kentucky\"\nThe racial makeup of the CDP was 94.80% White, 2.70% African American, 0.26% Native American, 0.85% Asian, 0.05% Pacific Islander, 0.23% from other races, and 1.11% from two or more",
       "em": 0.0,
-      "f1": 0.0
+      "f1": 0.012658227848101266
     },
     {
       "question": "Who was the father of the father of behaviorism?",
       "gold": [
         "Pickens Butler Watson"
       ],
-      "retrieved": "\"Jonathan Larson\"\nJonathan Larson Jonathan David Larson (February 4, 1960 – January 25, 1996) was an American composer and playwright noted for exploring the social issues of multiculturalism, addicti",
+      "retrieved": "\"George Tryon Harding\"\nthe basics of the newspaper business. George Tryon Harding George Tryon Harding II (June 12, 1843 – November 19, 1928), known as Tryon Harding (often misspelled \"\"Tyron\"\"), was ",
       "em": 0.0,
       "f1": 0.0
     },
@@ -848,7 +848,7 @@
       "gold": [
         "Anders van Wesel"
       ],
-      "retrieved": "\"National Academy of Design\"\n1824. and Silas Dustin was a curator. In 1824, the instructors at the National Academy of the Fine Arts included: Some of the Academy's better-known members include: Natio",
+      "retrieved": "\"Barack Obama Sr.\"\nBarack Obama Sr. Barack Hussein Obama Sr. (; 18 June 1936 – 24 November 1982) was a Kenyan senior governmental economist and the father of Barack Obama, the 44th President of the Un",
       "em": 0.0,
       "f1": 0.0
     },
@@ -857,7 +857,7 @@
       "gold": [
         "Charles Tupper Sr."
       ],
-      "retrieved": "\"Last Man on Earth (album)\"\nreflect upon Wainwright's troubled relationship with his father, Loudon Wainwright, Jr., a subject that has populated many of his earlier recordings. \"\"Last Man on Earth\"\" ",
+      "retrieved": "\"Madison Lake, Minnesota\"\nnearby. As of the census of 2010, there were 1,017 people, 394 households, and 271 families residing in the city. The population density was . There were 430 housing units at",
       "em": 0.0,
       "f1": 0.0
     },
@@ -866,43 +866,43 @@
       "gold": [
         "April 22, 1904"
       ],
-      "retrieved": "\"Jonathan Larson\"\nJonathan Larson Jonathan David Larson (February 4, 1960 – January 25, 1996) was an American composer and playwright noted for exploring the social issues of multiculturalism, addicti",
+      "retrieved": "\"Emperor of Japan\"\nThe Imperial House of Japan is the oldest continuing monarchical house in the world. The historical origins of the Emperors lie in the late Kofun period of the 3rd–7th centuries AD,",
       "em": 0.0,
-      "f1": 0.0
+      "f1": 0.00617283950617284
     },
     {
       "question": "Who was the father of the father of information theory?",
       "gold": [
         "Claude Sr."
       ],
-      "retrieved": "\"Jonathan Larson\"\nJonathan Larson Jonathan David Larson (February 4, 1960 – January 25, 1996) was an American composer and playwright noted for exploring the social issues of multiculturalism, addicti",
+      "retrieved": "\"Claude Shannon\"\nevents. The initiative was announced in the History Panel at the 2015 IEEE Information Theory Workshop Jerusalem and the IEEE Information Theory Society Newsletter. A detailed listing",
       "em": 0.0,
-      "f1": 0.0
+      "f1": 0.006578947368421052
     },
     {
       "question": "When was the person who delivered the \"Quit India\" speech born?",
       "gold": [
         "October 2, 1869"
       ],
-      "retrieved": "\"Jonathan Larson\"\nJonathan Larson Jonathan David Larson (February 4, 1960 – January 25, 1996) was an American composer and playwright noted for exploring the social issues of multiculturalism, addicti",
+      "retrieved": "Faridabad\nFaridabad Faridabad is the largest city (in terms of population) in the north India state of Haryana. It is a leading industrial centre and situated in the National Capital Region bordering ",
       "em": 0.0,
-      "f1": 0.006024096385542169
+      "f1": 0.0
     },
     {
       "question": "When did the president who warned about the military industrial complex die?",
       "gold": [
         "March 28, 1969"
       ],
-      "retrieved": "\"Gau Halle-Merseburg\"\nGauleiter, Ernst and Hinkler, both died in the final month of the war, the former killed in action, the latter through suicide. Jordan, the third Gauleiter, was sentenced to 25 y",
+      "retrieved": "\"Breezy Point, Minnesota\"\nThere were 899 housing units at an average density of 68.6 per square mile (26.5/km²). The racial makeup of the city was 98.16% White, 0.20% African American, 0.31% Native Am",
       "em": 0.0,
-      "f1": 0.0
+      "f1": 0.006968641114982579
     },
     {
       "question": "When did the president who said Tear Down This Wall die?",
       "gold": [
         "June 5, 2004"
       ],
-      "retrieved": "\"Jonathan Larson\"\nJonathan Larson Jonathan David Larson (February 4, 1960 – January 25, 1996) was an American composer and playwright noted for exploring the social issues of multiculturalism, addicti",
+      "retrieved": "\"Women's event at the 43rd Chess Olympiad\"\na full point against England and Romania, respectively. The match played on the top table between Serbia and India ended 2-2. Humpy Koneru and Harika Dronava",
       "em": 0.0,
       "f1": 0.0
     },
@@ -911,7 +911,7 @@
       "gold": [
         "312 m"
       ],
-      "retrieved": "\"Birmingham Snow Hill to Wolverhampton Low Level Line\"\non 3 August 1846. It quickly joined forces with the Birmingham and Oxford Junction Railway and both companies were bought by the Great Western on",
+      "retrieved": "\"Twomile Run\"\nthe Twomile Run watershed comes from baseflow. Above the swamp on Twomile Run, the discharge of the stream is 511 gallons per minute. Upstream of Middle Branch Twomile Run, the discharge",
       "em": 0.0,
       "f1": 0.0
     },
@@ -920,25 +920,25 @@
       "gold": [
         "February 11, 1650"
       ],
-      "retrieved": "\"Angelo Bissessarsingh\"\nAngelo Bissessarsingh Angelo Bissessarsingh (September 1982 – February 2, 2017) was an historian and author from Trinidad and Tobago. His written works include \"\"A Walk Back in",
+      "retrieved": "\"1901 Cincinnati Reds season\"\nHome runs; RBI = Runs batted in\"\" \"\"Note: G = Games played; AB = At bats; H = Hits; Avg. = Batting average; HR = Home runs; RBI = Runs batted in\"\" \"\"Note: G = Games pitch",
       "em": 0.0,
-      "f1": 0.006389776357827477
+      "f1": 0.006944444444444445
     },
     {
       "question": "When did the person who delivered the Gettysburg Address die?",
       "gold": [
         "April 15, 1865"
       ],
-      "retrieved": "\"Jonathan Larson\"\nJonathan Larson Jonathan David Larson (February 4, 1960 – January 25, 1996) was an American composer and playwright noted for exploring the social issues of multiculturalism, addicti",
+      "retrieved": "\"Lepo Sumera\"\nLepo Sumera Lepo Sumera (8 May 1950 – 2 June 2000) was an Estonian composer and teacher. Considered one of Estonia's most renowned composers along with Heino Eller, Eduard Tubin and Arvo",
       "em": 0.0,
-      "f1": 0.00625
+      "f1": 0.0
     },
     {
       "question": "Who was governor of Florida during Hurricane Irma?",
       "gold": [
         "Rick Scott"
       ],
-      "retrieved": "\"La Cañada Flintridge, California\"\nhigh desert area in the 18-wheeler. They traveled over the Angeles Crest Highway because, Bines said, he had received directions from his global positioning system ",
+      "retrieved": "\"History of Tallahassee, Florida\"\nThis count was in progress on December 9, when the United States Supreme Court 5-4 (Justices Stevens, Souter, Ginsburg and Breyer dissenting) granted Bush's emergency",
       "em": 0.0,
       "f1": 0.0
     },
@@ -947,7 +947,7 @@
       "gold": [
         "Real Madrid"
       ],
-      "retrieved": "\"Lido Vieri\"\nto rush quickly off his line to collect the ball, as well as his command of the area, leadership, and handling of crosses; despite his goalkeeping ability, he also gained a degree of infa",
+      "retrieved": "\"Bob Casey Jr.\"\ndegree from the Columbus School of Law at The Catholic University of America in 1988. Between college and law school, Casey served as a member of the Jesuit Volunteer Corps, and spent ",
       "em": 0.0,
       "f1": 0.0
     },
@@ -956,7 +956,7 @@
       "gold": [
         "Madrid"
       ],
-      "retrieved": "\"2011 in CONCACAF\"\nopen to all divisions of each nation's respective pyramid. 2011 in CONCACAF The year of 2011 in CONCACAF marked the 48th year of CONCACAF competitions. From 5 June through 25 June, ",
+      "retrieved": "Missouri\nMissouri Missouri is a state in the Midwestern United States. With over six million residents, it is the 18th-most populous state of the Union. The largest urban areas are St. Louis, Kansas C",
       "em": 0.0,
       "f1": 0.0
     },
@@ -965,7 +965,7 @@
       "gold": [
         "May 9, 2005"
       ],
-      "retrieved": "\"Arts Olympiad\"\nArts Olympiad The Arts Olympiad is an international art competition for children ages 8 to 12 organized by International Child Art Foundation with one million participants from seventy",
+      "retrieved": "\"Arabic numerals\"\ndifferent values, but also had the lower 4 bits equal to the digit value. Arabic numerals Arabic numerals, also called Hindu–Arabic numerals, are the ten digits: 0, 1, 2, 3, 4, 5, 6,",
       "em": 0.0,
       "f1": 0.0
     },
@@ -974,16 +974,16 @@
       "gold": [
         "King Wu of Zhou"
       ],
-      "retrieved": "\"Yury of Zvenigorod\"\npreparing a new campaign against Vasily when he died suddenly, on 5 July 1434, succeeded by his eldest son, Vasily Kosoy. Yury of Zvenigorod Yury Dmitrievich (26 November 1374, Pe",
+      "retrieved": "\"Emperor Kanmu\"\nTajihi no Toyotsugu (多治比豊継), daughter of Tajihi no Hironari (多治比広成) Court lady: Kudara no Yōkei (百済永継), daughter of Asukabe no Natomaro (飛鳥部奈止麻呂) In 2001, Japan's emperor Akihito told ",
       "em": 0.0,
-      "f1": 0.012698412698412697
+      "f1": 0.01993355481727575
     },
     {
       "question": "Who was the last emperor of the dynasty that succeeded the Song dynasty?",
       "gold": [
         "Toghon Temür"
       ],
-      "retrieved": "\"Yury of Zvenigorod\"\npreparing a new campaign against Vasily when he died suddenly, on 5 July 1434, succeeded by his eldest son, Vasily Kosoy. Yury of Zvenigorod Yury Dmitrievich (26 November 1374, Pe",
+      "retrieved": "\"George I of Great Britain\"\nprime minister. Towards the end of his reign, actual political power was held by Robert Walpole, now recognised as Britain's first \"\"de facto\"\" prime minister. George died ",
       "em": 0.0,
       "f1": 0.0
     },
@@ -992,7 +992,7 @@
       "gold": [
         "Powering Silicon Valley"
       ],
-      "retrieved": "\"La Mirada, California\"\nLa Mirada, California La Mirada is a city in southeast Los Angeles County, California United States, and is one of the Gateway Cities. The population was 48,527 at the 2010 cen",
+      "retrieved": "\"University of Portland\"\nuniversity opened its doors to 52 young men on September 5, 1901, with eight Roman Catholic priests from the local archdiocese serving as professors. At the request of the arc",
       "em": 0.0,
       "f1": 0.0
     },
@@ -1001,7 +1001,7 @@
       "gold": [
         "Richmond"
       ],
-      "retrieved": "\"Seaspray, Victoria\"\nrunning in 1990 and again in 2017. Especially in winter, southern right whales may provide onlookers chances to witness them cavorting close to shores. Seaspray, Victoria Seaspray",
+      "retrieved": "Missouri\nMissouri Missouri is a state in the Midwestern United States. With over six million residents, it is the 18th-most populous state of the Union. The largest urban areas are St. Louis, Kansas C",
       "em": 0.0,
       "f1": 0.0
     },
@@ -1010,16 +1010,16 @@
       "gold": [
         "Jefferson City"
       ],
-      "retrieved": "\"Malibu, California\"\nuse. Because of the failure to adequately address sewage disposal problems in the heart of the city, the local water board ordered Malibu in November 2009 to build a sewage plant ",
+      "retrieved": "\"University of Portland\"\nuniversity opened its doors to 52 young men on September 5, 1901, with eight Roman Catholic priests from the local archdiocese serving as professors. At the request of the arc",
       "em": 0.0,
-      "f1": 0.006349206349206348
+      "f1": 0.00625
     },
     {
       "question": "What's the capital of the state that Harvard University is in?",
       "gold": [
         "Boston"
       ],
-      "retrieved": "\"La Mirada, California\"\nLa Mirada, California La Mirada is a city in southeast Los Angeles County, California United States, and is one of the Gateway Cities. The population was 48,527 at the 2010 cen",
+      "retrieved": "\"Nikola Kovačević\"\nMatijasević and sister of volleyball players' manager Georges Matijasević. On August 25, 2016 his wife gave birth to their son Noa. In season 2012/2013 played for Polish club from",
       "em": 0.0,
       "f1": 0.0
     },
@@ -1028,7 +1028,7 @@
       "gold": [
         "Olympia"
       ],
-      "retrieved": "\"La Mirada, California\"\nLa Mirada, California La Mirada is a city in southeast Los Angeles County, California United States, and is one of the Gateway Cities. The population was 48,527 at the 2010 cen",
+      "retrieved": "\"Geography of Estonia\"\nand Emajõgi are among the most important of the country's many rivers. A small, recent cluster of meteorite craters, the largest of which is called Kaali are found near Saaremaa",
       "em": 0.0,
       "f1": 0.0
     },
@@ -1037,7 +1037,7 @@
       "gold": [
         "Brazil"
       ],
-      "retrieved": "\"Sunny Lowry\"\nat the age of 97 on 21 February 2008 at Warrington Hospital. Sunny Lowry Ethel \"\"Sunny\"\" Lowry MBE (2 January 1911, in Longsight, Manchester, Lancashire – 21 February 2008) was the first",
+      "retrieved": "\"Than E\"\nas the first General Assembly of the United Nations was about to meet. The headquarters offices at that time were in Lake Success, New York. She went to see some of her colleagues working the",
       "em": 0.0,
       "f1": 0.0
     },
@@ -1046,25 +1046,25 @@
       "gold": [
         "Pine Tree State"
       ],
-      "retrieved": "\"Horatio Hale\"\nconsisted of an Algonkin vocabulary, which he gathered from a band of Indians who had camped on the college grounds. Three years later, when the United States Exploring Expedition to li",
+      "retrieved": "\"Geography of Estonia\"\nand Emajõgi are among the most important of the country's many rivers. A small, recent cluster of meteorite craters, the largest of which is called Kaali are found near Saaremaa",
       "em": 0.0,
-      "f1": 0.0
+      "f1": 0.006211180124223602
     },
     {
       "question": "What is the nickname for the state that is the home to the “Avocado Capital of the World\"?",
       "gold": [
         "Golden State"
       ],
-      "retrieved": "\"La Mirada, California\"\neducation. La Mirada (Spanish for \"\"the look\"\") was the creation of two men, Andrew McNally, a printer and mapmaker from Chicago (see Rand McNally) and his son-in-law Edwin Nef",
+      "retrieved": "\"Hardwick, Massachusetts\"\nlands along the Ware, especially in the far eastern part of town, are marshy. The town has some open areas, and a portion of the lands not already protected as part of the Qu",
       "em": 0.0,
-      "f1": 0.006230529595015576
+      "f1": 0.006688963210702341
     },
     {
       "question": "What rocket was used for the mission that landed the first humans on the moon?",
       "gold": [
         "Saturn V"
       ],
-      "retrieved": "\"Ambrosini SAI.207\"\nAmbrosini SAI.207 The Ambrosini SAI.207 was a light fighter interceptor built entirely from wood and developed in Italy during World War II. Powered by a single 750 hp Isotta Frasc",
+      "retrieved": "\"Soyuz T-12\"\ncrew members, Kizim and Solovyov, were rescheduled elsewhere. They later became long-duration crew members of Salyut 7 EO-3, and Volk was scheduled fly in the passenger seat of a visiting",
       "em": 0.0,
       "f1": 0.0
     },
@@ -1073,25 +1073,25 @@
       "gold": [
         "July 27, 1953"
       ],
-      "retrieved": "\"Digby Tatham-Warter\"\nhunting and pig sticking. When the Second World War broke out, Digby was not initially sent to fight in Europe. His sister Kit served in the Western Desert Campaign and was award",
+      "retrieved": "Bollywood\nKhans\": Aamir Khan, Shah Rukh Khan, and Salman Khan. Combined, they have starred in most of the top ten highest-grossing Bollywood films. The three Khans have had successful careers since th",
       "em": 0.0,
-      "f1": 0.0
+      "f1": 0.006600660066006601
     },
     {
       "question": "What is the nickname for the state that Mount Rainier is located in?",
       "gold": [
         "Evergreen State"
       ],
-      "retrieved": "\"Sawyer House (Monroe, Michigan)\"\nSawyer House (Monroe, Michigan) The Sawyer House, also known as the Sawyer Homestead and in its previous incarnation as the Navarre House, is a city-owned house locat",
+      "retrieved": "\"Bảy Núi\"\nBảy Núi Bảy Núi (, \"\"seven mountains\"\"), also known by the Sino-Vietnamese version Thất Sơn (), is a range of small mountains located in the Tri Tôn and Tịnh Biên districts in Vietnam's An",
       "em": 0.0,
-      "f1": 0.006309148264984227
+      "f1": 0.007246376811594202
     },
     {
       "question": "When was the composer of Carol of the Bells born?",
       "gold": [
         "December 13, 1877"
       ],
-      "retrieved": "\"Jonathan Larson\"\nJonathan Larson Jonathan David Larson (February 4, 1960 – January 25, 1996) was an American composer and playwright noted for exploring the social issues of multiculturalism, addicti",
+      "retrieved": "KQSF\nKQSF KQSF (95.7 FM, \"\"Q95-7\"\") is a radio station licensed to Dell Rapids, South Dakota; it serves the Sioux Falls, South Dakota area. It first began broadcasting in 1998 under the call sign KSOB",
       "em": 0.0,
       "f1": 0.0
     },
@@ -1100,7 +1100,7 @@
       "gold": [
         "Conway Berners-Lee"
       ],
-      "retrieved": "\"Evan Morris\"\nEvan Morris Evan L. Morris (January 26, 1977 – July 9, 2015) was a lobbyist for Genentech and its parent corporation Roche in Washington, D.C. He began his career in Washington as an int",
+      "retrieved": "\"1991 St. Petersburg Open\"\nJo Durie 7–5, 6–3 1991 St. Petersburg Open The 1991 St. Petersburg Open was a women's tennis tournament played from September 23 through 29, 1991, on indoor carpet courts at",
       "em": 0.0,
       "f1": 0.0
     },
@@ -1109,7 +1109,7 @@
       "gold": [
         "Yanagiwara Naruko"
       ],
-      "retrieved": "\"The Holocaust in Serbia\"\nGerman Military Commander in Serbia appointed a Serbian civil puppet government to carry out administrative tasks in accordance with German direction and supervision. The pol",
+      "retrieved": "\"South Duxbury, Massachusetts\"\nat an average density of 158.8/km² (411.2/mi²). The racial makeup of the CDP was 97.98% White, 0.26% African American, 0.23% Native American, 0.65% Asian, 0.07% from oth",
       "em": 0.0,
       "f1": 0.0
     },
@@ -1118,7 +1118,7 @@
       "gold": [
         "Helium"
       ],
-      "retrieved": "\"M33 X-7\"\nX-7 one of the furthest confirmed stellar mass black holes known. M33 X-7 orbits a companion star that eclipses the black hole every 3.45 days. The companion star also has an unusually large",
+      "retrieved": "\"Andre Geim\"\nAndre Geim Sir Andre Konstantin Geim, FRS, HonFRSC, HonFInstP (born 21 October 1958) is a Soviet-born Dutch-British physicist working in the School of Physics and Astronomy at the Univers",
       "em": 0.0,
       "f1": 0.0
     },
@@ -1127,9 +1127,9 @@
       "gold": [
         "One World, One Dream"
       ],
-      "retrieved": "\"Arts Olympiad\"\nArts Olympiad The Arts Olympiad is an international art competition for children ages 8 to 12 organized by International Child Art Foundation with one million participants from seventy",
+      "retrieved": "\"Olympic triangle\"\ndegrees at the top and bottom marks. In this case the ratio of the windward leg to a reaching leg is 1:0.7071 and the course length for the 9 legs described above is 7.8284 times th",
       "em": 0.0,
-      "f1": 0.006896551724137931
+      "f1": 0.006211180124223602
     }
   ]
 }

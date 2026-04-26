@@ -7,7 +7,7 @@
 # the rest of the stack avoids. Install them only when you want that
 # retriever:
 #
-#   hipporag   ->  pip install torch
+#   hipporag   ->  pip install torch, pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cu130 , do not mix with the CPU VERSION!!!!
 #   graphrag   ->  pip install graphrag lancedb
 #
 # Forbidden in the base file (still): vllm, transformers, sentence-transformers,
@@ -34,3 +34,4 @@ filelock>=3.13
 packaging>=23.0
 tenacity>=8.2
 tiktoken>=0.7
+torch torchvision --index-url https://download.pytorch.org/whl/cu130

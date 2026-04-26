@@ -1,0 +1,1135 @@
+{
+  "retriever": "linear",
+  "corpus": "C:\\Users\\gleni\\Desktop\\Knapp Projects\\RAG_Bench\\Search-o1\\data\\FlashRAG_datasets\\bamboogle\\test.jsonl",
+  "metrics": {
+    "em": 0.0,
+    "f1": 0.0014592677226671251
+  },
+  "details": [
+    {
+      "question": "Who was president of the United States in the year that Citibank was founded?",
+      "gold": [
+        "james madison"
+      ],
+      "retrieved": "594: \"CN Tower\"\nThe CN Tower is the tallest freestanding structure in the Western Hemisphere. As of 2013, there are only two other freestanding structures in the Western Hemisphere which exceed in hei",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What rocket was the first spacecraft that ever approached Uranus launched on?",
+      "gold": [
+        "Titan IIIE"
+      ],
+      "retrieved": "659: \"Soyuz T-12\"\ncrew members, Kizim and Solovyov, were rescheduled elsewhere. They later became long-duration crew members of Salyut 7 EO-3, and Volk was scheduled fly in the passenger seat of a vis",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "In what year was the company that was founded as Sound of Music added to the S&P 500?",
+      "gold": [
+        "1999"
+      ],
+      "retrieved": "3367: \"Dimensional analysis\"\nargue that in comparing a stock to a flow, annual GDP should have dimensions of currency/time (dollars/year, for instance), and thus Debt-to-GDP should have units of years",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who was the first African American mayor of the most populous city in the United States?",
+      "gold": [
+        "David Dinkins"
+      ],
+      "retrieved": "699: \"Severus Alexander\"\ncontempt, had their remains cast into the Tiber river. He and his cousin were both grandsons of the influential and powerful Julia Maesa, who had arranged for Elagabalus' accl",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When did the last king from Britain's House of Hanover die?",
+      "gold": [
+        "20 June 1837"
+      ],
+      "retrieved": "2040: \"Blue Nile\"\nthe only ones to remain on the expedition for the entire journey. They chronicled their adventure with an IMAX camera and two handheld video cams, sharing their story in the IMAX fil",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When did the president who set the precedent of a two term limit enter office?",
+      "gold": [
+        "April 30, 1789"
+      ],
+      "retrieved": "2322: \"Meriden, Kansas\"\nindividuals and 9.2% had someone living alone who was 65 years of age or older. The average household size was 2.58 and the average family size was 3.12. The median age in the ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When did the president who set the precedent of a two term limit leave office?",
+      "gold": [
+        "March 4, 1797"
+      ],
+      "retrieved": "2376: \"Limington, Maine\"\n2010, there were 3,713 people, 1,392 households, and 1,029 families residing in the town. The population density was . There were 1,615 housing units at an average density of ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "How many people died in the second most powerful earthquake ever recorded?",
+      "gold": [
+        "131"
+      ],
+      "retrieved": "1154: \"Epoch of Extreme Inundations\"\nThe largest intra-continental lake system of today (the Great Lakes of North America) is six times smaller (245,000 km), with a water volume 30 times smaller (22,7",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Can people who have celiac eat camel meat?",
+      "gold": [
+        "Yes"
+      ],
+      "retrieved": "3431: \"Griffin family\"\nGriffin, voiced by Seth Green. Chris is an overweight, excitable, and outgoing teenage boy. Physically, he is a younger version of Peter, but intellectually, he often shows bett",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What was the final book written by the author of On the Origin of Species?",
+      "gold": [
+        "The Formation of Vegetable Mould Through the Action of Worms"
+      ],
+      "retrieved": "362: \"On the Origin of Species\"\nOn the Origin of Species On the Origin of Species (or more completely, On the Origin of Species by Means of Natural Selection, or the Preservation of Favoured Races in ",
+      "em": 0.0,
+      "f1": 0.01986754966887417
+    },
+    {
+      "question": "When was the company that built the first steam locomotive to carry passengers on a public rail line founded?",
+      "gold": [
+        "1823"
+      ],
+      "retrieved": "1548: \"Thừa Thiên-Huế Province\"\nin 1990 with an initial investment of 2.4 million USD with a capacity of 3 million liters/year, which has grown to a capacity of 100 million liters/year in 2007. V",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Which Theranos whistleblower is not related to a senior American government official?",
+      "gold": [
+        "Erika Cheung"
+      ],
+      "retrieved": "3029: \"Summer vacation\"\nrun \"\"Calendar B\"\" in which there is a long vacation in July and August. On the other hand, \"\"Calendar A\"\" has a long vacation around Christmas. In Costa Rica, summer vacation ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What is the fastest air-breathing manned aircraft mostly made out of?",
+      "gold": [
+        "Titanium"
+      ],
+      "retrieved": "1742: Tshe\nletters unique to the Serbian Cyrillic alphabet, and also the letter with which Serbian word for Cyrillic (ћирилица) starts, Tshe is often used as the basis for logos for various groups inv",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who built the fastest air-breathing manned aircraft?",
+      "gold": [
+        "Lockheed Corporation"
+      ],
+      "retrieved": "378: \"Boeing 787 Dreamliner\"\nto have a composite fuselage, composite wings, and use composites in most other airframe components. Each 787 contains approximately of carbon fiber reinforced polymer (CF",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When was the author of The Population Bomb born?",
+      "gold": [
+        "May 29, 1932"
+      ],
+      "retrieved": "249: \"2013 Varsity Rugby\"\nTries will be worth five points as usual, but conversions will be worth three points, while penalties and drop goals will only be worth two points. The following teams compet",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When did the author of Annabel Lee enlist in the army?",
+      "gold": [
+        "1827"
+      ],
+      "retrieved": "3197: \"National League Division Two in 2005\"\nKent fielded, reducing Surrey to 25 for 3, but Ali Brown's quickfire 65 and Jonathan Batty's 82 turned the match around, and Rikki Clarke hit 35 to take Su",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What was the religion of the inventor of the Polio vaccine?",
+      "gold": [
+        "Jewish"
+      ],
+      "retrieved": "1974: \"Kyaa Kool Hain Hum 3\"\ncollection at a local DVD store. Initially upset, Karjatiya calls off the wedding, due to which Kanhaiya attempts to commit suicide, causing everyone to fall in a sand pit",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who was the second wife of the founder of CNN?",
+      "gold": [
+        "Jane Shirley Smith"
+      ],
+      "retrieved": "66: BrainTwist\nthe new tetrahedron and vice versa. By performing arbitrary combinations of flips and rotations the pieces can be scrambled almost completely. The only restriction is that the mechanism",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When did the first prime minister of the Russian Empire come into office?",
+      "gold": [
+        "November 6, 1905"
+      ],
+      "retrieved": "407: \"State Duma (Russian Empire)\"\nthe Progressive Bloc was formed, fearing Rasputin's influence over Tsarina Alexandra would increase. The Duma gathered on 9 February 1916 after the 76-year-old Ivan ",
+      "em": 0.0,
+      "f1": 0.014492753623188408
+    },
+    {
+      "question": "What is the primary male hormone derived from?",
+      "gold": [
+        "cholesterol"
+      ],
+      "retrieved": "987: \"Luo people (Kenya)\"\nside. After the father's death the senior son takes over the responsibilities of leadership. These groups when considered in terms of genealogy, are people of the same grandf",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "The Filipino statesman who established the government-in-exile during the outbreak of World War II was also the mayor of what city?",
+      "gold": [
+        "Quezon City"
+      ],
+      "retrieved": "1736: Cresciano\none person and 5 were adults who lived with their parents. Of the rest of the households, there are 63 married couples without children, 82 married couples with children There were 13 ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Where was the person who shared the Nobel Prize in Physics in 1954 with Max Born born?",
+      "gold": [
+        "Oranienburg, Germany"
+      ],
+      "retrieved": "1954: \"Dally Messenger III\"\nthe semi-autobiographical book,\"\"Murphy's Law and the Pursuit of Happiness: A History of the Civil Celebrant Movement\"\", Dally Messenger III was born in Sydney in February ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When was the person who shared the Nobel Prize in Physics in 1954 with Max Born born?",
+      "gold": [
+        "January 8, 1891"
+      ],
+      "retrieved": "1954: \"Dally Messenger III\"\nthe semi-autobiographical book,\"\"Murphy's Law and the Pursuit of Happiness: A History of the Civil Celebrant Movement\"\", Dally Messenger III was born in Sydney in February ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What was the founding date of the university in which Plotonium was discovered?",
+      "gold": [
+        "March 23, 1868"
+      ],
+      "retrieved": "3384: \"U.S. Route 431 in Alabama\"\nand unsigned State Route 1 begin a concurrency with U.S. Highway 280 and unsigned State Route 38 and turn to the northwest. At Opelika, US-431 and State Route 1 diver",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "The material out of which the Great Sphinx of Giza is made of is mainly composed of what mineral?",
+      "gold": [
+        "calcite"
+      ],
+      "retrieved": "226: Penarth\nhas led the way in delivering this new qualification, associated to the International Baccalaureate programme. Spread over two sites with years seven to nine located in both Penarth and n",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "The husband of Lady Godiva was Earl of which Anglic kingdom?",
+      "gold": [
+        "Mercia"
+      ],
+      "retrieved": "2683: \"Karnataka Milk Federation\"\nDairy Development Corporation (KDDC) to implement a dairy development project run by the World Bank. In 1984 the organisation was renamed KMF. KMF has 14 milk unions ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "The machine used to extract honey from honeycombs uses which physical force?",
+      "gold": [
+        "Centrifugal Force"
+      ],
+      "retrieved": "3416: \"History of trigonometry\"\ncontain the earliest surviving tables of sine values and versine (1 − cosine) values, in 3.75° intervals from 0° to 90°, to an accuracy of 4 decimal places. They used t",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What is the third letter of the top level domain of the military?",
+      "gold": [
+        "l"
+      ],
+      "retrieved": "1530: \"Alphabet song\"\nc'4 c' g' g' | a' a' g'2 | f'4 f' e' e' | d' d' c'2 | g'4 g' f' f' | e' e' d'2 | g'4 \\times 2/3 { f'8 f' f' } e'4 d' | c' r r2 | \\bar \"|.\" } \\addlyrics { A B C D E F G H I J K L ",
+      "em": 0.0,
+      "f1": 0.006042296072507554
+    },
+    {
+      "question": "In what year was the government department where the internet originated at founded?",
+      "gold": [
+        "1947"
+      ],
+      "retrieved": "3367: \"Dimensional analysis\"\nargue that in comparing a stock to a flow, annual GDP should have dimensions of currency/time (dollars/year, for instance), and thus Debt-to-GDP should have units of years",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "The main actor of Indiana Jones is a licensed what?",
+      "gold": [
+        "pilot"
+      ],
+      "retrieved": "503: \"The Deadlines\"\nthe place where Nirvana had made their last studio album. Soon after recording their first album, Jones left the band and was replaced by Thomas Demise. The album had not yet been",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When was the person after which the Hubble Space Telescope is named after born?",
+      "gold": [
+        "November 20, 1889"
+      ],
+      "retrieved": "329: \"European Space Agency\"\nESA launched its first major scientific mission in 1975, Cos-B, a space probe monitoring gamma-ray emissions in the universe, which was first worked on by ESRO. The ESA co",
+      "em": 0.0,
+      "f1": 0.006230529595015577
+    },
+    {
+      "question": "When did the person who gave the Checkers speech die?",
+      "gold": [
+        "April 22, 1994"
+      ],
+      "retrieved": "1511: MDC1\nor knockout studies in mice have shown several defects at both the cellular and organismal level. Mice lacking \"\"MDC1\"\" are smaller, have infertile males, are radiosensitive, and are more s",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When was the philosopher that formulated the hard problem of consciousness born?",
+      "gold": [
+        "April 20, 1966"
+      ],
+      "retrieved": "1295: \"Hazel Green, Alabama\"\nwas 363 people per square mile (139.6/km²). There were 1,434 housing units at an average density of 143.4 per square mile (55.2/km²). The racial makeup of the community wa",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What is the capital of the second largest state in the US by area?",
+      "gold": [
+        "Austin"
+      ],
+      "retrieved": "3468: \"Interstate 75\"\nback onto northbound. The freeway proceeds to enter suburban portions of Pasco, Hernando, and Sumter counties on its way to Ocala and Gainesville. At Lake City, Florida, the Chri",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What is the maximum airspeed (in km/h) of the third fastest bird?",
+      "gold": [
+        "320 km/h"
+      ],
+      "retrieved": "3579: Speed\na circular path is known as \"\"tangential speed\"\" because the direction of motion is tangent to the circumference of the circle. For circular motion, the terms linear speed and tangential s",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who founded the city where the founder of geometry lived?",
+      "gold": [
+        "Alexander the Great"
+      ],
+      "retrieved": "1866: \"Hawkins, Wisconsin\"\nhousing units at an average density of 67.2 per square mile (25.9/km²). The racial makeup of the village was 98.11% White, 0.32% from other races, and 1.58% from two or more",
+      "em": 0.0,
+      "f1": 0.011834319526627219
+    },
+    {
+      "question": "What is the capital of the country where yoga originated?",
+      "gold": [
+        "New Delhi"
+      ],
+      "retrieved": "2681: \"Time in Europe\"\nuse UTC, as they did before the Second World War. The general result is a solar noon which is much later than clock noon, and later sunrises and sunsets than should theoreticall",
+      "em": 0.0,
+      "f1": 0.006060606060606061
+    },
+    {
+      "question": "The fourth largest city in Germany was originally called what?",
+      "gold": [
+        "Colonia Claudia Ara Agrippinensium"
+      ],
+      "retrieved": "587: \"Merck & Co.\"\nrebates to Medicaid and other health care programs and paid illegal remuneration to health care providers. On February 7, 2008 Merck agreed to pay more than $650 million to settle c",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When did Nirvana's second most selling studio album come out?",
+      "gold": [
+        "September 13, 1993"
+      ],
+      "retrieved": "502: \"Nirvana bootleg recordings\"\nNirvana bootleg recordings The Nirvana bootleg recordings are a number of audio CD recordings of musical performances by the American rock band Nirvana, which were pr",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What was the job of the father of the founder of psychoanalysis?",
+      "gold": [
+        "wool merchant"
+      ],
+      "retrieved": "714: \"Gustav Bychowski\"\nlatter looks specifically at Julius Caesar, Oliver Cromwell, Maximilien Robespierre, Adolf Hitler and Joseph Stalin. The psychoanalyst Frank M. Lachmann describes Bychowski as ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "How much protein in four boiled egg yolks?",
+      "gold": [
+        "10.8"
+      ],
+      "retrieved": "1054: \"UFC 211\"\nwas canceled. A featherweight bout between promotional newcomers, Jared Gordon and Michel Quiñones was expected for the event. However, Gordon pulled out of the fight on the day before",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What is the political party of the American president who entered into the Paris agreement?",
+      "gold": [
+        "Democratic Party"
+      ],
+      "retrieved": "3029: \"Summer vacation\"\nrun \"\"Calendar B\"\" in which there is a long vacation in July and August. On the other hand, \"\"Calendar A\"\" has a long vacation around Christmas. In Costa Rica, summer vacation ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "The most populous city in Punjab is how large (area wise)?",
+      "gold": [
+        "310 square kilometers"
+      ],
+      "retrieved": "1577: \"Kathmandu Medical College\"\nDirectory (IMED). KMC is an Associate Member of the Network Towards Unity for Health (TUFH) that has its headquarters at Glent in Belgium. Kathmandu Medical College (",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What was the death toll of the second largest volcanic eruption in the 20th century?",
+      "gold": [
+        "847"
+      ],
+      "retrieved": "527: \"Armero tragedy\"\nvolcano didn't kill 22,000 people. The government killed them.\"\" The relief efforts were hindered by the composition of the mud, which made it nearly impossible to move through w",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What was the death toll of the most intense Atlantic hurricane?",
+      "gold": [
+        "52"
+      ],
+      "retrieved": "2078: \"Ahmed Nazif\"\nwith fourteen new cabinet ministers on 14 July 2004. He received immediate parliamentary backing through a formal vote of confidence. He was the youngest serving prime minister of ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who was the head of NASA during Apollo 11?",
+      "gold": [
+        "Thomas O. Paine"
+      ],
+      "retrieved": "1192: \"Memorial High School (West New York, New Jersey)\"\nin its 2010 rankings (a decrease of 42 positions from the 2009 rank) which were based on the combined percentage of students classified as prof",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who is the father of the father of George Washington?",
+      "gold": [
+        "Lawrence Washington"
+      ],
+      "retrieved": "3791: \"Massachusetts Route 30\"\nalso has two interchanges with Route 9, one in Westborough and one at the Southborough-Framingham border (where the two highways have an interchange without actually cro",
+      "em": 0.0,
+      "f1": 0.00684931506849315
+    },
+    {
+      "question": "Who is the mother of the father of George Washington?",
+      "gold": [
+        "Mildred Warner"
+      ],
+      "retrieved": "3791: \"Massachusetts Route 30\"\nalso has two interchanges with Route 9, one in Westborough and one at the Southborough-Framingham border (where the two highways have an interchange without actually cro",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who is the father of the father of Barack Obama?",
+      "gold": [
+        "Hussein Onyango Obama"
+      ],
+      "retrieved": "2338: \"Mirza Fatali Akhundov\"\nrepertoire. Well ahead of his time, Akhundzade was a keen advocate for alphabet reform, recognizing deficiencies of Perso-Arabic script with regards to Turkic sounds. He ",
+      "em": 0.0,
+      "f1": 0.012461059190031154
+    },
+    {
+      "question": "Who is the mother of the father of Barack Obama?",
+      "gold": [
+        "Habiba Akumu Nyanjango"
+      ],
+      "retrieved": "2338: \"Mirza Fatali Akhundov\"\nrepertoire. Well ahead of his time, Akhundzade was a keen advocate for alphabet reform, recognizing deficiencies of Perso-Arabic script with regards to Turkic sounds. He ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who was mayor of New York City when Fiorello H. La Guardia was born?",
+      "gold": [
+        "William Russell Grace"
+      ],
+      "retrieved": "3402: Belarus\nof Belarus abandoned pegging the Belarusian ruble to the Russian ruble in August 2007. A new currency, the new Belarusian ruble (ISO 4217 code: BYN) was introduced in July 2016, replacin",
+      "em": 0.0,
+      "f1": 0.006666666666666666
+    },
+    {
+      "question": "Who was president of the U.S. when superconductivity was discovered?",
+      "gold": [
+        "William Howard Taft"
+      ],
+      "retrieved": "2107: \"K Foundation art award\"\ncollection of art works entitled \"\"Money - A Major Body of Cash\"\". The award, the exhibition and the accompanying extravagant press junket were widely reported by the me",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When was the person Russ Hanneman is based on born?",
+      "gold": [
+        "July 31, 1958"
+      ],
+      "retrieved": "3483: \"Interstate 75\"\n99-vehicle accident on that stretch of I-75 in heavy fog on December 11, 1990. I-75 does not meet any other highways until it overlaps I-40 near Farragut and heads eastbound. Tog",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When was the first location of the world's largest coffeehouse chain opened?",
+      "gold": [
+        "March 30, 1971"
+      ],
+      "retrieved": "2211: \"The Biggest Loser Australia (season 1)\"\nscene look at the show itself. All previously eliminated contestants were also weighed for the chance of the runners-up prize of A$50,000. Wal lost 66.3 ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who directed the highest grossing film?",
+      "gold": [
+        "James Cameroon"
+      ],
+      "retrieved": "480: California\nCalifornia California is a state in the Pacific Region of the United States. With 39.5 million residents, California is the most populous U.S. state and the third-largest by area. The ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When was the longest bridge in the world opened?",
+      "gold": [
+        "30 June 2011"
+      ],
+      "retrieved": "3260: \"Generalized Dirichlet distribution\"\neach colour is unknown. Write formula_48 for the proportion of the balls with colour formula_49 in the urn. Experiment 1. Analyst 1 believes that formula_50 ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Which company was responsible for the largest pharmaceutical settlement?",
+      "gold": [
+        "GlaxoSmithKline"
+      ],
+      "retrieved": "3750: \"1985 NCAA Division III football season\"\ntournament to determine the national champion of men's NCAA Division III college football. The championship Stagg Bowl game was held at Garrett-Harrison ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "In what year was the tallest self-supporting tower completed?",
+      "gold": [
+        "2012"
+      ],
+      "retrieved": "3367: \"Dimensional analysis\"\nargue that in comparing a stock to a flow, annual GDP should have dimensions of currency/time (dollars/year, for instance), and thus Debt-to-GDP should have units of years",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "In what year was the tallest fixed steel structure completed?",
+      "gold": [
+        "1988"
+      ],
+      "retrieved": "3367: \"Dimensional analysis\"\nargue that in comparing a stock to a flow, annual GDP should have dimensions of currency/time (dollars/year, for instance), and thus Debt-to-GDP should have units of years",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "In what year was the tallest lattice tower completed?",
+      "gold": [
+        "2012"
+      ],
+      "retrieved": "3367: \"Dimensional analysis\"\nargue that in comparing a stock to a flow, annual GDP should have dimensions of currency/time (dollars/year, for instance), and thus Debt-to-GDP should have units of years",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "In what year was the current tallest wooden lattice tower completed?",
+      "gold": [
+        "1935"
+      ],
+      "retrieved": "3367: \"Dimensional analysis\"\nargue that in comparing a stock to a flow, annual GDP should have dimensions of currency/time (dollars/year, for instance), and thus Debt-to-GDP should have units of years",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "In what country is the second tallest statue in the world?",
+      "gold": [
+        "China"
+      ],
+      "retrieved": "3623: \"Kenneth C. Martis\"\nnumbers for the partisan divide in each House. The map and pie chart on the lower left show the geographical pattern and partisan make-up of the Senate. The blue states have ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When was the tallest ferris wheel in the world completed?",
+      "gold": [
+        "2021"
+      ],
+      "retrieved": "3623: \"Kenneth C. Martis\"\nnumbers for the partisan divide in each House. The map and pie chart on the lower left show the geographical pattern and partisan make-up of the Senate. The blue states have ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "In what year was the tallest lighthouse completed?",
+      "gold": [
+        "1902"
+      ],
+      "retrieved": "3367: \"Dimensional analysis\"\nargue that in comparing a stock to a flow, annual GDP should have dimensions of currency/time (dollars/year, for instance), and thus Debt-to-GDP should have units of years",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "In what country is the world largest desalination plant?",
+      "gold": [
+        "Saudi Arabia"
+      ],
+      "retrieved": "500: Dresden\narchitecture and numerous world-renowned museums and art collections, Dresden has been called \"\"Elbflorenz\"\" (Florence of the Elbe). The incorporation of neighbouring rural communities ov",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "The most populous national capital city was established in what year?",
+      "gold": [
+        "1045 BC"
+      ],
+      "retrieved": "3367: \"Dimensional analysis\"\nargue that in comparing a stock to a flow, annual GDP should have dimensions of currency/time (dollars/year, for instance), and thus Debt-to-GDP should have units of years",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "The third largest river (by discharge) in the world is in what countries?",
+      "gold": [
+        "India and Bangladesh"
+      ],
+      "retrieved": "532: \"1930 Atlantic hurricane season\"\nfinal storm dissipated on October 21. Due to the lack of systems that developed, only one tropical cyclone, the second hurricane, managed to make landfall during ",
+      "em": 0.0,
+      "f1": 0.0060790273556231
+    },
+    {
+      "question": "What is the highest elevation (in meters) of the second largest island in the world?",
+      "gold": [
+        "4,884 m"
+      ],
+      "retrieved": "1865: \"Hwacheon County\"\nwere male; 11,351 were female. Only 90 of these people (0.38%) were foreign residents - 20 male and 70 female. The average household was home to 2.4 people, and 3,577 of the po",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What is the length of the second deepest river in the world?",
+      "gold": [
+        "6,300 km"
+      ],
+      "retrieved": "2266: \"Bacha Khan International Airport\"\nfeatures are available at the airport. Bacha Khan International Airport Bacha Khan International Airport (; ), previously called Peshawar International Airport",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "In what country is the third largest stadium in the world?",
+      "gold": [
+        "United States"
+      ],
+      "retrieved": "2128: \"2006 San Francisco 49ers season\"\na touchdown pass with Smith equaling his touchdown total of the entire 2005 season and passing for an encouraging 288 yards with 23 completions out of 40 attemp",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who is the largest aircraft carrier in the world is named after?",
+      "gold": [
+        "Gerald R. Ford"
+      ],
+      "retrieved": "2061: \"Grand Marais, Minnesota\"\nwere 1.6% of the population. There were 673 households, of which 21.5% had children under the age of 18 living with them, 37.1% were married couples living together, 9.",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "In what year did the oldest cat ever recorded with the Cat of the Year award?",
+      "gold": [
+        "1999"
+      ],
+      "retrieved": "1031: \"Chen Bochui Children's Literature Award\"\nYang Zhong Best Picture Books Best Literary Works of 2017 Best Contributions to Children's Magazines 2017 Special Contribution Award, 2017 Author of the",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "In what year was the country that is the third largest exporter of coffee founded?",
+      "gold": [
+        "1810"
+      ],
+      "retrieved": "3367: \"Dimensional analysis\"\nargue that in comparing a stock to a flow, annual GDP should have dimensions of currency/time (dollars/year, for instance), and thus Debt-to-GDP should have units of years",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who was the commander for the space mission that had the first spacewalk?",
+      "gold": [
+        "Pavel Belyayev"
+      ],
+      "retrieved": "1899: \"1992 South African apartheid referendum\"\nalso increase the political chaos in the country, and had no real reason to advocate that the whites oppose the negotiations. The ANC therefore advocate",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who is the predecessor of the longest-reigning British monarch?",
+      "gold": [
+        "George VI\n"
+      ],
+      "retrieved": "2680: \"The Bachelor Canada (season 3)\"\nacross the country to be with her. However, after getting a chance to talk to her, they agree that they would still be happy if she is the one Chris chooses. Ori",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "In 2016, who was the host of the longest running talk show?",
+      "gold": [
+        "Jimmy Fallon"
+      ],
+      "retrieved": "1183: \"2016 Kenyan Super Cup\"\nface punishment, but did not specify what the punishment would be or when it would be delivered. 2016 Kenyan Super Cup The 2016 Kenyan Super Cup was a Kenyan football mat",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "In 2016, who was the host of the longest running American game show?",
+      "gold": [
+        "Drew Carey"
+      ],
+      "retrieved": "3029: \"Summer vacation\"\nrun \"\"Calendar B\"\" in which there is a long vacation in July and August. On the other hand, \"\"Calendar A\"\" has a long vacation around Christmas. In Costa Rica, summer vacation ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who wrote the novel on which the longest running show in Broadway history is based on?",
+      "gold": [
+        "Gaston Leroux"
+      ],
+      "retrieved": "393: \"Adamson Tannehill\"\nhe provided funding to secure a fine education for Adamson. Little else is known of Adamson’s earliest years. No known portraits of Tannehill exist; however, family records in",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "In what country was the only cruise line that flies the American flag incorporated in?",
+      "gold": [
+        "Bermuda"
+      ],
+      "retrieved": "3029: \"Summer vacation\"\nrun \"\"Calendar B\"\" in which there is a long vacation in July and August. On the other hand, \"\"Calendar A\"\" has a long vacation around Christmas. In Costa Rica, summer vacation ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "In what year did work begin on the second longest road tunnel in the world?",
+      "gold": [
+        "1992"
+      ],
+      "retrieved": "3367: \"Dimensional analysis\"\nargue that in comparing a stock to a flow, annual GDP should have dimensions of currency/time (dollars/year, for instance), and thus Debt-to-GDP should have units of years",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What is the official color of the third oldest surviving university?",
+      "gold": [
+        "Cambridge Blue"
+      ],
+      "retrieved": "430: \"University of Portland\"\nuniversity opened its doors to 52 young men on September 5, 1901, with eight Roman Catholic priests from the local archdiocese serving as professors. At the request of th",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who succeeded the longest reigning Roman emperor?",
+      "gold": [
+        "Tiberius"
+      ],
+      "retrieved": "2334: \"Harold Primat\"\nand finished second in class at the 12 Hours of Sebring event. Remaining with Kruse on the other side of the Atlantic, Primat began the European season at Spa but retired due to ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who preceded the Roman emperor that declared war on the sea?",
+      "gold": [
+        "Tiberius"
+      ],
+      "retrieved": "2334: \"Harold Primat\"\nand finished second in class at the 12 Hours of Sebring event. Remaining with Kruse on the other side of the Atlantic, Primat began the European season at Spa but retired due to ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who produced the longest running video game franchise?",
+      "gold": [
+        "MECC"
+      ],
+      "retrieved": "814: \"2010 World Cup Taekwondo Team Championships\"\nare conducted in a single elimination format. 2010 World Cup Taekwondo Team Championships The 2010 World Cup Taekwondo Team Championships is the 3rd ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who was the father of the father of psychoanalysis?",
+      "gold": [
+        "Jacob Freud"
+      ],
+      "retrieved": "2354: \"Medford, Maine\"\nof the census of 2010, there were 254 people, 104 households, and 74 families residing in the town. The population density was . There were 164 housing units at an average densi",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who was the father of the father of empiricism?",
+      "gold": [
+        "Sir Nicholas Bacon"
+      ],
+      "retrieved": "508: \"Ernest Jones\"\nErnest Jones Alfred Ernest Jones (1 January 1879 – 11 February 1958) was a Welsh neurologist and psychoanalyst. A lifelong friend and colleague of Sigmund Freud from their first me",
+      "em": 0.0,
+      "f1": 0.006472491909385114
+    },
+    {
+      "question": "Who is the father of the father of observational astronomy?",
+      "gold": [
+        "Vincenzo Galilei"
+      ],
+      "retrieved": "1942: \"Oxford (CDP), New Jersey\"\nOxford (CDP), New Jersey Oxford is an unincorporated community and census-designated place (CDP) located within Oxford Township in Warren County, New Jersey, United St",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who is the father of the father of modern Hebrew?",
+      "gold": [
+        "Yehuda Leib"
+      ],
+      "retrieved": "729: \"Revival of the Hebrew language\"\nto use Hebrew as a lingua franca, the historical linguistic common denominator of all the Jewish groups. At the same time, a parallel development in Europe change",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who is the father of the father of modern experimental psychology?",
+      "gold": [
+        "Maximilian Wundt"
+      ],
+      "retrieved": "2285: \"South Coventry (CDP), Connecticut\"\nracial makeup of the CDP was 98.26% White, 0.22% African American, 0.58% Native American, 0.14% Asian, 0.36% from other races, and 0.43% from two or more race",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who is the father of the originator of cybernetics?",
+      "gold": [
+        "Leo Wiener"
+      ],
+      "retrieved": "739: Cybernetics\nidea of the invisible hand is as anticipation of the operation of the feedback mechanism in cybernetics. In the same book, Law, Legislation and Liberty, Hayek mentions, along with cyb",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who is the father of the father of the hydrogen bomb?",
+      "gold": [
+        "Max Teller"
+      ],
+      "retrieved": "544: \"George Washington Vanderbilt III\"\nGeorge Washington Vanderbilt III George Washington Vanderbilt III (September 23, 1914 – June 24, 1961) was a yachtsman and a scientific explorer who was a membe",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who was the father of the father of computer science?",
+      "gold": [
+        "Julius Mathison Turing"
+      ],
+      "retrieved": "2770: \"Massac, Kentucky\"\nThe racial makeup of the CDP was 94.80% White, 2.70% African American, 0.26% Native American, 0.85% Asian, 0.05% Pacific Islander, 0.23% from other races, and 1.11% from two o",
+      "em": 0.0,
+      "f1": 0.013114754098360656
+    },
+    {
+      "question": "Who was the father of the father of behaviorism?",
+      "gold": [
+        "Pickens Butler Watson"
+      ],
+      "retrieved": "546: \"George Tryon Harding\"\nthe basics of the newspaper business. George Tryon Harding George Tryon Harding II (June 12, 1843 – November 19, 1928), known as Tryon Harding (often misspelled \"\"Tyron\"\"),",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who was the father of the founder of modern human anatomy?",
+      "gold": [
+        "Anders van Wesel"
+      ],
+      "retrieved": "550: \"Barack Obama Sr.\"\nBarack Obama Sr. Barack Hussein Obama Sr. (; 18 June 1936 – 24 November 1982) was a Kenyan senior governmental economist and the father of Barack Obama, the 44th President of t",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What was the father of the last surviving Canadian father of Confederation?",
+      "gold": [
+        "Charles Tupper Sr."
+      ],
+      "retrieved": "2935: Two/Three\nTwo/Three Two/Three is Michigan musician Tadd Mullinix's second studio album under the Dabrye name. It was released by the Ghostly International label on June 13, 2006, around five yea",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When was the person who said “Now, I am become Death, the destroyer of worlds.” born?",
+      "gold": [
+        "April 22, 1904"
+      ],
+      "retrieved": "765: \"J. Robert Oppenheimer\"\nfrom one of John Donne's Holy Sonnets. According to the historian Gregg Herken, this naming could have been an allusion to Jean Tatlock, who had committed suicide a few mo",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who was the father of the father of information theory?",
+      "gold": [
+        "Claude Sr."
+      ],
+      "retrieved": "769: \"Claude Shannon\"\nevents. The initiative was announced in the History Panel at the 2015 IEEE Information Theory Workshop Jerusalem and the IEEE Information Theory Society Newsletter. A detailed li",
+      "em": 0.0,
+      "f1": 0.006389776357827477
+    },
+    {
+      "question": "When was the person who delivered the \"Quit India\" speech born?",
+      "gold": [
+        "October 2, 1869"
+      ],
+      "retrieved": "1686: DiffEngineX\nto align similar rows, but to ensure mismatched rows (with different identifiers) end up paired with blanks. This makes it easier to spot the addition of new rows and the deletion of",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When did the president who warned about the military industrial complex die?",
+      "gold": [
+        "March 28, 1969"
+      ],
+      "retrieved": "1248: \"Breezy Point, Minnesota\"\nThere were 899 housing units at an average density of 68.6 per square mile (26.5/km²). The racial makeup of the city was 98.16% White, 0.20% African American, 0.31% Nat",
+      "em": 0.0,
+      "f1": 0.007194244604316546
+    },
+    {
+      "question": "When did the president who said Tear Down This Wall die?",
+      "gold": [
+        "June 5, 2004"
+      ],
+      "retrieved": "760: \"Charles Tupper\"\ndied in April 1915. On October 30, 1915, in Bexleyheath, Tupper died. He was the last of the original Fathers of Confederation to die, and had lived the longest life of any Canad",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What is the lowest elevation of the longest railway tunnel?",
+      "gold": [
+        "312 m"
+      ],
+      "retrieved": "3412: \"Twomile Run\"\nthe Twomile Run watershed comes from baseflow. Above the swamp on Twomile Run, the discharge of the stream is 511 gallons per minute. Upstream of Middle Branch Twomile Run, the dis",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When did the person who said \"Cogito, ergo sum.\" die?",
+      "gold": [
+        "February 11, 1650"
+      ],
+      "retrieved": "2634: \"Canton, Kansas\"\nAccording to the United States Census Bureau, the city has a total area of , all of it land. As of the census of 2010, there were 748 people, 301 households, and 205 families re",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When did the person who delivered the Gettysburg Address die?",
+      "gold": [
+        "April 15, 1865"
+      ],
+      "retrieved": "798: \"Gettysburg College\"\na signal corps station and field hospital. Due to the geographic position it held, it was used by both Confederate and Union troops during the battle for signal work and surg",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who was governor of Florida during Hurricane Irma?",
+      "gold": [
+        "Rick Scott"
+      ],
+      "retrieved": "2930: Ambiguity\nbrackets are not allowed for grouping of expressions. Fortran, in addition, does not allow use of the same name (identifier) for different objects, for example, function and variable; ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "For which club did the winner of the 2007 Ballon d'Or play for in 2012?",
+      "gold": [
+        "Real Madrid"
+      ],
+      "retrieved": "1589: Newshub\n4 July 2011, 3 News revamped its presentation package starting with the early morning show of the time \"\"Firstline\"\", to have the \"\"floating tiles\"\" look, which was in use up till the la",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What's the capital city of the country that was the champion of the 2010 World Cup?",
+      "gold": [
+        "Madrid"
+      ],
+      "retrieved": "1007: \"The X Factor (UK series 12)\"\nsome of which take place during \"\"The X Factor‍\"\"s Saturday night slot. One option that was considered was to air a bumper show on Sunday nights on these weekends, ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When was the anime studio that made Sword Art Online founded?",
+      "gold": [
+        "May 9, 2005"
+      ],
+      "retrieved": "2296: \"Rice Township, Clearwater County, Minnesota\"\nRice Township, Clearwater County, Minnesota Rice Township is a township in Clearwater County, Minnesota, United States. The population was 134 at th",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who was the first king of the longest Chinese dynasty?",
+      "gold": [
+        "King Wu of Zhou"
+      ],
+      "retrieved": "828: \"History of the Ming dynasty\"\nwere several pretenders for the Ming throne, and their forces were divided. Each bastion of resistance was individually defeated by the Qing until 1662, when the las",
+      "em": 0.0,
+      "f1": 0.027586206896551724
+    },
+    {
+      "question": "Who was the last emperor of the dynasty that succeeded the Song dynasty?",
+      "gold": [
+        "Toghon Temür"
+      ],
+      "retrieved": "344: \"George I of Great Britain\"\nprime minister. Towards the end of his reign, actual political power was held by Robert Walpole, now recognised as Britain's first \"\"de facto\"\" prime minister. George ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What's the motto of the oldest California State university?",
+      "gold": [
+        "Powering Silicon Valley"
+      ],
+      "retrieved": "407: \"State Duma (Russian Empire)\"\nthe Progressive Bloc was formed, fearing Rasputin's influence over Tsarina Alexandra would increase. The Duma gathered on 9 February 1916 after the 76-year-old Ivan ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What's the capital of the state that the College of William & Mary is in?",
+      "gold": [
+        "Richmond"
+      ],
+      "retrieved": "837: \"College of William & Mary\"\nCollege of William & Mary The College of William & Mary (also known as William & Mary, W&M, and officially The College of William and Mary in Virginia) is a public res",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What's the capital of the state that Washington University in St. Louis is in?",
+      "gold": [
+        "Jefferson City"
+      ],
+      "retrieved": "1403: \"KAI KF-X\"\nKonkuk University, the KF-X is intended to be superior to the F-16 Fighting Falcon, replacing South Korea's aging F-4D/E Phantom II and F-5E/F Tiger II aircraft, with production numbe",
+      "em": 0.0,
+      "f1": 0.005865102639296187
+    },
+    {
+      "question": "What's the capital of the state that Harvard University is in?",
+      "gold": [
+        "Boston"
+      ],
+      "retrieved": "551: \"Barack Obama Sr.\"\nBarack II. She divorced him three years later. The elder Obama later went to Harvard University for graduate school, where he earned an M.A. in economics, and returned to Kenya",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What's the capital of the state that the Space Needle is at?",
+      "gold": [
+        "Olympia"
+      ],
+      "retrieved": "851: \"Gatlinburg Space Needle\"\ntheater. Gatlinburg Space Needle The Gatlinburg Space Needle is a tall observation tower in Gatlinburg, Tennessee, United States. The tower has an outdoor observation le",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Which team won in women's volleyball in the most recent Summer Olympics that was held in London?",
+      "gold": [
+        "Brazil"
+      ],
+      "retrieved": "857: \"Great Britain at the 2008 Summer Olympics\"\nGreat Britain at the 2008 Summer Olympics Great Britain, represented by the British Olympic Association (BOA), competed at the 2008 Summer Olympics in ",
+      "em": 0.0,
+      "f1": 0.006578947368421053
+    },
+    {
+      "question": "What is the nickname of the easternmost U.S. state?",
+      "gold": [
+        "Pine Tree State"
+      ],
+      "retrieved": "2107: \"K Foundation art award\"\ncollection of art works entitled \"\"Money - A Major Body of Cash\"\". The award, the exhibition and the accompanying extravagant press junket were widely reported by the me",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What is the nickname for the state that is the home to the “Avocado Capital of the World\"?",
+      "gold": [
+        "Golden State"
+      ],
+      "retrieved": "3871: \"2010 Paris–Nice\"\nnewly-taken lead in the mountains classification. With remaining, after the catch occurred, set a blistering pace at the front of the main field, trying to set up Nicolas Roche",
+      "em": 0.0,
+      "f1": 0.006191950464396284
+    },
+    {
+      "question": "What rocket was used for the mission that landed the first humans on the moon?",
+      "gold": [
+        "Saturn V"
+      ],
+      "retrieved": "659: \"Soyuz T-12\"\ncrew members, Kizim and Solovyov, were rescheduled elsewhere. They later became long-duration crew members of Salyut 7 EO-3, and Volk was scheduled fly in the passenger seat of a vis",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When did the war that Neil Armstrong served in end?",
+      "gold": [
+        "July 27, 1953"
+      ],
+      "retrieved": "495: \"Andhra Pradesh\"\nMagadha-area in northeastern India. A.K. Warder holds that \"the Mahāyāna originated in the south of India and almost certainly in the Andhra country.\" According to Xing, \"Several",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What is the nickname for the state that Mount Rainier is located in?",
+      "gold": [
+        "Evergreen State"
+      ],
+      "retrieved": "243: \"2007–08 BC Mures season\"\nout, the team did not get another win, cementing their position as eighth in the league. Major Squad changes after end of season The Romanian Basketball Federation decid",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When was the composer of Carol of the Bells born?",
+      "gold": [
+        "December 13, 1877"
+      ],
+      "retrieved": "882: Karolju\nKarolju Karolju is a suite of original Christmas carols for choir and orchestra by the American composer Christopher Rouse. The work was commissioned in 1989 by the Baltimore Symphony Orc",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who is the father of the scientist at MIT that won the Queen Elizabeth Prize for Engineering in 2013?",
+      "gold": [
+        "Conway Berners-Lee"
+      ],
+      "retrieved": "1096: Botswana\nand Swaziland in sub-Saharan African nations. This places Botswana at the third highest prevalence in the world, in 2013, while \"leading the way in prevention and treatment programmes\".",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who was the mother of the emperor of Japan during World War I?",
+      "gold": [
+        "Yanagiwara Naruko"
+      ],
+      "retrieved": "885: \"Henry Tizard\"\n(d. 1968), daughter of Arthur Prangley Wilson, a mining engineer. They had three sons: (John) Peter Mills Tizard, who became a professor of paediatrics at the University of London;",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Which element has an atomic number that is double that of hydrogen?",
+      "gold": [
+        "Helium"
+      ],
+      "retrieved": "744: \"J. Robert Oppenheimer\"\nconcerned about nuclear reactors being diverted from plutonium to tritium production. They were overridden by Truman, who announced a crash program after the Soviet Union ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What was the motto of the Olympics that had Fuwa as the mascots?",
+      "gold": [
+        "One World, One Dream"
+      ],
+      "retrieved": "1273: \"Afrim Taku\"\nwas considered to be an unexpected \"\"hero\"\" with his goals, leaving behind the strikers on the team. He had been activated every game for full 90 min, never suspended, substituted o",
+      "em": 0.0,
+      "f1": 0.006430868167202573
+    }
+  ]
+}

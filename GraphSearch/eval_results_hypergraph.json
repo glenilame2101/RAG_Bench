@@ -1,0 +1,1135 @@
+{
+  "retriever": "hypergraph",
+  "corpus": "C:\\Users\\gleni\\Desktop\\Knapp Projects\\RAG_Bench\\Search-o1\\data\\FlashRAG_datasets\\bamboogle\\test.jsonl",
+  "metrics": {
+    "em": 0.0,
+    "f1": 0.0010666666666666667
+  },
+  "details": [
+    {
+      "question": "Who was president of the United States in the year that Citibank was founded?",
+      "gold": [
+        "james madison"
+      ],
+      "retrieved": "Casilla Matt Tolbert finished season\nMatt Tolbert finished season\nwhere Open Canada following season\n---\n\"Binomial coefficient\"\nequals \"p\", where \"c\" is the number of carries when \"m\" and \"n\" are adde",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What rocket was the first spacecraft that ever approached Uranus launched on?",
+      "gold": [
+        "Titan IIIE"
+      ],
+      "retrieved": "Soccer League where Open Canada following\nloss Gator Bowl against West Virginia\nClassic After struggling Twins\n---\nThis was Coach Mitchell's seventh\nThe 11\"\"n\"\" different events we want to avoid corre",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "In what year was the company that was founded as Sound of Music added to the S&P 500?",
+      "gold": [
+        "1999"
+      ],
+      "retrieved": "Bowl against West Virginia Podlesh punts yards\nseason with club option 2011 worth million\nCanada following season played with division rivals\n---\n\"2011 Penn State Nittany Lions football team\"\nyards on",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who was the first African American mayor of the most populous city in the United States?",
+      "gold": [
+        "David Dinkins"
+      ],
+      "retrieved": "with Montreal's reserve team\nplayed youth football with Portuguese professional\nagainst West Virginia\n---\nFor a salt water swimmer, the lack of buoyancy was difficult to overcome\n\"1992 Alabama Crimson",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When did the last king from Britain's House of Hanover die?",
+      "gold": [
+        "20 June 1837"
+      ],
+      "retrieved": "Paul Piques Paul\nopener against Northern Illinois Podlesh\nwith club\n---\n\"Primavera Sound\"\nYo la Tengo, The Vaselines, Phoenix, Aphex Twin, Squarepusher, Andrew Bird and The Horrors\nDue to the increasi",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When did the president who set the precedent of a two term limit enter office?",
+      "gold": [
+        "April 30, 1789"
+      ],
+      "retrieved": "club option 2011 worth\nfinished season batting with over plate\nagainst Northern Illinois Podlesh season-high\n---\nIn the polynomial any rational root fully reduced would have to have a numerator that d",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When did the president who set the precedent of a two term limit leave office?",
+      "gold": [
+        "March 4, 1797"
+      ],
+      "retrieved": "Soccer League where Open Canada following season\nfinished season batting with over plate\nseason batting with over plate\n---\nDecimal\nnumbers that may be expressed as a fraction, the denominator of whic",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "How many people died in the second most powerful earthquake ever recorded?",
+      "gold": [
+        "131"
+      ],
+      "retrieved": "celebrity former soccer player over billion\nsecond\nseason played with\n---\nTo see this, imagine picking a point of each color randomly, with all points equally likely (i\nIn this case the solutions are ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Can people who have celiac eat camel meat?",
+      "gold": [
+        "Yes"
+      ],
+      "retrieved": "Montreal Impact\nWorld Baseball Classic After struggling Twins\ntwo-year deal with Twins worth\n---\nNote that the sum of the subscripts in a monomials is equal to the total number of elements\nOn 10 June ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What was the final book written by the author of On the Origin of Species?",
+      "gold": [
+        "The Formation of Vegetable Mould Through the Action of Worms"
+      ],
+      "retrieved": "Baseball Classic After struggling Twins\nPunto began losing time lineup\nGator Bowl against West Virginia Podlesh\n---\nThe distribution of Carmichael numbers by powers of 10 : In\n, the pyramid height is ",
+      "em": 0.0,
+      "f1": 0.1
+    },
+    {
+      "question": "When was the company that built the first steam locomotive to carry passengers on a public rail line founded?",
+      "gold": [
+        "1823"
+      ],
+      "retrieved": "where Open Canada following season played\nLeague where Open Canada following season played\nWest Virginia Podlesh punts yards 41–7 victory\n---\nPrimavera al Metro put on acts such as Internet 2 and The ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Which Theranos whistleblower is not related to a senior American government official?",
+      "gold": [
+        "Erika Cheung"
+      ],
+      "retrieved": "returning Canada play season with Montreal Impact\noption 2011 worth million\nFrom 2004 2006 Piques\n---\n\"\"October 8, 1922, at Triangle Park\"\" The Bulldogs' followed their victory with a 0–0 tie against ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What is the fastest air-breathing manned aircraft mostly made out of?",
+      "gold": [
+        "Titanium"
+      ],
+      "retrieved": "losing time lineup fellow Twin\nbase following struggles infielders\nYoutube over million combined\n---\nThe distribution of Carmichael numbers by powers of 10 : In\n\"Nick Punto\"\nTwins' primary shortstop",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who built the fastest air-breathing manned aircraft?",
+      "gold": [
+        "Lockheed Corporation"
+      ],
+      "retrieved": "2006 Piques played youth\n2006 Piques played youth football\nPaul Piques Paul\n---\nIn recognition of his successful season, Podlesh was named to the \"\"Jewish Sports Review\"\"’s 2005 College Football All-A",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When was the author of The Population Bomb born?",
+      "gold": [
+        "May 29, 1932"
+      ],
+      "retrieved": "Piques played youth football\nPiques played youth football with Portuguese\nPaul Piques\" Paul\n---\nOverall, in the 2005 season, Podlesh had 44 punts for 1,918 yards for a 43\nOverall, in his freshman seas",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When did the author of Annabel Lee enlist in the army?",
+      "gold": [
+        "1827"
+      ],
+      "retrieved": "opener against Northern\nyouth football with Portuguese professional\nplayed youth football\n---\nThe mayors of Girona, Manresa and Figueres organised special Renfe trains to Barcelona\nIn 2004 he joined t",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What was the religion of the inventor of the Polio vaccine?",
+      "gold": [
+        "Jewish"
+      ],
+      "retrieved": "Piques Paul Piques\nfrom disabled\nLeague where Open Canada following season played\n---\nIf \"\"A\"\" is a finite set, this analysis does not apply (the density of a finite set is zero)\nThere are eight color",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who was the second wife of the founder of CNN?",
+      "gold": [
+        "Jane Shirley Smith"
+      ],
+      "retrieved": "2008 season with club option\nseason-high yards 20–13 loss\nseason batting with over\n---\nTV announcers=Big Ten Network Matt Devlin, Glen Mason & Dionne Miller The third ranked Alabama Crimson Tide, coac",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When did the first prime minister of the Russian Empire come into office?",
+      "gold": [
+        "November 6, 1905"
+      ],
+      "retrieved": "played with Montreal's reserve team Trois-Rivières\nopener against Northern Illinois Podlesh season-high\nwith Montreal's reserve team Trois-Rivières\n---\nThe victory gave Piedmont (14-1) its second foot",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What is the primary male hormone derived from?",
+      "gold": [
+        "cholesterol"
+      ],
+      "retrieved": "Casilla Matt\n\"Nick Punto\" Twins' primary\nBaseball Classic After struggling Twins\n---\nThe \"primitive triples\" are the solutions where and\nThe grand final will be contested in mid",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "The Filipino statesman who established the government-in-exile during the outbreak of World War II was also the mayor of what city?",
+      "gold": [
+        "Quezon City"
+      ],
+      "retrieved": "football with Portuguese professional clubs\nBaseball Classic After struggling Twins\n2006 Piques played youth football with Portuguese\n---\n\"Margaret White Wrixon\"\n16, she came second, finding the lake ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Where was the person who shared the Nobel Prize in Physics in 1954 with Max Born born?",
+      "gold": [
+        "Oranienburg, Germany"
+      ],
+      "retrieved": "with club option 2011 worth million\nseason with club option 2011 worth million\nprimary\n---\n\"Athletics at the 1964 Summer Olympics – Men's 4 × 100 metres relay\"\noff to Bob Hayes 3 meters behind France'",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When was the person who shared the Nobel Prize in Physics in 1954 with Max Born born?",
+      "gold": [
+        "January 8, 1891"
+      ],
+      "retrieved": "season with club option 2011 worth million\nwith club option 2011 worth million\nseason with club option 2011 worth\n---\nThree such representations of the number 17, for example, are shown below: The the",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What was the founding date of the university in which Plotonium was discovered?",
+      "gold": [
+        "March 23, 1868"
+      ],
+      "retrieved": "losing time lineup fellow Twin\nopener against Northern\nfrom disabled\n---\nThe distribution of Carmichael numbers by powers of 10 : In\n, the pyramid height is zero)",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "The material out of which the Great Sphinx of Giza is made of is mainly composed of what mineral?",
+      "gold": [
+        "calcite"
+      ],
+      "retrieved": "with club option 2011 worth million Punto\nclub option 2011 worth million Punto\nwith club option 2011 worth million\n---\nExpressed as a fully reduced fraction, the decimal numbers are those, whose denom",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "The husband of Lady Godiva was Earl of which Anglic kingdom?",
+      "gold": [
+        "Mercia"
+      ],
+      "retrieved": "2006 Piques played youth football with Portuguese\nseason with club option\nSoccer League where Open Canada following season\n---\nThe formula for the semiperimeter of a quadrilateral with side lengths \"\"",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "The machine used to extract honey from honeycombs uses which physical force?",
+      "gold": [
+        "Centrifugal Force"
+      ],
+      "retrieved": "West Virginia Podlesh punts yards 41–7\nWest Virginia Podlesh punts yards 41–7 victory\nagainst West Virginia Podlesh punts yards 41–7\n---\nThis can be seen from the area formula \"πr\" and the circumferen",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What is the third letter of the top level domain of the military?",
+      "gold": [
+        "l"
+      ],
+      "retrieved": "Bowl against West Virginia Podlesh punts yards\nagainst West Virginia Podlesh punts yards\nWest Virginia Podlesh punts yards\n---\nThe first few values are \"\"a\"\" = 1\nThe distribution of Carmichael numbers",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "In what year was the government department where the internet originated at founded?",
+      "gold": [
+        "1947"
+      ],
+      "retrieved": "Twins' primary shortstop Punto signed two-year\nfinished season batting with\nfinished season batting with over plate\n---\n\"Binomial coefficient\"\nequals \"p\", where \"c\" is the number of carries when \"m\" a",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "The main actor of Indiana Jones is a licensed what?",
+      "gold": [
+        "pilot"
+      ],
+      "retrieved": "following season played with division rivals Italia\ndirector internet celebrity former soccer\nstruggles infielders Alexi Casilla Matt Tolbert\n---\n\"\"at Elk's Field, Akron, Ohio\"\" Scoring Drives: \"\"at C",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When was the person after which the Hubble Space Telescope is named after born?",
+      "gold": [
+        "November 20, 1889"
+      ],
+      "retrieved": "million following 2008 season with club\nfollowing 2008 season\n2003 season\n---\nNorth Carolina State countered with a 90-yard kickoff return for a touchdown by Gregory Golden, but the Panthers then scor",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When did the person who gave the Checkers speech die?",
+      "gold": [
+        "April 22, 1994"
+      ],
+      "retrieved": "After struggling Twins regular shortstop 2009\nover million combined followers From 2004\n\"Adam Podlesh\" 2003 season opener against Northern\n---\nThen Mississippi State caught a break, picking off a Bark",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When was the philosopher that formulated the hard problem of consciousness born?",
+      "gold": [
+        "April 20, 1966"
+      ],
+      "retrieved": "where Open Canada following season played with\n2006 Piques played youth football with Portuguese\nMontreal Impact 2007 played\n---\n\"Primavera Sound\"\nYo la Tengo, The Vaselines, Phoenix, Aphex Twin, Squa",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What is the capital of the second largest state in the US by area?",
+      "gold": [
+        "Austin"
+      ],
+      "retrieved": "Baseball Classic After struggling Twins regular shortstop\nloss Gator Bowl against West Virginia\nPiques played youth football with\n---\nThe first few values are \"\"a\"\" = 1\nThe \"primitive triples\" are the",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What is the maximum airspeed (in km/h) of the third fastest bird?",
+      "gold": [
+        "320 km/h"
+      ],
+      "retrieved": "Bowl against West Virginia Podlesh punts yards\nplay season with Montreal\nTwins' primary shortstop Punto\n---\nThe centers of these three circles fall on a single line (the Lemoine line)\nThe lower sectio",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who founded the city where the founder of geometry lived?",
+      "gold": [
+        "Alexander the Great"
+      ],
+      "retrieved": "with Twins\nMontreal Impact\n\"Adam Podlesh\" 2003 season\n---\nThe club set 14 offensive team records in 2002, including Khari Jones throwing for a team record 46 touchdowns and slotback Milt Stegall catch",
+      "em": 0.0,
+      "f1": 0.03333333333333333
+    },
+    {
+      "question": "What is the capital of the country where yoga originated?",
+      "gold": [
+        "New Delhi"
+      ],
+      "retrieved": "Bowl against West Virginia Podlesh punts yards\n\"Nick Punto\"\nPiques played youth football with\n---\nThe values of \"\"r\"\"(\"\"n\"\")/\"\"n\"\"\nThe first few values are \"\"a\"\" = 1",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "The fourth largest city in Germany was originally called what?",
+      "gold": [
+        "Colonia Claudia Ara Agrippinensium"
+      ],
+      "retrieved": "opener against Northern Illinois Podlesh season-high eight\nMontreal\ndeal with Twins worth million\n---\nThe top four teams from the round-robin stage progress to the finals stage, played over three week",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When did Nirvana's second most selling studio album come out?",
+      "gold": [
+        "September 13, 1993"
+      ],
+      "retrieved": "Soccer League where Open Canada following season\ndirector internet celebrity former soccer\nseason with club option\n---\nHead coach Joe Paterno, still recovering from injuries sustained in a practice co",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What was the job of the father of the founder of psychoanalysis?",
+      "gold": [
+        "wool merchant"
+      ],
+      "retrieved": "losing time lineup fellow Twin Brendan Harris\nBaseball Classic After struggling Twins\ntime lineup fellow Twin Brendan Harris\n---\n\"Nick Punto\"\nTwins' primary shortstop\nWhen formula_47, we have so we fi",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "How much protein in four boiled egg yolks?",
+      "gold": [
+        "10.8"
+      ],
+      "retrieved": "over billion views Youtube\nPodlesh season-high eight punts season-high\nBowl against West Virginia Podlesh punts yards\n---\nDraw lines from the center of the cube to each of the 8 vertices\nIf two or mor",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What is the political party of the American president who entered into the Paris agreement?",
+      "gold": [
+        "Democratic Party"
+      ],
+      "retrieved": "2011 worth million Punto represented Team\nfootball with Portuguese professional clubs\n2003 season opener against Northern\n---\nThat seems to be the magic number, even for a new starting-off band\nTeams ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "The most populous city in Punjab is how large (area wise)?",
+      "gold": [
+        "310 square kilometers"
+      ],
+      "retrieved": "played with division rivals Italia\nItaly 2009 World\n\"Jon Paul Piques\"\n---\nThe match played on the top table between Serbia and India ended 2-2\nIf \"\"A\"\" has \"\"k\"\" elements whose greatest common divisor",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What was the death toll of the second largest volcanic eruption in the 20th century?",
+      "gold": [
+        "847"
+      ],
+      "retrieved": "2003 season opener against Northern\nMatt Tolbert finished season batting\nBowl against West Virginia Podlesh punts yards\n---\nIf \"\"A\"\" is a finite set, this analysis does not apply (the density of a fin",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What was the death toll of the most intense Atlantic hurricane?",
+      "gold": [
+        "52"
+      ],
+      "retrieved": "loss Gator Bowl against West\nagainst Northern\nloss Gator Bowl against West Virginia\n---\nIf \"\"A\"\" is a finite set, this analysis does not apply (the density of a finite set is zero)\n, the pyramid heigh",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who was the head of NASA during Apollo 11?",
+      "gold": [
+        "Thomas O. Paine"
+      ],
+      "retrieved": "where Open\nSoccer League where Open Canada following season\ninfielders\n---\nFor instance, from the pair formula_78, we compute and we can check that this satisfies formula_80\nOn May 4, 2013, Head Coach",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who is the father of the father of George Washington?",
+      "gold": [
+        "Lawrence Washington"
+      ],
+      "retrieved": "Twins' primary shortstop Punto signed two-year\nBowl against West Virginia Podlesh\nwhere Open Canada following season played with\n---\n\"Primavera Sound\"\nYo la Tengo, The Vaselines, Phoenix, Aphex Twin, ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who is the mother of the father of George Washington?",
+      "gold": [
+        "Mildred Warner"
+      ],
+      "retrieved": "celebrity former soccer player over billion views\nfinished season batting with\ncelebrity former soccer player over billion\n---\n\"Primavera Sound\"\nYo la Tengo, The Vaselines, Phoenix, Aphex Twin, Square",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who is the father of the father of Barack Obama?",
+      "gold": [
+        "Hussein Onyango Obama"
+      ],
+      "retrieved": "finished season batting with\nSoccer League where Open Canada following\nTolbert finished season batting with over\n---\n\"Nick Punto\"\nTwins' primary shortstop\nHead coach Joe Paterno, still recovering from",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who is the mother of the father of Barack Obama?",
+      "gold": [
+        "Habiba Akumu Nyanjango"
+      ],
+      "retrieved": "finished season batting with\nTolbert finished season batting with over\nSoccer League where Open Canada following\n---\nIn 2004 he joined the Hamilton Tiger-Cats as the team's receivers coach and stayed ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who was mayor of New York City when Fiorello H. La Guardia was born?",
+      "gold": [
+        "William Russell Grace"
+      ],
+      "retrieved": "returning from disabled\nLeague where Open Canada following season played\nwith club option 2011 worth million\n---\n\"Athletics at the 1964 Summer Olympics – Men's 4 × 100 metres relay\"\noff to Bob Hayes 3",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who was president of the U.S. when superconductivity was discovered?",
+      "gold": [
+        "William Howard Taft"
+      ],
+      "retrieved": "2009 World Baseball Classic After struggling Twins\nwith Montreal's reserve team Trois-Rivières\nSoccer League where Open Canada following season\n---\n3 meters behind Hayes, Poland's Marian Dudziak was a",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When was the person Russ Hanneman is based on born?",
+      "gold": [
+        "July 31, 1958"
+      ],
+      "retrieved": "2009 World Baseball Classic After struggling Twins\nwith club option 2011 worth million\nTwin Brendan\n---\n\"Primavera Sound\"\nYo la Tengo, The Vaselines, Phoenix, Aphex Twin, Squarepusher, Andrew Bird and",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When was the first location of the world's largest coffeehouse chain opened?",
+      "gold": [
+        "March 30, 1971"
+      ],
+      "retrieved": "Canadian Soccer League where Open Canada following\nTrois-Rivières Attak Canadian Soccer League where Open\nshortstop Punto signed two-year deal with Twins\n---\nCambridge made the better start and held a",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who directed the highest grossing film?",
+      "gold": [
+        "James Cameroon"
+      ],
+      "retrieved": "yards 20–13 loss Gator Bowl\nworth million\nwith Twins worth million\n---\nOn May 4, 2013, Head Coach Mark Mitchell led the Piedmont High School Boys Track and Field Team to the 2013 AHSAA 3A Track & Fiel",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When was the longest bridge in the world opened?",
+      "gold": [
+        "30 June 2011"
+      ],
+      "retrieved": "Punto re-inserted into\nBowl against West\nseason with club option\n---\nThe reason is that when each division occurs, the intermediate result that is produced is itself a binomial coefficient, so no rema",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Which company was responsible for the largest pharmaceutical settlement?",
+      "gold": [
+        "GlaxoSmithKline"
+      ],
+      "retrieved": "season-high eight punts season-high yards 20–13 loss\nopener against Northern Illinois Podlesh season-high eight\nyards 20–13 loss Gator Bowl\n---\nTV announcers=Big Ten Network Matt Devlin, Glen Mason & ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "In what year was the tallest self-supporting tower completed?",
+      "gold": [
+        "2012"
+      ],
+      "retrieved": "Canada following season played with\nfinished season batting with over\nSporting Braga before returning\n---\nThe largest equilateral triangle inscribed in a Reuleaux triangle is the one connecting its th",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "In what year was the tallest fixed steel structure completed?",
+      "gold": [
+        "1988"
+      ],
+      "retrieved": "Podlesh\" 2003 season\nBowl against West Virginia Podlesh punts yards\nCanada following season played with\n---\n\"2011 Penn State Nittany Lions football team\"\nyards on 12 carries scored two touchdowns\nThe ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "In what year was the tallest lattice tower completed?",
+      "gold": [
+        "2012"
+      ],
+      "retrieved": "opener against Northern Illinois Podlesh season-high eight\n2009 World Baseball Classic\ncelebrity former soccer player over billion views\n---\n\"2012 ANZ Championship season\"\na second time, with one bye ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "In what year was the current tallest wooden lattice tower completed?",
+      "gold": [
+        "1935"
+      ],
+      "retrieved": "Open Canada following season played with\nCanada following season played with\nopener against Northern Illinois Podlesh season-high eight\n---\n\"2011 Penn State Nittany Lions football team\"\nyards on 12 ca",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "In what country is the second tallest statue in the world?",
+      "gold": [
+        "China"
+      ],
+      "retrieved": "opener against Northern Illinois Podlesh season-high eight\n\"Adam Podlesh\" 2003 season\nNorthern Illinois Podlesh season-high eight punts season-high\n---\n\"2011 Penn State Nittany Lions football team\"\nya",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When was the tallest ferris wheel in the world completed?",
+      "gold": [
+        "2021"
+      ],
+      "retrieved": "Soccer League where Open Canada following season\nwhere Open\nopener against Northern Illinois Podlesh\n---\nIt was a British Long Distance Swimming Association (BLDSA) race, and age\n\"Binomial coefficient",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "In what year was the tallest lighthouse completed?",
+      "gold": [
+        "1902"
+      ],
+      "retrieved": "Canada following season played with\nopener against Northern Illinois Podlesh season-high eight\nwith Montreal Impact\n---\n\"2011 Penn State Nittany Lions football team\"\nyards on 12 carries scored two tou",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "In what country is the world largest desalination plant?",
+      "gold": [
+        "Saudi Arabia"
+      ],
+      "retrieved": "Impact 2007 played with Montreal's reserve\npunts season-high yards 20–13\nWest Virginia Podlesh punts yards 41–7 victory\n---\nIn those days of no GPS, her coach had come to trust this famous Dover pilot",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "The most populous national capital city was established in what year?",
+      "gold": [
+        "1045 BC"
+      ],
+      "retrieved": "opener against Northern\nPodlesh\" 2003 season opener against Northern Illinois\nopener against Northern Illinois\n---\nThe following season, he played with division rivals the Italia Shooters, where he wo",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "The third largest river (by discharge) in the world is in what countries?",
+      "gold": [
+        "India and Bangladesh"
+      ],
+      "retrieved": "over million combined followers From 2004\nAfter struggling Twins regular shortstop 2009\nover million combined followers From 2004 2006\n---\nTherefore, it suffices to find the distance \"\"x\"\" or \"\"x\"\" fr",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What is the highest elevation (in meters) of the second largest island in the world?",
+      "gold": [
+        "4,884 m"
+      ],
+      "retrieved": "Twins' primary shortstop Punto\nMontreal Impact\nCanada following season played with division rivals\n---\nThe centers of these three circles fall on a single line (the Lemoine line)\n\"Primavera Sound\"\nYo ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What is the length of the second deepest river in the world?",
+      "gold": [
+        "6,300 km"
+      ],
+      "retrieved": "Canada following season played with division rivals\nover million combined followers From\nWest Virginia Podlesh punts yards 41–7\n---\nThe only restriction is that the mechanism prevents a 180 degree rot",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "In what country is the third largest stadium in the world?",
+      "gold": [
+        "United States"
+      ],
+      "retrieved": "into regular lineup second base following\nAfter struggling Twins\ninfielders\n---\nThe mayors of Girona, Manresa and Figueres organised special Renfe trains to Barcelona\nThe area of a regular polygon is ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who is the largest aircraft carrier in the world is named after?",
+      "gold": [
+        "Gerald R. Ford"
+      ],
+      "retrieved": "Open Canada following season played with\nopener against Northern Illinois Podlesh season-high eight\nfinished season batting with\n---\n\"2011 Penn State Nittany Lions football team\"\nyards on 12 carries s",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "In what year did the oldest cat ever recorded with the Cat of the Year award?",
+      "gold": [
+        "1999"
+      ],
+      "retrieved": "signed two-year deal with Twins\nwith Twins worth million following\nPunto signed two-year deal with Twins\n---\nConsequently, the two tetrahedrons are restricted to show only 4 of the eight colors at a t",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "In what year was the country that is the third largest exporter of coffee founded?",
+      "gold": [
+        "1810"
+      ],
+      "retrieved": "where Open Canada following season played with\nfinished season batting with over plate\nopener against Northern Illinois Podlesh\n---\n3 meters behind Hayes, Poland's Marian Dudziak was able to out lean ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who was the commander for the space mission that had the first spacewalk?",
+      "gold": [
+        "Pavel Belyayev"
+      ],
+      "retrieved": "Tolbert finished season batting with\ncelebrity former\nwhere Open\n---\nIn 2004 he joined the Hamilton Tiger-Cats as the team's receivers coach and stayed with the team for two years until rejoining the ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who is the predecessor of the longest-reigning British monarch?",
+      "gold": [
+        "George VI\n"
+      ],
+      "retrieved": "with Montreal Impact\nwith club option 2011 worth million\nseason with club option 2011 worth million\n---\n\"\"October 8, 1922, at Triangle Park\"\" The Bulldogs' followed their victory with a 0–0 tie agains",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "In 2016, who was the host of the longest running talk show?",
+      "gold": [
+        "Jimmy Fallon"
+      ],
+      "retrieved": "Soccer League where Open Canada following season\nBaseball\nMontreal Impact 2007 played\n---\nCambridge made the better start and held a slight lead, but after passing the Mile Post level, OUWBC made a pu",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "In 2016, who was the host of the longest running American game show?",
+      "gold": [
+        "Drew Carey"
+      ],
+      "retrieved": "Podlesh season-high eight punts season-high\ncombined followers From 2004 2006 Piques played\nTwins regular shortstop 2009 Punto began\n---\nThe top four teams from the round-robin stage progress to the f",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who wrote the novel on which the longest running show in Broadway history is based on?",
+      "gold": [
+        "Gaston Leroux"
+      ],
+      "retrieved": "Punto signed two-year deal with Twins worth\nwith Twins worth million following\nBowl against West Virginia Podlesh\n---\nThe Bulldogs scored 81 points to outpace runner-up Trinity Presbyterian, which sco",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "In what country was the only cruise line that flies the American flag incorporated in?",
+      "gold": [
+        "Bermuda"
+      ],
+      "retrieved": "with club option 2011 worth\nopener against Northern Illinois Podlesh\nclub option 2011 worth\n---\nThese combinations (subsets) are enumerated by the 1 digits of the set of base 2 numbers counting from 0",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "In what year did work begin on the second longest road tunnel in the world?",
+      "gold": [
+        "1992"
+      ],
+      "retrieved": "season with club option\nfinished season batting with over plate\nfinished season batting with over\n---\n2 feet to the mile and was built 11 feet wide on the\nThe lower section of the ditch extends from t",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What is the official color of the third oldest surviving university?",
+      "gold": [
+        "Cambridge Blue"
+      ],
+      "retrieved": "Bowl against West Virginia Podlesh punts yards\nPiques played youth football with\nreturning from disabled\n---\nThe distribution of Carmichael numbers by powers of 10 : In\nThe BrainTwist consists of 12 c",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who succeeded the longest reigning Roman emperor?",
+      "gold": [
+        "Tiberius"
+      ],
+      "retrieved": "where Open Canada following season played with\nSoccer League where Open Canada following season\nlineup second base following struggles infielders\n---\n\"Primavera Sound\"\nYo la Tengo, The Vaselines, Phoe",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who preceded the Roman emperor that declared war on the sea?",
+      "gold": [
+        "Tiberius"
+      ],
+      "retrieved": "Soccer League where Open Canada following season\nPiques played youth football\nImpact 2007 played with Montreal's reserve team\n---\n\"Primavera Sound\"\nPrimavera als Clubs filled various venues around tow",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who produced the longest running video game franchise?",
+      "gold": [
+        "MECC"
+      ],
+      "retrieved": "2004 2006 Piques played\npunts season-high yards 20–13 loss Gator\neight punts season-high yards 20–13 loss Gator\n---\nThe club set 14 offensive team records in 2002, including Khari Jones throwing for a",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who was the father of the father of psychoanalysis?",
+      "gold": [
+        "Jacob Freud"
+      ],
+      "retrieved": "with Twins\nplayed with Montreal's\nprimary\n---\nAmong all quadrilaterals, the shape that has the greatest ratio of its perimeter to its diameter is an equidiagonal kite with angles π/3, 5π/12, 5π/6, and",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who was the father of the father of empiricism?",
+      "gold": [
+        "Sir Nicholas Bacon"
+      ],
+      "retrieved": "Podlesh season-high eight punts season-high yards 20–13\nfinished season batting with\nSoccer League where Open Canada following season\n---\n\"Athletics at the 1964 Summer Olympics – Men's 4 × 100 metres ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who is the father of the father of observational astronomy?",
+      "gold": [
+        "Vincenzo Galilei"
+      ],
+      "retrieved": "opener against Northern Illinois Podlesh season-high\nagainst Northern Illinois Podlesh season-high\nseason batting with\n---\nDecimal\nnumbers that may be expressed as a fraction, the denominator of which",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who is the father of the father of modern Hebrew?",
+      "gold": [
+        "Yehuda Leib"
+      ],
+      "retrieved": "opener against Northern Illinois Podlesh season-high\nopener against Northern Illinois Podlesh season-high eight\nopener against Northern Illinois Podlesh\n---\n2 feet to the mile and was built 11 feet wi",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who is the father of the father of modern experimental psychology?",
+      "gold": [
+        "Maximilian Wundt"
+      ],
+      "retrieved": "2009 World Baseball Classic After struggling Twins\nTwins' primary shortstop Punto signed two-year\nPodlesh season-high eight punts season-high yards 20–13\n---\n\"Athletics at the 1964 Summer Olympics – M",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who is the father of the originator of cybernetics?",
+      "gold": [
+        "Leo Wiener"
+      ],
+      "retrieved": "with club option 2011 worth million Punto\nPodlesh season-high eight punts season-high yards 20–13\nwhere Open Canada following season played\n---\nIf \"A\", \"B\", and \"C\" are as above, then the circle of Ap",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who is the father of the father of the hydrogen bomb?",
+      "gold": [
+        "Max Teller"
+      ],
+      "retrieved": "finished season batting with\nwith Twins\nwhere Open Canada following season played with\n---\n\"Nick Punto\"\nTwins' primary shortstop\n\"Athletics at the 1964 Summer Olympics – Men's 4 × 100 metres relay\"\nof",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who was the father of the father of computer science?",
+      "gold": [
+        "Julius Mathison Turing"
+      ],
+      "retrieved": "opener against Northern Illinois Podlesh season-high eight\n20–13 loss\nPodlesh\" 2003 season opener against Northern\n---\n\"Adam Podlesh\"\n2003, in the season opener against Northern Illinois, Podlesh had ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who was the father of the father of behaviorism?",
+      "gold": [
+        "Pickens Butler Watson"
+      ],
+      "retrieved": "with Twins\nopener against Northern Illinois Podlesh season-high eight\nPodlesh season-high eight punts season-high yards 20–13\n---\n\"Athletics at the 1964 Summer Olympics – Men's 4 × 100 metres relay\"\no",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who was the father of the founder of modern human anatomy?",
+      "gold": [
+        "Anders van Wesel"
+      ],
+      "retrieved": "\"Adam Podlesh\" 2003 season\nfinished season batting with\nBowl against West Virginia Podlesh\n---\n\"Nick Punto\"\nTwins' primary shortstop\nIn 2004 he joined the Hamilton Tiger-Cats as the team's receivers c",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What was the father of the last surviving Canadian father of Confederation?",
+      "gold": [
+        "Charles Tupper Sr."
+      ],
+      "retrieved": "losing time lineup fellow Twin\nfrom disabled\nBaseball Classic After struggling Twins\n---\nThe grand final will be contested in mid\nMore generally, when casting out nines by summing digits, any set of d",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When was the person who said “Now, I am become Death, the destroyer of worlds.” born?",
+      "gold": [
+        "April 22, 1904"
+      ],
+      "retrieved": "over million combined followers From 2004\nPaul Piques Paul\nClassic After struggling Twins regular shortstop 2009\n---\nThe third Carmichael number (1729) is the Hardy-Ramanujan Number: the smallest numb",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who was the father of the father of information theory?",
+      "gold": [
+        "Claude Sr."
+      ],
+      "retrieved": "season with club option\nWest Virginia Podlesh punts yards 41–7 victory\nbatting with over plate\n---\n\"Binomial coefficient\"\nequals \"p\", where \"c\" is the number of carries when \"m\" and \"n\" are added in b",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When was the person who delivered the \"Quit India\" speech born?",
+      "gold": [
+        "October 2, 1869"
+      ],
+      "retrieved": "where Open Canada following season played with\nopener against Northern Illinois Podlesh season-high\n2006 Piques played youth football with Portuguese\n---\n\"Primavera Sound\"\nYo la Tengo, The Vaselines, ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When did the president who warned about the military industrial complex die?",
+      "gold": [
+        "March 28, 1969"
+      ],
+      "retrieved": "infielders Alexi Casilla Matt Tolbert\nformer soccer player over billion views\nMontreal Impact\n---\nIn the Gator Bowl against West Virginia, Podlesh had two punts for 67 yards in the 41–7 victory\nThe ce",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When did the president who said Tear Down This Wall die?",
+      "gold": [
+        "June 5, 2004"
+      ],
+      "retrieved": "celebrity former soccer player over billion views\nPodlesh\" 2003 season opener against Northern\nPodlesh\" 2003 season opener against\n---\nThe most interesting match of the fourth round was the clash betw",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What is the lowest elevation of the longest railway tunnel?",
+      "gold": [
+        "312 m"
+      ],
+      "retrieved": "with over plate\nLeague where\nplay season with Montreal Impact\n---\nThe centers of these three circles fall on a single line (the Lemoine line)\nThe distribution of Carmichael numbers by powers of 10 : I",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When did the person who said \"Cogito, ergo sum.\" die?",
+      "gold": [
+        "February 11, 1650"
+      ],
+      "retrieved": "Paul Piques Paul\nPodlesh\" 2003 season\ncombined followers\n---\nThe third Carmichael number (1729) is the Hardy-Ramanujan Number: the smallest number that can be expressed as the sum of two cubes (of pos",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When did the person who delivered the Gettysburg Address die?",
+      "gold": [
+        "April 15, 1865"
+      ],
+      "retrieved": "season opener against Northern Illinois Podlesh\nseason-high yards 20–13 loss Gator Bowl\nPunto signed two-year deal\n---\n3 meters behind Hayes, Poland's Marian Dudziak was able to out lean Delecour for ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who was governor of Florida during Hurricane Irma?",
+      "gold": [
+        "Rick Scott"
+      ],
+      "retrieved": "against Northern Illinois\nSoccer League where Open Canada following season\nopener against Northern Illinois\n---\n\"\"October 15, 1922, at Lakeside Park\"\" The Bulldog's week 3 opponent was the Oorang Indi",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "For which club did the winner of the 2007 Ballon d'Or play for in 2012?",
+      "gold": [
+        "Real Madrid"
+      ],
+      "retrieved": "shortstop 2009\nworth million following 2008 season with club\nmillion following 2008 season with club option\n---\nAfter struggling as the Twins regular shortstop in 2009, Punto began losing time in the ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What's the capital city of the country that was the champion of the 2010 World Cup?",
+      "gold": [
+        "Madrid"
+      ],
+      "retrieved": "professional clubs Sporting Braga\nWorld Baseball\n\"Jon Paul\n---\n, the pyramid height is zero)\nThe United States' Bob Hayes ran the final 100m of the relay in a record 8",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When was the anime studio that made Sword Art Online founded?",
+      "gold": [
+        "May 9, 2005"
+      ],
+      "retrieved": "director internet celebrity former soccer\nstruggles infielders Alexi Casilla Matt Tolbert\nTrois-Rivières Attak Canadian Soccer League where Open\n---\nTournament rules do not allow draws; matches that a",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who was the first king of the longest Chinese dynasty?",
+      "gold": [
+        "King Wu of Zhou"
+      ],
+      "retrieved": "over million combined\nover billion\ncelebrity former soccer player over billion\n---\n\"Primavera Sound\"\nYo la Tengo, The Vaselines, Phoenix, Aphex Twin, Squarepusher, Andrew Bird and The Horrors\nIn our e",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who was the last emperor of the dynasty that succeeded the Song dynasty?",
+      "gold": [
+        "Toghon Temür"
+      ],
+      "retrieved": "Canada following season played\nreturning from\n2008 season with club option 2011 worth\n---\n\"Binomial coefficient\"\nequals \"p\", where \"c\" is the number of carries when \"m\" and \"n\" are added in base \"p\"\n3",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What's the motto of the oldest California State university?",
+      "gold": [
+        "Powering Silicon Valley"
+      ],
+      "retrieved": "Piques Paul Piques\nWest Virginia Podlesh\nseason-high yards 20–13 loss Gator Bowl against\n---\nFor the ellipse formula_213 the intersection points of \"orthogonal\" tangents lie on the circle formula_214\n",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What's the capital of the state that the College of William & Mary is in?",
+      "gold": [
+        "Richmond"
+      ],
+      "retrieved": "loss Gator Bowl against West Virginia\nwith Montreal's reserve team\nworth million Punto represented Team\n---\nThe distribution of Carmichael numbers by powers of 10 : In\nThe first few values are \"\"a\"\" =",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What's the capital of the state that Washington University in St. Louis is in?",
+      "gold": [
+        "Jefferson City"
+      ],
+      "retrieved": "Bowl against West Virginia Podlesh punts yards\nloss Gator Bowl against West Virginia\nBaseball Classic After struggling Twins regular shortstop\n---\nIf two or more teams have the same number of points, ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What's the capital of the state that Harvard University is in?",
+      "gold": [
+        "Boston"
+      ],
+      "retrieved": "Piques played youth football with\nBaseball Classic After struggling Twins regular shortstop\nloss Gator Bowl against West Virginia\n---\nThe first few values are \"\"a\"\" = 1\nThe \"primitive triples\" are the",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What's the capital of the state that the Space Needle is at?",
+      "gold": [
+        "Olympia"
+      ],
+      "retrieved": "Bowl against West Virginia Podlesh punts yards\n\"Nick Punto\"\nPiques played youth football with\n---\nThe first few values are \"\"a\"\" = 1\nThe \"primitive triples\" are the solutions where and",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Which team won in women's volleyball in the most recent Summer Olympics that was held in London?",
+      "gold": [
+        "Brazil"
+      ],
+      "retrieved": "professional clubs Sporting Braga before returning\nLeague where Open Canada following season played\nOpen Canada following season played\n---\nThis round is played best-out-of-three games, for a team to ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What is the nickname of the easternmost U.S. state?",
+      "gold": [
+        "Pine Tree State"
+      ],
+      "retrieved": "losing time lineup fellow Twin\n\"Nick Punto\" Twins' primary shortstop\nBaseball Classic After struggling Twins regular shortstop\n---\nThe distribution of Carmichael numbers by powers of 10 : In\n, the pyr",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What is the nickname for the state that is the home to the “Avocado Capital of the World\"?",
+      "gold": [
+        "Golden State"
+      ],
+      "retrieved": "Bowl against West Virginia Podlesh punts yards\nloss Gator Bowl against West Virginia\nBaseball Classic After struggling Twins\n---\nThe distribution of Carmichael numbers by powers of 10 : In\n\"Paul LaPol",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What rocket was used for the mission that landed the first humans on the moon?",
+      "gold": [
+        "Saturn V"
+      ],
+      "retrieved": "Bowl against West Virginia Podlesh punts yards\nworth million Punto represented Team\nMontreal's\n---\nThe \"primitive triples\" are the solutions where and\nThe first few values are \"\"a\"\" = 1",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When did the war that Neil Armstrong served in end?",
+      "gold": [
+        "July 27, 1953"
+      ],
+      "retrieved": "Soccer League where Open Canada following\nPodlesh season-high eight punts season-high yards 20–13\nmillion following 2008 season with club\n---\nPoints ratio Match won 3–0 or 3–1: 3 match points for the ",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What is the nickname for the state that Mount Rainier is located in?",
+      "gold": [
+        "Evergreen State"
+      ],
+      "retrieved": "base following struggles infielders\nmillion Punto represented Team\nPiques played youth football with\n---\nThe \"primitive triples\" are the solutions where and\nThe first few values are \"\"a\"\" = 1",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "When was the composer of Carol of the Bells born?",
+      "gold": [
+        "December 13, 1877"
+      ],
+      "retrieved": "returning from disabled\nSoccer League where Open Canada following season\nfinished season batting with\n---\n\"Primavera Sound\"\nYo la Tengo, The Vaselines, Phoenix, Aphex Twin, Squarepusher, Andrew Bird a",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who is the father of the scientist at MIT that won the Queen Elizabeth Prize for Engineering in 2013?",
+      "gold": [
+        "Conway Berners-Lee"
+      ],
+      "retrieved": "season with club option 2011 worth\nseason with club option 2011 worth million\n2008 season with club option 2011 worth\n---\nHumpy Koneru and Harika Dronavalli won their games on the first two boards for",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Who was the mother of the emperor of Japan during World War I?",
+      "gold": [
+        "Yanagiwara Naruko"
+      ],
+      "retrieved": "second\nlosing time\n\"Nick Punto\" Twins' primary shortstop Punto signed\n---\nCambridge made the better start and held a slight lead, but after passing the Mile Post level, OUWBC made a push to hold a hal",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "Which element has an atomic number that is double that of hydrogen?",
+      "gold": [
+        "Helium"
+      ],
+      "retrieved": "2006 Piques played youth football with\nwith club option 2011 worth million\nTwins regular shortstop 2009\n---\n\"Nick Punto\"\nTwins' primary shortstop\nEquivalently, the exponent of a prime \"p\" in formula_3",
+      "em": 0.0,
+      "f1": 0.0
+    },
+    {
+      "question": "What was the motto of the Olympics that had Fuwa as the mascots?",
+      "gold": [
+        "One World, One Dream"
+      ],
+      "retrieved": "World Baseball\nplayed youth football\nyouth football with\n---\n, the pyramid height is zero)\nIf \"\"A\"\" is a finite set, this analysis does not apply (the density of a finite set is zero)",
+      "em": 0.0,
+      "f1": 0.0
+    }
+  ]
+}
